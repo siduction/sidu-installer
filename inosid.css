@@ -1,0 +1,102 @@
+@CHARSET "UTF-8";
+body {
+  background: #fffff0;
+  font-size: 12px;
+  margin: 1.5ex 1em;
+  background: orange;
+}
+#main_area{
+	width: 800px;
+	min-height: 400px;
+}
+#header{
+	height: 50px;
+	margin-top: 10px;
+	font-size: 20px;
+	background: #d3d3d3;
+	padding: 1em;
+	text-align: center;
+}
+#content{
+	background: #f3f3f3;
+	padding: 1em;
+}
+#content h1{
+	text-align: center;
+	color: orange;
+	font-size: 2em;
+}
+#text_area{
+	min-height: 500px;
+}
+.error_message{
+	color: red;
+}
+.center{
+	text-align: center;
+}
+.left_block{
+	float: left;
+	display: block;
+	margin-right: 1em;
+}
+.right_block{
+	float: right;
+	display: block;
+}
+.navigation{
+}
+.logo{
+}
+.button_one_only{
+	text-align: right;
+}
+.textblock{
+	padding: 1em;
+	margin: 0.5em;
+	border: 1px orange solid;
+	float: none;	
+}
+.warning{
+	font-weight: bold;
+}
+.col_label{
+	width: 10em;
+}
+table { empty-cells: show; }
+th { text-align: left; font-weight: bold; }
+
+table.table_col5 tr td { width: 20% }
+td { vertical-align: top; }
+.horicontal_line { border-top: 1px orange solid; margin-top: 1em; margin-bottom: 1em;}
+
+#table_partition_mount, #table_partition_partman, #table_partition_root{ 
+	width: 100%; 
+}
+/* ------ Plugin home ------- */
+.home_img_warning { 
+	margin-right: 1em; 
+	float: left; 
+}
+.home_img_usb {
+	margin-top: 5px;
+	margin-right: 1em; 
+}
+.home_button_usb {
+}
+/* ----- Plugin wait ------- */
+.wait_progress_frame{
+	width: 100%;
+	background-color: gray;
+	margin: 0;
+	border: black 1px solid;
+}
+.wait_progress{
+	background-color: orange;
+	text-align: center;
+	color: black;
+}
+
+.unused{
+	border: 1px red solid;
+}

@@ -1,0 +1,53 @@
+<div id="text_area">
+<h1>###txt_user_data###</h1>
+<div class="textblock">
+<table>
+	<tr>
+		<td class="col_label">###txt_root_password###:</td>
+		<td><input type="password" name="root_pass" value="###VAL_ROOT_PASS###" size="20" maxlength="20" />###ERROR_ROOT_PASS###
+		</td>
+		<td>###txt_desc_root_password###<br />###txt_desc_password###
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">###txt_root_again:</td>
+		<td><input type="password" name="root_pass2" value="###VAL_ROOT_PASS2###" size="20" maxlength="20" />###ERROR_ROOT_PASS2###
+		<td>###txt_desc_password2###
+		</td>
+		</td>
+	</tr>
+</table>
+</div>
+<div class="textblock">
+<table>
+	<tr>
+		<td class="col_label">###txt_real_name###:</td>
+		<td><input type="text" name="real_name" value="###VAL_REAL_NAME###" size="20" maxlength="20" />###ERROR_REAL_NAME###
+		</td>
+		<td>###txt_optional###
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">###txt_login_name###:</td>
+		<td><input type="text" name="name" value="###VAL_NAME###" size="20" maxlength="20" />###ERROR_NAME###
+		</td>
+		<td>###txt_desc_login###
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">###txt_password###:</td>
+		<td><input type="password" name="pass" value="###VAL_PASS###" size="20" maxlength="20" />###ERROR_PASS###
+		</td>
+		<td>###txt_desc_password###
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">###txt_again:</td>
+		<td><input type="password" name="pass2" value="###VAL_PASS2###" size="20" maxlength="20" />###ERROR_PASS2###
+		</td>
+		<td>###txt_desc_password2###
+		</td>
+	</tr>
+</table>
+</div>
+</div> <!-- text_area-->

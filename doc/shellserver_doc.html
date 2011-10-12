@@ -1,0 +1,165 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" type="text/css" href="doc.css">
+<title>Shell Server (Proposal)</title>
+</head>
+<body>
+<!---===TOC===-->
+<div class="toc">
+<ul>
+<li> <a href="#C1_">1.    Introduction</a></li>
+<li> <a href="#C2_">2.    Communication</a></li>
+<li> <a href="#C2_1_">2.1. Task "get current timezone"</a></li>
+<li> <a href="#C2_2_">2.2. options: </a></li>
+<li> <a href="#C2_3_">2.3. Tasks</a></li>
+<li> <a href="#C3_">3.    Conventions</a></li>
+<li> <a href="#C4_">4.    Local Installation</a></li>
+<li> <a href="#C4_1_">4.1.    Installing the Shell Server</a></li>
+<li> <a href="#C4_1_1_">4.1.1.  Webserver setup</a></li>
+<li> <a href="#C4_2_">4.2.    Starting the Shell Server</a></li>
+<li> <a href="#C4_3_">4.3.    Testing the Shell Server</a></li>
+<li> <a href="#C4_3_1_">4.3.1.   Stand Alone Test</a></li>
+<li> <a href="#C4_3_2_">4.3.2.   Integrated Test</a></li>
+</ul>
+</div>
+<!---===TOC===-->
+<h1><a name="C1_">1.</a>    Introduction</h1>
+<p>There is a problem in web applications for running long term services: 
+If the user change the page (URL) subprocesses will be killed.
+My idea to avoid this: an autonomous process for command execution.
+This process calls the backend shell scripts, so I called it "shell server".
+</p>
+<h1><a name="C2_">2.</a>    Communication</h1>
+<p>For a simple and quick implementation the communication is based on files.
+The client (the php program) writes a task definition file into the task input directory.
+This task contains an answer file, options, a command and optionally other parameters.
+The shell server poll for these files, executes the command 
+and remove the task definition file.
+The answer of the command is written to the given file.
+</p> 
+<h2><a name="C2_1_">2.1.</a> File Format"</h2>
+<pre>
+answer-file
+options
+command
+param1
+...
+</pre>
+
+<p><strong>Example:</strong><br/>
+The time zone data can be requested by the timezoneinfo command:<br/>
+The task file: /tmp/shellserver-tasks/s980118664291681150_127.0.0.1.1316641045.1.cmd
+</p>
+<pre>
+/home/wsl6/php/inosid/timezoneinfo.txt
+std
+timezoneinfo
+current
+</pre>
+<h2><a name="C2_2_">2.2.</a> options: </h2>
+<ul>
+<li>std: no effect. For documentation only.</li>
+<li>background: the process will be run in background</li>
+<li>source: the script is started in the current shell. Normally a subshell is called.</li> 
+</ul>
+<h2><a name="C2_3_">2.3.</a> Tasks</h2>
+<table border="1">
+<tr>
+<th>Command:</th>
+<th>Params:</th>
+<th>Description</th>
+</tr>
+<tr>
+<td>timezoneinfo</td>
+<td>current | all</td>
+<td><strong>current</strong>: the current timezone is returned, e.g. "Europe/Berlin"<br>
+<strong>all</strong>: The timezone data will be returned.
+</td>
+</tr>
+<tr>
+<td>startgui</td>
+<td>application param user opt</td>
+<td>Starts a GUI program. application is the executable, param the parameter of the program,
+user is the name of the user which gives the rights.<br/>
+opt: console: the program will be started in a console.</td>
+</tr>
+<tr>
+<td>partinfo</td>
+<td>-</td>
+<td>Return the partition info of the disks.</td>
+</tr>
+</table>
+<h1><a name="C3_">3.</a>    Conventions</h1>
+<ul>
+<li>The task definition file must have an unique filename: A good choice: prefix, session id, timestamp 
+and a current number and the extension ".cmd".</li>
+<li>The task definition files must have the extension ".cmd".</li>
+<li>The working directory of the shell server must contain the scripts. 
+Therefore the subdirectory backend is best.</li>
+<li>If the command is named "x" (in the task definition), the script's name must be "x.sh".</li>
+</ul>
+<h1><a name="C4_">4.</a>    Local Installation</h1>
+<h2><a name="C4_1_">4.1.</a>    Installing the Shell Server</h2>
+<ul>
+<li>Create a base directory: <code>mkdir ~/testinstall</code></li>
+<li>Make it to the working directory: <code>cd ~/testinstall</code></li>
+<li>Clone the repository: clone git://f-r-e-i.de/inosid</li>
+<li>Prepare your webserver: see below.It must know the directory ~/testinstall/inosid, e.g. as URL http://localinosid
+</ul>
+<h3><a name="C4_1_1_">4.1.1.</a>  Webserver setup</h3>
+<p>Include into /etc/hosts</p>
+<pre>
+127.0.0.2	localinosid
+</pre>
+<p>Add to <code>/etc/apache2/sites-available/default</code>:
+</p>
+<pre>
+&lt;VirtualHost *&gt;
+        ServerName  localinosid
+        ServerAdmin hamatoma@gmx.de
+        DocumentRoot /home/hm/testinstall/inosid
+        &lt;directory /home/hm/testinstall/inosid&gt;
+                Order allow,deny
+                Allow from all
+                Options Indexes MultiViews FollowSymLinks
+        &lt;/directory&gt;
+&lt;/VirtualHost&gt;
+</pre>
+<p>Load the new config: <code>/etc/init.d/apache2 reload</code>
+</p>
+<h2><a name="C4_2_">4.2.</a>    Starting the Shell Server</h2>
+<ul>
+<li>Go into backend directory: <code>cd ~/testinstall/backend</code></li>
+<li>Be root: <code>sudo -s</code></li>
+<li>Start the shell server: <code>./shellserver.sh -v</code></li>
+</ul>
+<h2><a name="C4_3_">4.3.</a>    Testing the Shell Server</h2>
+<h3><a name="C4_3_1_">4.3.1.</a>   Stand Alone Test</h3>
+Start a terminal:
+<pre><code>
+cd ~/testinstall/backend
+cat &lt;&lt;EOS &gt;tmp/shellserver-tasks/x1.cmd
+/tmp/timezones.txt
+timezoneinfo
+current
+EOS
+sleep 2
+cat tmp/timezones.txt
+</code>
+</pre>
+<p>You should see your current timezone.</p>
+<p>The output of the shell server should be the message:</p>
+<pre>
+timezoneinfo  current -&gt; /tmp/timezones.txt
+</pre>
+<h3><a name="C4_3_2_">4.3.2.</a>   Integrated Test</h3>
+<ul>
+<li>Open a browser: http://localinosid/install.php</li>
+<li>Click "next" to go to the rootfs page</li>
+<li>You must see now the local drives and partitions in the combo boxes. 
+This info is found out by the shell server.</li>
+</ul>
+</body>
+</html>

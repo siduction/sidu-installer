@@ -1,0 +1,28 @@
+<div id="text_area">
+<h1>###txt_welcome###</h1>
+<div class="textblock">
+<p>###txt_introduction###</p>
+<p>###txt_intro2###</p>
+</div> 
+<div class="textblock warning">
+<img class="home_img_warning" src="###URL_STATIC###images/warning.png" alt="###txt_alt_warning###" />
+<div>###txt_warning###<br />
+###txt_warning2###
+</div>
+</div>
+<div class="textblock">
+###txt_help###
+<ul>
+<li>###txt_chat###: <a href="http://irc.oftc.net"> irc.oftc.net ###txt_channel### #siduction</a></li>
+<li>###txt_forum###: <a href="http://forum.siduction.org"> http://forum.siduction.org</a></li>
+<li>###txt_wiki###: <a href="http://wiki.siduction.org"> http://wiki.siduction.org</a></li>
+</ul>
+</div>
+<div class="textblock">
+<div class="center">
+<img class="home_img_usb" src="###URL_STATIC###images/usbstick.png" alt="###txt_alt_usb###" />
+<input class="home_button_usb" type="submit" name="button_usb_install" value="###txt_usb_installer###" />
+</div>
+</div>
+</div> <!-- text_area-->
+

@@ -1,0 +1,45 @@
+<div id="text_area">
+<h1>###txt_bootloader###</h1>
+<div class="textblock">
+<p>###txt_description###
+</p>
+<table border="0">
+<tr><td class="col_label">###txt_manager###:</td>
+<td>
+<select name="loader" size="2">
+###OPT_LOADER###
+</select>
+</td>
+</tr>
+<tr><td class="col_label">###txt_target###:</td>
+<td>
+<select name="target" size="3">
+###OPT_TARGET###
+</select>
+</td>
+</tr>
+</table>
+</div>
+<div class="textblock">
+<table border="0">
+<tr>
+<td>###txt_region###:</td>
+<td>
+<select name="region" size="10">
+###OPT_REGION###
+</select>
+</td>
+<td>###txt_city###:</td>
+<td>
+<select name="city" size="10">
+###OPT_CITY###
+</select>
+</td>
+<td>
+<input type="submit" name="button_refresh" value="###txt_refresh###" />
+</td>
+</tr>
+</table>
+</div>
+</div> <!-- text_area-->
+
