@@ -1,3 +1,4 @@
+<div id="text_area">
 <h1>###txt_wait###</h1>
 <div class="textblock">
 ###txt_intro###
@@ -8,4 +9,5 @@
 ###PROGRESS###
 <div class="textblock center">
 <input type="submit" name="button_cancel" value="###txt_cancel###" />
+</div>
 </div>
