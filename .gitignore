@@ -1,0 +1,12 @@
+.buildpath
+.project
+.settings
+trace.txt
+*.~
+doxy/**/
+doc
+*~
+Dox.sh
+currenttimezone.txt
+timezoneinfo.txt
+tmp/*
