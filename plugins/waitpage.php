@@ -14,8 +14,8 @@ class WaitPage extends Page{
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'wait');
-		$sleep = $this->getConfiguration('refresh');
-		$session->metaDynamic = '<meta http-equiv="refresh" content="' . $sleep . '; URL="' . $session->urlForm . '/>';
+		$sleep = (int) $this->getConfiguration('refresh');
+		$session->metaDynamic = "<meta http-equiv=\"refresh\" content=\"$sleep; URL=" . $session->urlForm . '" />';
 	}
 	/** Builds the core content of the page.
 	 * 
@@ -38,10 +38,25 @@ class WaitPage extends Page{
 			$value = $this->getUserData('program');
 			$this->content = str_replace('###PROGRAM###', $value, $this->content);
 			$procent = -1;
+			$state = "";
 			if (! file_exists('/etc/inosid/demo_progress')){
 				$value = $this->getUserData('progress');
-				if (file_exists($value))
-					$procent = (int) $this->session->readFile($value);
+				if (file_exists($value)){
+					$progress = $this->session->readFile($value);
+					if (strpos($progress, "\t") > 0)
+						list($procent, $state) = explode("\t", $progress);
+					else {
+						$procent = $progress;
+						$state = '';
+					}
+					$procent = (int) $procent;
+					if (! empty($state)){
+						$progress = $this->getConfiguration('PROGRESS_STATE');
+						$state = str_replace('###STATE###',
+							htmlentities($state), $progress);
+					}
+					
+				}
 			} else {
 				$demoText = $this->getConfiguration('txt_demotext');
 				$value = $this->getUserData('demo.progress');
@@ -57,6 +72,7 @@ class WaitPage extends Page{
 				$value = $this->session->readFileFromBase('plugins/wait.progress.txt', false);
 				$value = str_replace('###PROCENT###', strval($procent) . '%', $value);
 				$value = str_replace('###WIDTH###', strval ($procent), $value);
+				$value = str_replace('###PROGRESS_STATE###', $state, $value);
 				$this->content = str_replace('###PROGRESS###', $value, $this->content);
 				$this->content = str_replace('###DEMO_TEXT###', $demoText, $this->content);
 			}

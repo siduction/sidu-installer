@@ -96,7 +96,11 @@ td { vertical-align: top; }
 	text-align: center;
 	color: black;
 }
-
+.progress_state{
+	text-align: left;
+	color: blue;
+	margin-top: 1em;
+}
 .unused{
 	border: 1px red solid;
 }

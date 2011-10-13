@@ -58,11 +58,15 @@ std
 timezoneinfo
 current
 </pre>
-<h2><a name="C2_2_">2.2.</a> options: </h2>
+<h2><a name="C2_2_">2.2.</a> Options</h2>
 <ul>
 <li>std: no effect. For documentation only.</li>
-<li>background: the process will be run in background</li>
-<li>source: the script is started in the current shell. Normally a subshell is called.</li> 
+<li>background: The process will be run in background.</li>
+<li>source: The script is started in the current shell. Normally a subshell is called.</li> 
+<li>requestfile: the script exspects only one parameter: the task definition file itself. Without this
+option the shellserver fetches the parameter from the task definition file and puts them as command arguments.
+In this case the script must remove the tast definition file.
+<li>
 </ul>
 <h2><a name="C2_3_">2.3.</a> Tasks</h2>
 <table border="1">
@@ -89,6 +93,25 @@ opt: console: the program will be started in a console.</td>
 <td>partinfo</td>
 <td>-</td>
 <td>Return the partition info of the disks.</td>
+</tr>
+<tr>
+<td>install</td>
+<td>task definition file (tdf)</td>
+<td>Fulfills the installation. The tdf contains the real parameter as variable assignments:<br />
+<strong>progress=</strong>&lt;progress file&gt; Example: <strong>/tmp/p9543943743.txt</strong><br />
+<strong>timezone=</strong>&lt;region&gt;/&lt;city&gt; Example: <strong>Europe/Berlin</strong><br />
+<strong>rootpart=</strong>&lt;root partition&gt; Example: <strong>/dev/sda3</strong><br />
+<strong>rootfs=</strong>&lt;root file system&gt; Example: <strong>ext4</strong><br />
+<strong>mounts=</strong>&lt;mount point definitions&gt; Example: <strong>/dev/sda3|/home|ext4|wd2t_home;/dev/sdb3|/tmp/var|btrfs|sm512_temp</strong><br />
+<strong>bootmanager=</strong>&lt;boot manager&gt; Example: <strong>-</strong> or <strong>grub</strong><br />
+<strong>bootdest=</strong>&lt;destination of the boot info&gt; Example: <strong>mbr</strong> (for master boot sector) or <strong>partition</strong><br />
+<strong>ssh=</strong>&lt;sshd should be started&gt; Example: <strong>0</strong> (for no) or <strong>1</strong> (for yes)<br />
+<strong>rootpw=</strong>&lt;root password&gt; Example: <strong>8935lf923</strong><br />
+<strong>username=</strong>&lt;user name&gt; Example: <strong>Jonny Weißmüller</strong><br />
+<strong>login=</strong>&lt;login name&gt; Example: <strong>jonny</strong><br />
+<strong>pw=</strong>&lt;user password&gt; Example: <strong>8935lf923</strong><br />
+<strong>hostname=</strong>&lt;host name&gt; Example: <strong>siductionbox</strong> <br />
+</td>
 </tr>
 </table>
 <h1><a name="C3_">3.</a>    Conventions</h1>

@@ -9,7 +9,7 @@ cat <<EOS >$CMD
 $ANSWER
 requestfile
 install
-progressfile=$PROGRESS
+progress=$PROGRESS
 timezone=Europe/Berlin
 rootpart=/dev/sda3
 rootfs=ext4

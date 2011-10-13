@@ -514,5 +514,31 @@ abstract class Page{
 		$this->session->gotoPage('wait', 'startwait');
 		return false;
 	}
-	
+	/** Gets the index of value in a list.
+	 * 
+	 * The value and the list are in the user data.
+	 * 
+	 * @param $page					name of the page
+	 * @param $keyOfCurrent			the key of the value in the user data
+	 * @param $keyOfListUserData	NULL or the key of the list in the user data
+	 * @param $keyOfListConfig		NULL or the key of the list in the configuration
+	 * @return -1: key is not in the list. Otherwise: the index in the list
+	 */
+	function indexOfList($page, $keyOfCurrent, $keyOfListUserData, $keyOfListConfig){
+		$value = $this->session->userData->getValue($page, $keyOfCurrent);
+		if ($keyOfListUserData != NULL)
+			$list = $this->session->userData->getValue($page, $keyOfListUserData);
+		else
+			$list = $this->session->configuration->getValue($page . '.' . $keyOfListConfig);
+		$list = explode(OPT_SEPARATOR, $list);
+		$rc = -1;
+		$count = count($list);
+		for ($ix = 0; $ix < $count; $ix++) {
+			if (strcmp($value, $list[$ix]) == 0){
+				$rc = $ix;
+				break;
+			}
+		}
+		return $rc;
+	}
 }

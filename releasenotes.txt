@@ -1,3 +1,7 @@
-V0.01: Summary: Initial state
-* Implements the functionality of the old frontend
+v0.01:
+Initial state
+
+v0.02:
+First running version
+* The v0.01 was not the newest version
 

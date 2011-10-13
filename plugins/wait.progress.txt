@@ -1,10 +1,10 @@
-<div class="textblock center">
-<br/>
-<div class="wait_progress_frame">
-<div class="wait_progress" style="width:###WIDTH###%">###PROCENT###
-</div>
-</div>
+<div class="textblock center"><!-- progress -->
+	<br/>
+	<div class="wait_progress_frame">
+	<div class="wait_progress" style="width:###WIDTH###%">###PROCENT###
+	</div>
+	</div>
+###PROGRESS_STATE###
 ###DEMO_TEXT###
-<br/>
-</div>
+	<br/>
 </div><!-- progress -->

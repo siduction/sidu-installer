@@ -1,5 +1,6 @@
 #! /bin/bash
 #set -x
+ARGS=$*
 DIR=$(pwd)/../tmp/shellserver-tasks
 SLEEP=1
 VERBOSE=
@@ -10,26 +11,35 @@ CMDDIR=$(pwd)
 function oneFile(){
 	FN=$1
 	mapfile -t <$FN LINES
-	rm $FN
 	ANSWER=${LINES[0]}
 	OPTS=${LINES[1]}
 	CMD=${LINES[2]}
-	IX=3
-	PARAM=
-	COUNT=${#LINES[@]}
-	while [ $IX -lt $COUNT ] ; do
-		if [ -z "${LINES[$IX]}" ] ; then
-			# multiple passes kill empty params:
-			PARAM="$PARAM ''"
-		else
-			PARAM="$PARAM ${LINES[$IX]}"
+	REQUSTFILE=
+	FOUND=$(echo $OPTS | grep -i requestfile)
+	if [ -n "$FOUND" ] ; then
+		PARAM=$(pwd)/$FN.IN_WORK
+		mv $FN $PARAM
+		FN=$PARAM
+	else
+		rm $FN
+		IX=3
+		PARAM=
+		COUNT=${#LINES[@]}
+		while [ $IX -lt $COUNT ] ; do
+			if [ -z "${LINES[$IX]}" ] ; then
+				# multiple passes kill empty params:
+				PARAM="$PARAM ''"
+			else
+				PARAM="$PARAM ${LINES[$IX]}"
+			fi
+			IX=$(expr $IX + 1)
+		done 
+		if [ "$VERBOSE" == "-v" ] ; then
+			echo "$CMD $PARAM -> $ANSWER OPTS: $OPTS"
 		fi
-		IX=$(expr $IX + 1)
-	done 
-	pushd $CMDDIR >>/dev/null
-	if [ "$VERBOSE" == "-v" ] ; then
-		echo "$CMD $PARAM -> $ANSWER OPTS: $OPTS"
 	fi
+	pushd $CMDDIR >>/dev/null
+	
 	SOURCE=
 	FOUND=$(echo $OPTS | grep -i source)
 	if [ -n "$FOUND" ] ; then
@@ -89,6 +99,9 @@ fi
 	
 while true ; do
 	poll
+	if [ "$1" == -1 -o "$2" == -1 ] ; then
+		exit
+	fi
 	sleep $SLEEP
 done
 
