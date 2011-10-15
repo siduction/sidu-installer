@@ -1,0 +1,81 @@
+<div id="text_area">
+<h1>###txt_title###</h1>
+<div class="textblock">
+<p>###txt_intro_partman###
+</p>
+<table id="table_partition_partman" class="table_col5">
+	<tr>
+		<td class="col_label">###txt_disk###:</td>
+		<td>
+		<select name="disk" size="1">
+		###OPT_DISK###
+		</select>
+		</td>
+		<td class="col_label">###txt_partman###:</td>
+		<td>
+		<select name="partman" size="1">
+		###OPT_PARTMAN###
+		</select>
+		</td>
+		<td>
+		<input type="submit" name="button_exec" value="###txt_exec###" />
+		</td>
+	</tr>
+</table>
+###ERROR_DISK###
+</div>
+<div class="textblock">
+<p>###txt_intro###
+</p>
+<table id="table_partition_root" class="table_col5">
+	<tr>
+		<td>###txt_root###:</td>
+		<td>
+		<select name="root" size="1">
+		###OPT_ROOT###
+		</select>
+		</td>
+		<td>###txt_filesys###:</td>
+		<td>
+		<select name="filesys" size="1">
+		###OPT_FILESYS###
+		</select>
+		</td>
+		<td></td>
+	</tr>
+</table>
+</div>
+<div class="textblock">
+<p>###txt_intro_info###
+</p>
+<table id="table_partition_root" class="table_col5">
+	<tr>
+		<td>###txt_disk###:</td>
+		<td>
+		<select name="disk2" size="1">
+		###OPT_DISK2###
+		</select>
+		</td>
+		<td>
+		<input type="submit" name="button_refresh" value="###txt_refresh###" />
+		</td>
+		<td></td>
+		<td></td>
+	</tr>
+</table>
+<div class="horicontal_line"></div>
+<table id="rootfs_part_info">
+	<tr>
+		<th>###txt_device###</th>
+		<th>###txt_label###</th>
+		<th>###txt_size###</th>
+		<th>###txt_parttype###</th>
+		<th>###txt_fs###</th>
+		<th>###txt_info###</th>
+	</tr>
+	###ROWS_PARTINFO###
+</table>
+</div>
+</div> <!-- text_area-->
+
+
