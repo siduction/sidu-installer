@@ -1,0 +1,14 @@
+Questions and Answers about fll-installer and installer-gui
+
+fll-installer:
+* call: fll-installer -i progress-fifo
+* includes (sources) $HOME/.sidconf
+* use usermod -p <pw> for modifying password
+
+installer-gui:
+* uses mkpasswd --method=SHA-256 for encryption
+* uses "dpkg-reconfigure locals" to set the timezone
+
+Questions:
+* Is there no usage of salt (encrpytion of password)?
+
