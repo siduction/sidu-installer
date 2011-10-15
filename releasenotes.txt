@@ -5,3 +5,9 @@ v0.02:
 First running version
 * The v0.01 was not the newest version
 
+v0.03:
+* Plugin wait: the min-height of the page was too short:
+** missing frame "text_area" added
+* Creation of a compatible config file (fullstory backend)
+
+
