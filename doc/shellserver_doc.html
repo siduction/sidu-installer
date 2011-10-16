@@ -9,29 +9,31 @@
 <!---===TOC===-->
 <div class="toc">
 <ul>
-<li> <a href="#C1_">1.    Introduction</a></li>
-<li> <a href="#C2_">2.    Communication</a></li>
-<li> <a href="#C2_1_">2.1. Task "get current timezone"</a></li>
-<li> <a href="#C2_2_">2.2. options: </a></li>
-<li> <a href="#C2_3_">2.3. Tasks</a></li>
-<li> <a href="#C3_">3.    Conventions</a></li>
-<li> <a href="#C4_">4.    Local Installation</a></li>
-<li> <a href="#C4_1_">4.1.    Installing the Shell Server</a></li>
-<li> <a href="#C4_1_1_">4.1.1.  Webserver setup</a></li>
-<li> <a href="#C4_2_">4.2.    Starting the Shell Server</a></li>
-<li> <a href="#C4_3_">4.3.    Testing the Shell Server</a></li>
-<li> <a href="#C4_3_1_">4.3.1.   Stand Alone Test</a></li>
-<li> <a href="#C4_3_2_">4.3.2.   Integrated Test</a></li>
+<li> <a href="#C1_">1.     Introduction</a></li>
+<li> <a href="#C2_">2.     Communication</a></li>
+<li> <a href="#C2_1_">2.1.  File Format"</a></li>
+<li> <a href="#C2_2_">2.2.  Options</a></li>
+<li> <a href="#C2_3_">2.3.  Tasks</a></li>
+<li> <a href="#C3_">3.     Conventions</a></li>
+<li> <a href="#C4_">4.     Local Installation</a></li>
+<li> <a href="#C4_1_">4.1.     Installing the Shell Server</a></li>
+<li> <a href="#C4_1_1_">4.1.1.   Webserver setup</a></li>
+<li> <a href="#C4_2_">4.2.     Starting the Shell Server</a></li>
+<li> <a href="#C4_3_">4.3.     Testing the Shell Server</a></li>
+<li> <a href="#C4_3_1_">4.3.1.    Stand Alone Test</a></li>
+<li> <a href="#C4_3_2_">4.3.2.    Integrated Test</a></li>
+<li> <a href="#C4_3_2_1_">4.3.2.1. Running a partition manager</a></li>
+<li> <a href="#C4_3_2_2_">4.3.2.2. Real Siduction installation</a></li>
 </ul>
 </div>
 <!---===TOC===-->
-<h1><a name="C1_">1.</a>    Introduction</h1>
+<h1><a name="C1_">1.</a>     Introduction</h1>
 <p>There is a problem in web applications for running long term services: 
 If the user change the page (URL) subprocesses will be killed.
 My idea to avoid this: an autonomous process for command execution.
 This process calls the backend shell scripts, so I called it "shell server".
 </p>
-<h1><a name="C2_">2.</a>    Communication</h1>
+<h1><a name="C2_">2.</a>     Communication</h1>
 <p>For a simple and quick implementation the communication is based on files.
 The client (the php program) writes a task definition file into the task input directory.
 This task contains an answer file, options, a command and optionally other parameters.
@@ -39,7 +41,7 @@ The shell server poll for these files, executes the command
 and remove the task definition file.
 The answer of the command is written to the given file.
 </p> 
-<h2><a name="C2_1_">2.1.</a> File Format"</h2>
+<h2><a name="C2_1_">2.1.</a>  File Format"</h2>
 <pre>
 answer-file
 options
@@ -58,7 +60,7 @@ std
 timezoneinfo
 current
 </pre>
-<h2><a name="C2_2_">2.2.</a> Options</h2>
+<h2><a name="C2_2_">2.2.</a>  Options</h2>
 <ul>
 <li>std: no effect. For documentation only.</li>
 <li>background: The process will be run in background.</li>
@@ -66,9 +68,9 @@ current
 <li>requestfile: the script exspects only one parameter: the task definition file itself. Without this
 option the shellserver fetches the parameter from the task definition file and puts them as command arguments.
 In this case the script must remove the tast definition file.
-<li>
+</li>
 </ul>
-<h2><a name="C2_3_">2.3.</a> Tasks</h2>
+<h2><a name="C2_3_">2.3.</a>  Tasks</h2>
 <table border="1">
 <tr>
 <th>Command:</th>
@@ -114,7 +116,7 @@ opt: console: the program will be started in a console.</td>
 </td>
 </tr>
 </table>
-<h1><a name="C3_">3.</a>    Conventions</h1>
+<h1><a name="C3_">3.</a>     Conventions</h1>
 <ul>
 <li>The task definition file must have an unique filename: A good choice: prefix, session id, timestamp 
 and a current number and the extension ".cmd".</li>
@@ -123,15 +125,15 @@ and a current number and the extension ".cmd".</li>
 Therefore the subdirectory backend is best.</li>
 <li>If the command is named "x" (in the task definition), the script's name must be "x.sh".</li>
 </ul>
-<h1><a name="C4_">4.</a>    Local Installation</h1>
-<h2><a name="C4_1_">4.1.</a>    Installing the Shell Server</h2>
+<h1><a name="C4_">4.</a>     Local Installation</h1>
+<h2><a name="C4_1_">4.1.</a>     Installing the Shell Server</h2>
 <ul>
 <li>Create a base directory: <code>mkdir ~/testinstall</code></li>
 <li>Make it to the working directory: <code>cd ~/testinstall</code></li>
 <li>Clone the repository: clone git://f-r-e-i.de/inosid</li>
 <li>Prepare your webserver: see below.It must know the directory ~/testinstall/inosid, e.g. as URL http://localinosid
 </ul>
-<h3><a name="C4_1_1_">4.1.1.</a>  Webserver setup</h3>
+<h3><a name="C4_1_1_">4.1.1.</a>   Webserver setup</h3>
 <p>Include into /etc/hosts</p>
 <pre>
 127.0.0.2	localinosid
@@ -152,14 +154,15 @@ Therefore the subdirectory backend is best.</li>
 </pre>
 <p>Load the new config: <code>/etc/init.d/apache2 reload</code>
 </p>
-<h2><a name="C4_2_">4.2.</a>    Starting the Shell Server</h2>
+<h2><a name="C4_2_">4.2.</a>     Starting the Shell Server</h2>
 <ul>
+<li>Edit the <strong>$HOME/.shellserverrc</strong>: FLL_SEARCHPATH=&lt;path_to_fll_installer&gt;
 <li>Go into backend directory: <code>cd ~/testinstall/backend</code></li>
 <li>Be root: <code>sudo -s</code></li>
 <li>Start the shell server: <code>./shellserver.sh -v</code></li>
 </ul>
-<h2><a name="C4_3_">4.3.</a>    Testing the Shell Server</h2>
-<h3><a name="C4_3_1_">4.3.1.</a>   Stand Alone Test</h3>
+<h2><a name="C4_3_">4.3.</a>     Testing the Shell Server</h2>
+<h3><a name="C4_3_1_">4.3.1.</a>    Stand Alone Test</h3>
 Start a terminal:
 <pre><code>
 cd ~/testinstall/backend
@@ -177,12 +180,23 @@ cat tmp/timezones.txt
 <pre>
 timezoneinfo  current -&gt; /tmp/timezones.txt
 </pre>
-<h3><a name="C4_3_2_">4.3.2.</a>   Integrated Test</h3>
+<h3><a name="C4_3_2_">4.3.2.</a>    Integrated Test</h3>
+<h4><a name="C4_3_2_1_">4.3.2.1.</a> Running a partition manager</h4>
 <ul>
+<li>Ensure the shellserver is running.</li>
 <li>Open a browser: http://localinosid/install.php</li>
-<li>Click "next" to go to the rootfs page</li>
-<li>You must see now the local drives and partitions in the combo boxes. 
-This info is found out by the shell server.</li>
+<li>Click next to be on the rootfs page.</li>
+<li>Choose a disk and a partition manager</li>
+<li>Click the [execute] button.</li>
+</ul>
+<p>The partition manager program, e.g. fdisk, should start and the wait page should be shown until this external program is running.
+</p>
+<h4><a name="C4_3_2_2_">4.3.2.2.</a> Real Siduction installation</h4>
+<ul>
+<li>Ensure the shellserver is running.</li>
+<li>Open a browser: http://localinosid/install.php</li>
+<li>Fill in all data and click "next" until the last page is shown</li>
+<li>Click [save config and install] button.</li>
 </ul>
 </body>
 </html>
