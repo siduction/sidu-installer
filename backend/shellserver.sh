@@ -3,9 +3,9 @@
 ARGS=$*
 DIR=$(pwd)/../tmp/shellserver-tasks
 SLEEP=1
-VERBOSE=
-TRACE_ON=
-TRACE_OFF=
+export VERBOSE=
+export TRACE_ON=
+export TRACE_OFF=
 CMDDIR=$(pwd)
 
 function oneFile(){
@@ -92,9 +92,9 @@ if [ ! -d $DIR ] ; then
 fi
 cd $DIR
 if [ "$1" == "-v" ] ; then
-	VERBOSE=-v
-	TRACE_ON="set -x"
-	TRACE_OFF="set +x"
+	export VERBOSE=-v
+	export TRACE_ON="set -x"
+	export TRACE_OFF="set +x"
 fi
 	
 while true ; do
