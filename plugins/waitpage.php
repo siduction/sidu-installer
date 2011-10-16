@@ -37,10 +37,10 @@ class WaitPage extends Page{
 				if (strcasecmp($cols[0], "PERC") == 0){
 					$this->setUserData("progress.procent", $cols[1]);
 				} elseif (strcasecmp($cols[0], "CURRENT") == 0){
-					$this->setUserData("progress.text", $cols[1]);
+					$this->setUserData("progress.description", $cols[1]);
 				} elseif (strcasecmp($cols[0], "COMPLETE") == 0){
 					$cols = explode(' ', $cols[1]);
-					$this->setUserData("progress.current", $cols[1]);
+					$this->setUserData("progress.ix", $cols[1]);
 					$this->setUserData("progress.max", $cols[3]);
 				} else if (count($cols) > 1) {
 					$this->progressText = "unknown content of $file: $line";
@@ -76,7 +76,7 @@ class WaitPage extends Page{
 				if (file_exists($file)){
 					$this->readProgress($session, $file);
 					$procent = (int) $this->getUserData('progress.procent');
-					$state = $this->getUserData('progress.text');
+					$state = $this->getUserData('progress.description');
 					if (! empty($state)){
 						$progress = $this->getConfiguration('PROGRESS_STATE');
 						$state = str_replace('###STATE###',
