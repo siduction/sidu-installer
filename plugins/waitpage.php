@@ -7,7 +7,6 @@
  * @author hm
  */
 class WaitPage extends Page{
-	
 	/** Constructor.
 	 * 
 	 * @param $session
@@ -16,6 +15,39 @@ class WaitPage extends Page{
 		parent::__construct($session, 'wait');
 		$sleep = (int) $this->getConfiguration('refresh');
 		$session->metaDynamic = "<meta http-equiv=\"refresh\" content=\"$sleep; URL=" . $session->urlForm . '" />';
+	}
+	/** Reads one entry of the progress file.
+	 * 
+	 * One entry have 3 lines:
+	 * PERC=30
+	 * CURRENT=<b>Partition created</b>
+	 * COMPLETE=completed 3 of 20
+	 * @param $session
+	 * @param $file		Name of the progress file 
+	 */ 
+	function readProgress(&$session, $file){
+		$fp = fopen($file, "r");
+		if ($fp){
+			$line = "";
+			while($line = fgets($fp, 16000)){
+				$line = chop($line);
+				if (empty($line))
+					break;
+				$cols = explode('=', $line, 2);
+				if (strcasecmp($cols[0], "PERC") == 0){
+					$this->setUserData("progress.procent", $cols[1]);
+				} elseif (strcasecmp($cols[0], "CURRENT") == 0){
+					$this->setUserData("progress.text", $cols[1]);
+				} elseif (strcasecmp($cols[0], "COMPLETE") == 0){
+					$cols = explode(' ', $cols[1]);
+					$this->setUserData("progress.current", $cols[1]);
+					$this->setUserData("progress.max", $cols[3]);
+				} else if (count($cols) > 1) {
+					$this->progressText = "unknown content of $file: $line";
+				}
+			}
+			fclose($fp);
+		}
 	}
 	/** Builds the core content of the page.
 	 * 
@@ -40,20 +72,15 @@ class WaitPage extends Page{
 			$procent = -1;
 			$state = "";
 			if (! file_exists('/etc/inosid/demo_progress')){
-				$value = $this->getUserData('progress');
-				if (file_exists($value)){
-					$progress = $this->session->readFile($value);
-					if (strpos($progress, "\t") > 0)
-						list($procent, $state) = explode("\t", $progress);
-					else {
-						$procent = $progress;
-						$state = '';
-					}
-					$procent = (int) $procent;
+				$file = $this->getUserData('progress');
+				if (file_exists($file)){
+					$this->readProgress($session, $file);
+					$procent = (int) $this->getUserData('progress.procent');
+					$state = $this->getUserData('progress.text');
 					if (! empty($state)){
 						$progress = $this->getConfiguration('PROGRESS_STATE');
 						$state = str_replace('###STATE###',
-							htmlentities($state), $progress);
+							$state, $progress);
 					}
 					
 				}

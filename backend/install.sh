@@ -7,9 +7,10 @@ ANSWER=$1
 PARAMFILE=$2
 
 mapfile -t <$PARAMFILE LINES
-rm $PARAMFILE
 PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
-
+CONFIGFILE=$(echo ${LINES[4]} | sed -e 's/\n//; s/configfile=//i;')
+rm $PARAMFILE
+test -n "$VERBOSE" && echo "Config: $CONFIGFILE"
 function simulation(){
 	echo "Progress: '$PROGRESSFILE'"
 	
@@ -20,8 +21,12 @@ function simulation(){
 		if [ -z "$ACTION" ] ; then
 			ACTION="action $X"
 		fi
-		echo -e "$PROCENT\t$ACTION" >$PROGRESSFILE
-		cat $PROGRESSFILE
+		cat <<EOS >$PROGRESSFILE
+PERC=$PROCENT
+CURRENT=<b>$ACTION</b>
+COMPLETE=completed $X of 20
+EOS
+		test -n "$VERBOSE" && echo "$PROCENT %"
 		sleep 1
 		X=$(expr $X + 1)
 	done
