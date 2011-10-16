@@ -4,7 +4,6 @@
 trace.txt
 *.~
 doxy/**/
-doc
 *~
 Dox.sh
 currenttimezone.txt
