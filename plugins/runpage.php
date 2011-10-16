@@ -56,6 +56,12 @@ class RunPage extends Page{
 		
 		$curValue = $this->session->userData->getValue('rootfs', 'root');
 		$params[] = "rootpart=$curValue";
+		$lines[] = "# Here the sidux-System will be installed";
+		$lines[] = "# This value will be checked by function module_hd_check";
+		$lines[] = "HD_CHOICE='$curValue'";
+		$lines[] = "";
+		
+		
 		$lines[] = "# Determines if the HD should be formatted. (mkfs.*)";
 		$lines[] = "# Possible are: yes|no";
 		$lines[] = "# Default value is: yes";
@@ -74,12 +80,6 @@ class RunPage extends Page{
 		$lines[] = "# Default value is: ext4";
 		$lines[] = "HD_FSTYPE='$curValue'";
 
-		$curValue = $ix <= 0 ? 'no' : 'yes';
-		$lines[] = "# Here the sidux-System will be installed";
-		$lines[] = "# This value will be checked by function module_hd_check";
-		$lines[] = "HD_CHOICE='$curValue'";
-		$lines[] = "";
-		
 		$count = $this->session->userData->getValue('mountpoint', 'mounts.rowcount');
 		$mounts = '';
 		$map = "";
@@ -93,6 +93,12 @@ class RunPage extends Page{
 		$params[] = substr($mounts, 1);
 		$lines[] = "# Here you can give additional mappings. (Experimental) You need to have the partitions formatted yourself and give the correct mappings like: /dev/hda4:/boot /dev/hda5:/var /dev/hda6:/tmp";
 		$lines[] = "HD_MAP='$map'";
+		$lines[] = "";
+		
+		$lines[] = "# If set to yes, the program will NOT check if there is enough space to install sidux on the selected partition(s). Use at your own risk! Useful for example with HD_MAP if you only have a small root partition.";
+		$lines[] = "# Possible are: yes|no";
+		$lines[] = "# Default value is: no";
+		$lines[] = "HD_IGNORECHECK='no'";
 		$lines[] = "";
 		
 		$lines[] = "SWAP_MODULE='configured'";
@@ -183,6 +189,8 @@ class RunPage extends Page{
 		$lines[] = "# mount partitions on boot. Default value is: yes";
 		$lines[] = "HD_AUTO='yes'";
 		$lines[] = "";
+
+
 		$configFile = fopen($shellConfig, "w");
 		foreach ($lines as $key => $val) {
 			$val .= "\n";
