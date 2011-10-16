@@ -7,6 +7,8 @@ export VERBOSE=
 export TRACE_ON=
 export TRACE_OFF=
 CMDDIR=$(pwd)
+# Customization
+test -e $HOME/.shellserverrc && source $HOME/.shellserverrc
 
 function oneFile(){
 	FN=$1
