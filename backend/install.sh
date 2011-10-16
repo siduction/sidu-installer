@@ -6,11 +6,16 @@
 ANSWER=$1
 PARAMFILE=$2
 
+if [ -z "$FLL_SEARCHPATH" ] ; then
+	FLL_SEARCHPATH=$(which fll-installer)
+fi
+
 mapfile -t <$PARAMFILE LINES
 PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
 CONFIGFILE=$(echo ${LINES[4]} | sed -e 's/\n//; s/configfile=//i;')
 rm $PARAMFILE
 test -n "$VERBOSE" && echo "Config: $CONFIGFILE"
+
 function simulation(){
 	echo "Progress: '$PROGRESSFILE'"
 	
@@ -33,5 +38,30 @@ EOS
 	rm $PROGRESSFILE
 	touch $ANSWER
 }
-simulation
+
+function fll_install(){
+	CONFIG=$HOME/.sidconf
+	mv $CONFIGFILE $CONFIG
+	# @todo: replacing password
+	local P
+	P=$(grep USERPASS_CRYPT= $CONFIG | sed "s/USERPASS_CRYPT='//; s/'$//")
+	HASH=$(mkpasswd --method=sha-256 $P)
+	sed -i "s%USERPASS_CRYPT=.*\$%USERPASS_CRYPT='$HASH'%;" $CONFIG
+	
+	P=$(grep ROOTPASS_CRYPT= $CONFIG | sed "s/ROOTPASS_CRYPT='//; s/'$//;")
+	HASH=$(mkpasswd --method=sha-256 $P)
+	sed -i "s%ROOTPASS_CRYPT=.*\$%ROOTPASS_CRYPT='$HASH'%;" $CONFIG
+	
+	pushd $FLL_SEARCHPATH
+	test -n "$VERBOSE" && echo "progress: $PROGRESSFILE"
+	cat <<EOS >$PROGRESSFILE
+PERC=1
+CURRENT=<b>Initialization</b>
+COMPLETE=completed 0 of 10
+EOS
+
+	./fll-installer -i $PROGRESSFILE
+}
+
+fll_install
 
