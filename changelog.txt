@@ -10,4 +10,7 @@ v0.03:
 ** missing frame "text_area" added
 * Creation of a compatible config file (fullstory backend)
 
+v0.04:
+* change URL encoding: install.php/home -> install.php?page=home
+
 

@@ -108,7 +108,7 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'rootfs';
+		$page = 'wait';
 		$_SERVER = array();
 		$_SERVER['HTTP_HOST'] = 'ino.ant';
 		$_SERVER['DOCUMENT_ROOT'] = '/home/wsl6/php/inosid';
@@ -126,7 +126,7 @@ class Session{
 		$_SERVER["REQUEST_METHOD"] = 'get';
 		
 		//$_POST['button_cancel'] = 'x';
-		$_POST['button_exec'] = 'x';
+		//$_POST['button_install'] = 'x';
 		
 		$_POST['root_pass'] = '123456';
 		$_POST['root_pass2'] = '123456';
@@ -160,10 +160,12 @@ class Session{
 		$this->homeDir = $parts['dir'];
 		$this->scriptUrl = $_SERVER['SCRIPT_NAME'];
 		$this->requestUri = $_SERVER['REQUEST_URI'];
-		if (! isset($_SERVER['PATH_INFO']) || empty($_SERVER['PATH_INFO']))
-			$this->page = 'home';
-		else 
+		if (isset($_SERVER['PATH_INFO']) && ! empty($_SERVER['PATH_INFO']))
 			$this->page = substr($_SERVER['PATH_INFO'], 1);
+		elseif (isset($_GET["page"]) && ! empty($_GET["page"]))
+			$this->page = $_GET["page"];
+		else 
+			$this->page = 'home';
 		$this->domain = $_SERVER['HTTP_HOST'];
 		$parts = $this->splitFile($this->scriptUrl);
 		$this->urlStatic = 'http://' . $this->domain . $parts['dir'];
@@ -361,7 +363,7 @@ class Session{
 	 */
 	function gotoPage($url, $from){
 		$this->userData->write();
-		$header = 'Location: http://' . $this->domain . $this->scriptUrl . '/' . $url;
+		$header = 'Location: http://' . $this->domain . $this->scriptUrl . '?page=' . $url;
 		$this->trace(TRACE_RARE, "gotoPage($from): $url -> $header");
 		header($header);
 		exit;
