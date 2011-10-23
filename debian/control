@@ -1,0 +1,20 @@
+Source: sidu-installer
+Section: admin
+Priority: optional
+Maintainer: Hamatoma <inosid@hm.f-r-e-i.de>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.2
+Homepage: http://siduction.org
+#Vcs-Git: git://git.debian.org/collab-maint/sidu-installer.git
+Vcs-Browser: http://git.siduction.org
+
+Package: sidu-installer
+Architecture: all
+Depends: ${shlibs:Depends}, ${misc:Depends},
+	fll-installer
+Suggests: gparted
+Description: GUI for the siduction installer
+ sidu-installer provides a graphical user interface for the siduction installer.
+ This installer can be started on from the live linux system to install the 
+ system to a harddisk.
+

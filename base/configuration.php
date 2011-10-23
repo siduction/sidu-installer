@@ -22,7 +22,7 @@ class Configuration{
 	 */
 	function __construct(&$session){
 		$this->filename = $session->findFileByLanguage('inosid.conf', 
-			$session->language);
+			'base/');
 		$this->makros = NULL;
 		$this->session = $session;
 		$this->read();

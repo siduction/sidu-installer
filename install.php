@@ -4,10 +4,10 @@
  */
 set_magic_quotes_runtime(0);
 error_reporting(E_ALL);
-include "session.php";
-include "page.php";
-include "userdata.php";
-include "configuration.php";
+include "base/session.php";
+include "base/page.php";
+include "base/userdata.php";
+include "base/configuration.php";
 
 $session = new Session();
 $wait = $session->userData->getValue('wait', 'answer');

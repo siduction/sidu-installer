@@ -374,7 +374,7 @@ abstract class Page{
 	/** Reads the template for the content area of the current plugin.
 	 */
 	function readContentTemplate(){
-		$this->content = $this->session->readFileFromBase('plugins/' . $this->name . '.content.txt', true);
+		$this->content = $this->session->readFileFromPlugin($this->name . '.content.txt', true);
 	}
 	/** Gets the count of rows of a given table.
 	 * 

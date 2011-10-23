@@ -11,6 +11,11 @@ v0.03:
 * Creation of a compatible config file (fullstory backend)
 
 v0.04:
-* change URL encoding: install.php/home -> install.php?page=home
-
+* Change URL encoding: install.php/home -> install.php?page=home
+* Debianization + packaging: new subdirectory structure 
+** subdirs: + base/, + debian/)
+** files moved to base/: *.php (except install.php), *.conf, *.css, *.html
+** file moved to images/: siduction_logo.png
+** new function readFileFromPlugin()
+** additional paramter subdir: buildNameWithLanguage(), findFileByLanguage()
 

@@ -1,0 +1,5 @@
+install.php	usr/share/sidu-installer/
+base		usr/share/sidu-installer/
+plugins		usr/share/sidu-installer/
+backend		usr/share/sidu-installer/
+data		var/cache/sidu-installer/

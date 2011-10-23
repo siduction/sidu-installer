@@ -96,7 +96,7 @@ class WaitPage extends Page{
 			else {
 				if ($procent > 100)
 					$this->stop('wait.100%');
-				$value = $this->session->readFileFromBase('plugins/wait.progress.txt', false);
+				$value = $this->session->readFileFromPlugin('wait.progress.txt', false);
 				$value = str_replace('###PROCENT###', strval($procent) . '%', $value);
 				$value = str_replace('###WIDTH###', strval ($procent), $value);
 				$value = str_replace('###PROGRESS_STATE###', $state, $value);

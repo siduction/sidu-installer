@@ -108,7 +108,7 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'wait';
+		$page = 'home';
 		$_SERVER = array();
 		$_SERVER['HTTP_HOST'] = 'ino.ant';
 		$_SERVER['DOCUMENT_ROOT'] = '/home/wsl6/php/inosid';
@@ -313,13 +313,14 @@ class Session{
 	/** Builds an absolute filename with a given language code.
 	 * 
 	 * @param $name 	the filename with path
+	 * @param $subDir	the subdirectory of the file
 	 * @param $lang		the language code
 	 * @return the filename completed with the language code
 	 */
-	function buildNameWithLanguage($name, $lang){
+	function buildNameWithLanguage($name, $subDir, $lang){
 		$parts = $this->splitFile($name);
 		$dir = $parts['dir'];
-		$filename = $this->homeDir . $parts['dir'] 
+		$filename = $this->homeDir . $subDir . $parts['dir'] 
 			. $parts['name'] . "_" . $lang
 			. $parts['ext'];
 		$this->trace(TRACE_FINE, 'buildNameWithLanguage: ' . $filename);
@@ -327,16 +328,17 @@ class Session{
 	}
 	/** Returns a filename for the given language.
 	 *
-	 * @param $name the relative filename without language part
+	 * @param $name 	the filename without language part
+	 * @param $subDir	the subdirectory of the file
 	 * @return the filename with language code (if exists)
 	 */
-	function findFileByLanguage($name){
+	function findFileByLanguage($name, $subDir){
 		// We look for a filename containing the language code:
-		$filename = $this->buildNameWithLanguage($name, $this->language);
+		$filename = $this->buildNameWithLanguage($name, $subDir, $this->language);
 		if (! file_exists($filename))
-			$filename = $this->buildNameWithLanguage($name, 'en');
+			$filename = $this->buildNameWithLanguage($name, $subDir, 'en');
 		if (! file_exists($filename))
-			$filename = $this->homeDir . $name;
+			$filename = $this->homeDir . $subDir . $name;
 		return $filename;
 		
 	}
@@ -349,10 +351,26 @@ class Session{
 	function readFileFromBase($name, $useLanguage){
 		$this->trace(TRACE_CONFIG, 'readFileFromBase: ' . $name);
 		if (! $useLanguage)
-			$filename = $this->homeDir . $name;
+			$filename = $this->homeDir . 'base/' . $name;
 		else{
 			// We look for a filename containing the language code:
-			$filename = $this->findFileByLanguage($name);
+			$filename = $this->findFileByLanguage($name, 'base/');
+		}
+		return $this->readFile($filename);
+	}
+	/** Reads a file laying in the base directory.
+	 * 
+	 * @param $name 		the filename without a path
+	 * @param $useLanguage	true: the filename can contain the language code.
+	 * @return the content of the file
+	 */
+	function readFileFromPlugin($name, $useLanguage){
+		$this->trace(TRACE_CONFIG, 'readFileFromPlugin: ' . $name);
+		if (! $useLanguage)
+			$filename = $this->homeDir . 'plugins/' . $name;
+		else{
+			// We look for a filename containing the language code:
+			$filename = $this->findFileByLanguage($name, 'plugins/');
 		}
 		return $this->readFile($filename);
 	}
@@ -363,7 +381,7 @@ class Session{
 	 */
 	function gotoPage($url, $from){
 		$this->userData->write();
-		$header = 'Location: http://' . $this->domain . $this->scriptUrl . '?page=' . $url;
+		$header = 'Location: http:../install.php' . '?page=' . $url;
 		$this->trace(TRACE_RARE, "gotoPage($from): $url -> $header");
 		header($header);
 		exit;
