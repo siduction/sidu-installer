@@ -5,13 +5,13 @@ Maintainer: Hamatoma <inosid@hm.f-r-e-i.de>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.2
 Homepage: http://siduction.org
-#Vcs-Git: git://git.debian.org/collab-maint/sidu-installer.git
-Vcs-Browser: http://git.siduction.org
+Vcs-Git: git3@git.siduction.org:packages/siduction-repository/sidu-installer
+Vcs-Browser: http://git.siduction.org/?p=packages/siduction-repository/sidu-installer.git;a=summary
 
 Package: sidu-installer
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends},
-	fll-installer
+Depends: ${shlibs:Depends}, ${misc:Depends}
+#	fll-installer
 Suggests: gparted
 Description: GUI for the siduction installer
  sidu-installer provides a graphical user interface for the siduction installer.

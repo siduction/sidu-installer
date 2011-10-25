@@ -8,4 +8,4 @@ doxy/**/
 Dox.sh
 currenttimezone.txt
 timezoneinfo.txt
-tmp/*
+debian/sidu-installer.debhelper.log
