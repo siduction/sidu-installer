@@ -34,15 +34,21 @@ class WaitPage extends Page{
 				if (empty($line))
 					break;
 				$cols = explode('=', $line, 2);
-				if (strcasecmp($cols[0], "PERC") == 0){
-					$this->setUserData("progress.procent", $cols[1]);
-				} elseif (strcasecmp($cols[0], "CURRENT") == 0){
-					$this->setUserData("progress.description", $cols[1]);
-				} elseif (strcasecmp($cols[0], "COMPLETE") == 0){
+				if (strcasecmp($cols[0], 'PERC') == 0){
+					$procent = $cols[1];
+						// fll-installer returns a factor: 0.95 == 95%
+					if (strncmp($procent, '0.', 2) == 0)
+						$procent = strval(intval(floatval($procent) * 100));
+					$this->setUserData('progress.procent', $procent);
+				} elseif (strcasecmp($cols[0], 'CURRENT') == 0){
+					$this->setUserData('progress.description', $cols[1]);
+				} elseif (strcasecmp($cols[0], 'COMPLETE') == 0){
 					$cols = explode(' ', $cols[1]);
-					$this->setUserData("progress.ix", $cols[1]);
-					$this->setUserData("progress.max", $cols[3]);
-				} else if (count($cols) > 1) {
+					$this->setUserData('progress.ix', $cols[1]);
+					$this->setUserData('progress.max', $cols[3]);
+				} elseif (strcasecmp($cols[0], 'end') == 0){
+					$this->setUserData('progress.procent', '100');
+				} elseif (count($cols) > 1) {
 					$this->progressText = "unknown content of $file: $line";
 				}
 			}

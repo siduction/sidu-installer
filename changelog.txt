@@ -22,4 +22,8 @@ v0.04:
 * .gitignore adapted: generated files of dpkg-buildpackage. tmp moved to /var/lib/sidu-installer
 * debian control: VCS info corrected. Dependancy reduces (enables test installation)
 * new: ./files, sidu-installer.substvars (dpkg-buildpackage)
+* shellserver.sh: config file in /etc/sidu-installer. Creating and chmod of task directory.
+* install.sh: configfile from /etc/sidu-installer Fix: building answer file, removing progress file
+* temporary files now in /var/lib/sidu-installer
+* format of the progress file: may be a factor (0..1.0) instead of procent. "end" means 100%
 
