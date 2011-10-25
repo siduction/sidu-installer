@@ -52,10 +52,10 @@ param1
 
 <p><strong>Example:</strong><br/>
 The time zone data can be requested by the timezoneinfo command:<br/>
-The task file: /tmp/shellserver-tasks/s980118664291681150_127.0.0.1.1316641045.1.cmd
+The task file: /var/lib/sidu-installer/shellserver-tasks/s980118664291681150_127.0.0.1.1316641045.1.cmd
 </p>
 <pre>
-/home/wsl6/php/inosid/timezoneinfo.txt
+/var/lib/sidu-installer/timezoneinfo.txt
 std
 timezoneinfo
 current
@@ -100,7 +100,7 @@ opt: console: the program will be started in a console.</td>
 <td>install</td>
 <td>task definition file (tdf)</td>
 <td>Fulfills the installation. The tdf contains the real parameter as variable assignments:<br />
-<strong>progress=</strong>&lt;progress file&gt; Example: <strong>/tmp/p9543943743.txt</strong><br />
+<strong>progress=</strong>&lt;progress file&gt; Example: <strong>/var/lib/sidu-installer/p9543943743.txt</strong><br />
 <strong>timezone=</strong>&lt;region&gt;/&lt;city&gt; Example: <strong>Europe/Berlin</strong><br />
 <strong>rootpart=</strong>&lt;root partition&gt; Example: <strong>/dev/sda3</strong><br />
 <strong>rootfs=</strong>&lt;root file system&gt; Example: <strong>ext4</strong><br />
@@ -166,19 +166,19 @@ Therefore the subdirectory backend is best.</li>
 Start a terminal:
 <pre><code>
 cd ~/testinstall/backend
-cat &lt;&lt;EOS &gt;tmp/shellserver-tasks/x1.cmd
-/tmp/timezones.txt
+cat &lt;&lt;EOS &gt;/var/lib/sidu-installer/shellserver-tasks/x1.cmd
+/var/lib/sidu-installer/timezones.txt
 timezoneinfo
 current
 EOS
 sleep 2
-cat tmp/timezones.txt
+cat /var/lib/sidu-installer/timezones.txt
 </code>
 </pre>
 <p>You should see your current timezone.</p>
 <p>The output of the shell server should be the message:</p>
 <pre>
-timezoneinfo  current -&gt; /tmp/timezones.txt
+timezoneinfo  current -&gt; /var/lib/sidu-installer/timezones.txt
 </pre>
 <h3><a name="C4_3_2_">4.3.2.</a>    Integrated Test</h3>
 <h4><a name="C4_3_2_1_">4.3.2.1.</a> Running a partition manager</h4>

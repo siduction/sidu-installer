@@ -26,4 +26,4 @@ v0.04:
 * install.sh: configfile from /etc/sidu-installer Fix: building answer file, removing progress file
 * temporary files now in /var/lib/sidu-installer
 * format of the progress file: may be a factor (0..1.0) instead of procent. "end" means 100%
-
+* Fix: timezoneinfo.txt will be created in ${tempdir}
