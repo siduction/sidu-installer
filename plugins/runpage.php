@@ -56,7 +56,7 @@ class RunPage extends Page{
 		
 		$curValue = $this->session->userData->getValue('rootfs', 'root');
 		$params[] = "rootpart=$curValue";
-		$lines[] = "# Here the sidux-System will be installed";
+		$lines[] = "# Here the siduction-System will be installed";
 		$lines[] = "# This value will be checked by function module_hd_check";
 		$lines[] = "HD_CHOICE='$curValue'";
 		$lines[] = "";
@@ -98,7 +98,10 @@ class RunPage extends Page{
 		$lines[] = "# If set to yes, the program will NOT check if there is enough space to install sidux on the selected partition(s). Use at your own risk! Useful for example with HD_MAP if you only have a small root partition.";
 		$lines[] = "# Possible are: yes|no";
 		$lines[] = "# Default value is: no";
-		$lines[] = "HD_IGNORECHECK='no'";
+		$ix = $this->indexOfList('run', 'force', NULL, 'opt_force');
+		$params[] = "force=$ix";
+		$curValue = $ix == 0 ? 'no' : 'yes';
+		$lines[] = "HD_IGNORECHECK='$curValue'";
 		$lines[] = "";
 		
 		$lines[] = "SWAP_MODULE='configured'";
@@ -108,7 +111,7 @@ class RunPage extends Page{
 		$lines[] = "SWAP_AUTODETECT='yes'";
 		$lines[] = "";
 		
-		$lines[] = "# The swap partitions to be used by the installed sidux.";
+		$lines[] = "# The swap partitions to be used by the installed siduction.";
 		$lines[] = "# This value will be checked by function module_swap_check";
 		$lines[] = "SWAP_CHOICES='__swapchoices__'";
 		$lines[] = "";
@@ -187,7 +190,10 @@ class RunPage extends Page{
 		$lines[] = "INSTALL_READY='yes'";
 		$lines[] = "";
 		$lines[] = "# mount partitions on boot. Default value is: yes";
-		$lines[] = "HD_AUTO='yes'";
+		$ix = $this->indexOfList('mountpoint', 'mountonboot', NULL, 'opt_mountonboot');
+		$params[] = "mountonboot=$ix";
+		$curValue = $ix == 0 ? 'no' : 'yes';
+		$lines[] = "HD_AUTO='$curValue'";
 		$lines[] = "";
 
 

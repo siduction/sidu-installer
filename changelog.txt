@@ -27,3 +27,5 @@ v0.04:
 * temporary files now in /var/lib/sidu-installer
 * format of the progress file: may be a factor (0..1.0) instead of procent. "end" means 100%
 * Fix: timezoneinfo.txt will be created in ${tempdir}
+* New field: mountonboot
+* Parameter file for fll-installer: HD_IGNORECHECK and HD_AUTO will be set from input fields

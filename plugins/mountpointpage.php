@@ -20,6 +20,7 @@ class MountpointPage extends Page{
 		$this->setDefaultOption('add_label', 0, false);
 		$this->setDefaultOption('add_mount', 0, false);
 		$this->setField('add_mount2', '');
+		$this->setDefaultOption('mountonboot', 1, true);
 	}
 	/** Builds the core content of the page.
 	 * 
@@ -32,6 +33,7 @@ class MountpointPage extends Page{
 		$this->fillOptions('add_dev', true);
 		$this->fillOptions('add_label', true);
 		$this->fillOptions('add_mount');
+		$this->fillOptions('mountonboot');
 		$this->fillRows('mounts');		
 		$this->fillRows('partinfo');		
 	}
@@ -40,7 +42,8 @@ class MountpointPage extends Page{
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
-		$rc = array('add_dev', 'add_label', 'add_mount', 'add_mount2', 'disk2');
+		$rc = array('add_dev', 'add_label', 'add_mount', 
+			'add_mount2', 'disk2', 'mountonboot');
 		return $rc;
 	}
 	/** Handles the "add mountpoint" button.

@@ -41,6 +41,19 @@
 	</tr>
 	###ROWS_MOUNTS###
 </table>
+<div class="horicontal_line"></div>
+<table class="table_col5">
+	<tr>
+		<td>###txt_mount_on_boot###</td>
+		<td><select name="mountonboot" size="1">
+			###OPT_MOUNTONBOOT###
+			</select>
+		</td>
+		<td>###txt_desc_mount_on_boot###</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
 </div>
 <div class="textblock">
 <p>###txt_intro_info###
