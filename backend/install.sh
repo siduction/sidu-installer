@@ -5,10 +5,9 @@
 #set -x
 ANSWER=$1
 PARAMFILE=$2
+ETC_CONFIG=/etc/sidu-installer/install.conf
 
-if [ -z "$FLL_SEARCHPATH" ] ; then
-	FLL_SEARCHPATH=$(which fll-installer)
-fi
+test-e $ETC_CONFIG && source $ETC_CONFIG
 
 mapfile -t <$PARAMFILE LINES
 PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
@@ -61,6 +60,8 @@ COMPLETE=completed 0 of 10
 EOS
 
 	./fll-installer -i $PROGRESSFILE
+	touch $ANSWER
+	rm $PROGRESSFILE
 }
 
 fll_install

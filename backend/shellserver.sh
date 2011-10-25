@@ -1,13 +1,18 @@
 #! /bin/bash
 #set -x
 ARGS=$*
-DIR=$(pwd)/../tmp/shellserver-tasks
+
 SLEEP=1
 export VERBOSE=
 export TRACE_ON=
 export TRACE_OFF=
+TASK_DIR=/var/lib/sidu-installer/shellserver-tasks
+ETC_CONFIG=/etc/sidu-installer/install.conf
+
+
 CMDDIR=$(pwd)
 # Customization
+test -e $ETC_CONFIG && source $ETC_CONFIG
 test -e $HOME/.shellserverrc && source $HOME/.shellserverrc
 
 function oneFile(){
@@ -88,11 +93,13 @@ function poll(){
 		fi
 	fi
 }
-if [ ! -d $DIR ] ; then
-	mkdir $DIR
-	chmod uog+rwx $DIR
+if [ ! -d $TASK_DIR ] ; then
+	mkdir -p $TASK_DIR
+	chmod uog+rwx $TASK_DIR
+	NODE=$(basename $(dirname $TASK_DIR))
+	test $NODE == 'sidu-installer' && chmod uog+rwx $TASK_DIR/../../$NODE
 fi
-cd $DIR
+cd $TASK_DIR
 if [ "$1" == "-v" ] ; then
 	export VERBOSE=-v
 	export TRACE_ON="set -x"
