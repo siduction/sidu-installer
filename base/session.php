@@ -40,6 +40,8 @@ class Session{
 	var $clientAddress;
 	/// e.g /index.php 
 	var $scriptUrl; 
+	/// e.g. http://example.com/index.php
+	var $absScriptUrl; 
 	/// e.g. "/index.php/help?info=1&edit=False"
 	var $requestUri; 
 	/// e.g. help
@@ -78,25 +80,25 @@ class Session{
 	function __construct(){
 		global $_SERVER;
 		
-		$doTrace = false;
+		$doTrace = False;
 		$server = $_SERVER;
 		$this->charset = 'UTF-8';
 		$this->tempDir = NULL;
-		$ix = -1;
-		if (! isset($_SERVER))
-			$ix = strpos($_SERVER['QUERY_STRING'], '_debug=1');
-		if (! isset($_SERVER['DOCUMENT_ROOT']) || $ix > 0)
-			$this->simulateServer();
 		// Prefix 'x': we use strpos() and we want to get an index > 0.
 		$this->traceFlag = 'x' . TRACE_ALL;
 		//$this->traceFile = '/tmp/trace.txt';
-		$this->parseEnvironment();
-		$this->traceFile = $this->homeDir . "tmp/trace.txt";
+		$this->traceFile = "/tmp/trace.txt";
 		if ($doTrace)
 			$this->traceFp = fopen($this->traceFile, "a");
 		else
 			$this->traceFp = NULL;
 		$this->trace(TRACE_RARE, '==== Start:');
+		$ix = -1;
+		if (! isset($_SERVER))
+			$ix = strpos($_SERVER['QUERY_STRING'], '_debug=1');
+		if (! isset($_SERVER['DOCUMENT_ROOT']) || $ix > 0)
+			$this->simulateServer();
+		$this->parseEnvironment();
 		$this->configuration = new Configuration($this);
 		$this->tempDir = $this->configuration->getValue('.tempdir');
 		$this->userData = new UserData($this);
@@ -108,24 +110,43 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'home';
+		$page = 'rootfs';
 		$_SERVER = array();
-		$_SERVER['HTTP_HOST'] = 'ino.ant';
-		$_SERVER['DOCUMENT_ROOT'] = '/home/wsl6/php/inosid';
+
+		$_SERVER['PATH_TRANSLATED'] = '/usr/share/sidu-installer/home';
+		$_SERVER['HTTP_USER_AGENT'] = 'Opera/9.80 (x11; Linux86_64; U; de) Presto/2.9.168 Version/11.51';
+		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+		$_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'de-DE,en;q=0.9,fr-CA;q=0.8,ay;q=0.7,de;q=0.6';
+		$_SERVER['REMOTE_PORT'] = '50262';
+		$_SERVER['SCRIPT_FILENAME'] = '/usr/share/sidu-installer/install.php';
+		$_SERVER['SCRIPT_NAME'] = '/install.php';
+		$_SERVER['REQUEST_METHOD'] = 'GET';
+		$_SERVER['HTTP_HOST'] = 'sidu-installer:8086';
+		$_SERVER['PATH_INFO'] = '';
+		$_SERVER['SERVER_PORT'] = '8086';
+		$_SERVER['QUERY_STRING'] = 'button_next=Weiter';
+		$_SERVER['DOCUMENT_ROOT'] = '/usr/share/sidu-installer';
+		$_SERVER['SERVER_ADDR'] = '127.0.0.1';
+		$_SERVER['REQUEST_URI'] = '/install.php/home?button_next=Weiter';
+		
+		if (True){
+		$_SERVER['HTTP_HOST'] = 'sidu-installer';
+		$_SERVER['DOCUMENT_ROOT'] = '/usr/share/sidu-installer';
 		$_SERVER['SCRIPT_FILENAME'] = '/home/wsl6/php/inosid/install.php';
-		$_SERVER['SCRIPT_NAME'] = '/inosid/install.php';
-		$_SERVER['REQUEST_URI'] = "/inosid/install.php/user?$page=1&param2=abc";
+		$_SERVER['SCRIPT_NAME'] = '/install.php';
+		$_SERVER['REQUEST_URI'] = "/install.php/$page?param2=abc";
 		$_SERVER['PATH_INFO'] = "";
 		if (! empty($page))
-			$_SERVER['PATH_INFO'] = "/$page";
-		$_SERVER['PHP_SELF'] = "/inosid/install.php/$page";
+		$_SERVER['PATH_INFO'] = "";
+		$_SERVER['PHP_SELF'] = "/inosid/install.php";
 		$_SERVER['HTTP_HOST'] = 'localhost';
 		$_SERVER['HTTP_ACCEPT_LANGUAGE'] = 'en-US,de-DE,de;q=0.9,en;q=0.8';
 		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
 		$_SERVER['HTTP_USER_AGENT'] = 'Opera/9.80 (X11; Linux x86_64; U; de) Presto/2.9.168 Version/11.50';
 		$_SERVER["REQUEST_METHOD"] = 'get';
+		}
 		
-		//$_POST['button_cancel'] = 'x';
+		$_POST['button_next'] = 'x';
 		//$_POST['button_install'] = 'x';
 		
 		$_POST['root_pass'] = '123456';
@@ -152,7 +173,9 @@ class Session{
 			$this->fields = $_POST;
 		else 
 			$this->fields = $_GET;
-		
+		$this->trace(TRACE_CONFIG, '_SERVER:');
+		foreach ($_SERVER as $key => $value)
+			$this->trace(TRACE_CONFIG, $key . '=' . $value);
 		$mode = $_SERVER['REQUEST_METHOD'];
 		$this->usePost = strcasecmp($mode, 'post') == 0;
 		$this->scriptFile = $_SERVER['SCRIPT_FILENAME'];
@@ -160,16 +183,42 @@ class Session{
 		$this->homeDir = $parts['dir'];
 		$this->scriptUrl = $_SERVER['SCRIPT_NAME'];
 		$this->requestUri = $_SERVER['REQUEST_URI'];
+		if (empty($_SERVER['PATH_INFO'])){
+			$pathInfo = substr($this->requestUri, strlen($this->scriptUrl));
+			$ix = strpos($pathInfo, '/');
+			if (! ($ix === False) && $ix == 0){
+				$ix = strpos($pathInfo, '?');
+				if ($ix > 0)
+					$pathInfo = substr($pathInfo, 0, $ix);
+				$_SERVER['PATH_INFO'] = $pathInfo;
+			}
+		}
+		
 		if (isset($_SERVER['PATH_INFO']) && ! empty($_SERVER['PATH_INFO']))
 			$this->page = substr($_SERVER['PATH_INFO'], 1);
-		elseif (isset($_GET["page"]) && ! empty($_GET["page"]))
+		elseif (isset($_GET['page']) && ! empty($_GET['page']))
 			$this->page = $_GET["page"];
-		else 
-			$this->page = 'home';
+		else {
+			$uri = $this->requestUri;
+			$ix = strpos($uri, 'page=');
+			if ($ix === False)			
+				$this->page = 'home';
+			else 
+			{
+				$ix += 5;
+				$length = strlen($uri);
+				$ixEnd = strpos($uri, '&', $ix);
+				if ($ixEnd === False)
+					$ixEnd = $length;
+				$this->page = substr($uri, $ix, $ixEnd - $ix);
+			}
+		}
 		$this->domain = $_SERVER['HTTP_HOST'];
 		$parts = $this->splitFile($this->scriptUrl);
 		$this->urlStatic = 'http://' . $this->domain . $parts['dir'];
-		$this->urlForm = 'http://' . $this->domain . $this->scriptUrl . '/' . $this->page;
+		$absScriptUrl = 'http://' . $this->domain . $this->scriptUrl;
+		$this->absScriptUrl = $absScriptUrl;
+		$this->urlForm = $absScriptUrl . '/' . $this->page;
 		$this->clientAddress = $_SERVER['REMOTE_ADDR'];
 		$agent = $_SERVER['HTTP_USER_AGENT'];
 		$agent = preg_replace('/\D/', '', $agent);
@@ -180,7 +229,7 @@ class Session{
 		if ($ix > 0)
 		{
 			$this->paramString = substr($this->requestUri, $ix + 1);
-			$this->params = split("&", $this->paramString);
+			$this->params = explode('&', $this->paramString);
 		}
 		$this->lang = "en";
 		$lang = $_SERVER["HTTP_ACCEPT_LANGUAGE"];
@@ -381,7 +430,7 @@ class Session{
 	 */
 	function gotoPage($url, $from){
 		$this->userData->write();
-		$header = 'Location: http:../install.php' . '?page=' . $url;
+		$header = 'Location: ' . $this->absScriptUrl . '/' . $url;
 		$this->trace(TRACE_RARE, "gotoPage($from): $url -> $header");
 		header($header);
 		exit;
