@@ -29,3 +29,10 @@ v0.04:
 * Fix: timezoneinfo.txt will be created in ${tempdir}
 * New field: mountonboot
 * Parameter file for fll-installer: HD_IGNORECHECK and HD_AUTO will be set from input fields
+
+v0.05
+* Change URL encoding back to install.php/home
+* session.php: Repairing wrong settings of $_SERVER['PATH_INFO']
+* userdata.php: Fix: open() can fail
+* control: ${shlibs:Depends} removed
+* install.php: Debug code
