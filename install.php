@@ -16,8 +16,10 @@ if (! empty ($wait)){
 		$session->gotoPage('wait', 'install.wait');
 }
 $pagename = $session->page;
-if (empty($pagename))
+if (empty($pagename)){
 	$pagename = 'home';
+	$session->trace(TRACE_RARE, 'No page found');
+}
 $pageDefinition =  $session->homeDir . 'plugins/' . $pagename . 'page.php';
 if (! file_exists($pageDefinition)){
 	$session->trace(TRACE_RARE, "Not found: $pageDefinition");
