@@ -10,7 +10,7 @@ Vcs-Browser: http://git.siduction.org/?p=packages/siduction-repository/sidu-inst
 
 Package: sidu-installer
 Architecture: all
-Depends: ${shlibs:Depends}, ${misc:Depends}
+Depends: ${misc:Depends}
 #	fll-installer
 Suggests: gparted
 Description: GUI for the siduction installer
