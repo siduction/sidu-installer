@@ -34,7 +34,7 @@ class UserData{
 		$key = "$plugin.$variable";
 		if (isset($this->data[$key]))
 			$rc = $this->data[$key];
-		$this->session->trace(TRACE_FINE, "UserData.getValue($key): '$rc'");
+		//$this->session->trace(TRACE_FINE, "UserData.getValue($key): '$rc'");
 		return $rc; 
 	}
 	/** Stores the value of a variable (or a field).
@@ -66,10 +66,12 @@ class UserData{
 			$this->session->trace(TRACE_CONFIG, 'UserData.write()'
 				. count($this->data) . ' vars');
 			$fp = fopen($this->filename, 'w');
-			foreach ($this->data as $key => $value){
-				fprintf($fp, "%s=%s\n", $key, $value);
+			if ($fp){
+				foreach ($this->data as $key => $value){
+					fprintf($fp, "%s=%s\n", $key, $value);
+				}
+				fclose($fp);
 			}
-			fclose($fp);
 		}
 	}
 }
