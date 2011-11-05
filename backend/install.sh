@@ -5,14 +5,14 @@
 #set -x
 ANSWER=$1
 PARAMFILE=$2
-ETC_CONFIG=/etc/sidu-installer/install.conf
+ETC_CONFIG=/etc/sidu-installer/shellserver.conf
 
-test-e $ETC_CONFIG && source $ETC_CONFIG
+test -e $ETC_CONFIG && source $ETC_CONFIG
 
 mapfile -t <$PARAMFILE LINES
 PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
 CONFIGFILE=$(echo ${LINES[4]} | sed -e 's/\n//; s/configfile=//i;')
-rm $PARAMFILE
+rm -f $PARAMFILE
 test -n "$VERBOSE" && echo "Config: $CONFIGFILE"
 
 function simulation(){
@@ -34,7 +34,7 @@ EOS
 		sleep 1
 		X=$(expr $X + 1)
 	done
-	rm $PROGRESSFILE
+	rm -f $PROGRESSFILE
 	touch $ANSWER
 }
 
@@ -52,16 +52,20 @@ function fll_install(){
 	sed -i "s%ROOTPASS_CRYPT=.*\$%ROOTPASS_CRYPT='$HASH'%;" $CONFIG
 	
 	pushd $FLL_SEARCHPATH
-	test -n "$VERBOSE" && echo "progress: $PROGRESSFILE"
+	test -n "$VERBOSE" && echo "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"
+	test -n "$SHELLSERSVERLOG" && echo >>$SHELLSERSVERLOG "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"
 	cat <<EOS >$PROGRESSFILE
 PERC=1
 CURRENT=<b>Initialization</b>
 COMPLETE=completed 0 of 10
 EOS
-
-	./fll-installer -i $PROGRESSFILE
+	CMD=$(which fll-installer)
+	test -z "$CMD" && test -e fll-installer && CMD=./fll-installer
+	test -z "$CMD" && CMD=$BIN_FLL_INSTALLER
+	test -n "$SHELLSERVERLOG" && echo >> $SHELLSERVERLOG "pwd=$(pwd) ; ./fll-installer -i $PROGRESSFILE"
+	$CMD -i $PROGRESSFILE
 	touch $ANSWER
-	rm $PROGRESSFILE
+	rm -f $PROGRESSFILE
 }
 
 fll_install

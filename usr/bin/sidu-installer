@@ -1,0 +1,4 @@
+#! /bin/sh
+sudo /etc/init.d/pywwetha start
+sudo /etc/init.d/sidu-shellserver start
+x-www-browser http://sidu-installer:8086/install.php

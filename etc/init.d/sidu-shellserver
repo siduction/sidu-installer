@@ -1,0 +1,74 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:       sidu-shellserver 
+# Required-Start: localfs
+# Required-Stop:  localfs
+# Default-Start:  3 4 5
+# Default-Stop:   0 1 6
+# Description:    A server to start shell scripts for the sidu installer.
+### END INIT INFO
+PATH=$PATH:/bin:/sbin:/usr/sbin
+
+VERBOSE=-v
+BIN=/usr/share/sidu-installer/backend/shellserver.sh
+
+start() {
+  pid=$(getPid)
+  if [ -n "$pid" ] ; then
+        echo "shellserver is running yet: $pid"
+  else
+          start-stop-daemon $VERBOSE --background --exec $BIN --start -- --daemon
+  fi
+}
+
+stop() {
+  pid=$(getPid)
+  if [ -z "$pid" ] ; then
+        echo "not running: shellserver"
+  else
+          kill -TERM $pid
+          count=10
+          while [ $count ">" 0 ] ; do
+            pid=$(getPid)
+            test -z "$pid" && break
+                count=$(expr $count - 1)
+          done
+          pid=$(getPid)
+          test -n "$pid" && kill -9 $pid
+  fi
+ }
+
+getPid() {
+        pid=$(ps aux | perl -ne 'print $1 if /^\S+\s+(\d+).*bash.*shellserver\.sh/')
+        echo $pid
+}
+
+
+case "$1" in
+start)
+    start $pid
+    ;;
+stop)
+    stop $pid
+    ;;
+restart)
+    stop $pid
+    start ""
+    ;;
+status)
+    echo -n "Checking for the siduction shellserver"
+    pid=$(getPid)
+    if [ -n "$pid" ]; then
+        echo " ...running"
+    else
+        echo " ...not running"
+    fi
+    ;;
+*)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+    ;;
+esac
+
+exit 0

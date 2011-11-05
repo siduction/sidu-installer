@@ -36,3 +36,13 @@ v0.05
 * userdata.php: Fix: open() can fail
 * control: ${shlibs:Depends} removed
 * install.php: Debug code
+
+v0.06 shellserver as daemon, logging
+* install.sh: optional logging into a file, no questions using rm, parameters from shellserver.conf
+* shellserver.sh: optional logging, new option --daemon, no questions using rm
+* startgui.sh: using $CONSOLE and $CONSOLE_ARGS instead of konsole -e
+* sidu-installer.install: etc/* /usr/bin/*
+* shellserver.conf: New: CONSOLE, CONSOLE_ARGS, BIN_FLL_INSTALLER
+* New: installer can be run as daemon: etc/* usr/bin/* 
+
+ 

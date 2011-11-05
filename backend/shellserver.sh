@@ -1,19 +1,37 @@
 #! /bin/bash
-#set -x
-ARGS=$*
-
+# This is a server for the sidu-installer
+# The tasks are given by files
+#
 SLEEP=1
 export VERBOSE=
 export TRACE_ON=
 export TRACE_OFF=
 TASK_DIR=/var/lib/sidu-installer/shellserver-tasks
-ETC_CONFIG=/etc/sidu-installer/install.conf
+ETC_CONFIG=/etc/sidu-installer/shellserver.conf
 
-
-CMDDIR=$(pwd)
 # Customization
 test -e $ETC_CONFIG && source $ETC_CONFIG
 test -e $HOME/.shellserverrc && source $HOME/.shellserverrc
+export DAEMON=
+
+while [ -n "$1" ] ; do 
+	if [ "$1" == "-v" ] ; then
+		export VERBOSE=-v
+		export TRACE_ON="set -x"
+		export TRACE_OFF="set +x"
+	elif [ "$1" == "--daemon" ] ; then
+		export DAEMON=1
+		test -z "$SHELLSERVERLOG" && export SHELLSERVERLOG=/tmp/shellserver.log
+	fi
+	shift
+done
+function say(){
+	test -n "$SHELLSERVERLOG" && echo $* >>$SHELLSERVERLOG
+	test -n "$VERBOSE" && echo $* 
+}
+SHELLSERVERHOME=$(dirname $0)
+test ${SHELLSERVERHOME=:0:1} != '/' && SHELLSERVERHOME=$(pwd)/$SHELLSERVERHOME
+test -n "$VERBOSE" && echo "SHELLSERVERHOME=$SHELLSERVERHOME"	
 
 function oneFile(){
 	FN=$1
@@ -28,7 +46,7 @@ function oneFile(){
 		mv $FN $PARAM
 		FN=$PARAM
 	else
-		rm $FN
+		rm -f $FN
 		IX=3
 		PARAM=
 		COUNT=${#LINES[@]}
@@ -41,11 +59,9 @@ function oneFile(){
 			fi
 			IX=$(expr $IX + 1)
 		done 
-		if [ "$VERBOSE" == "-v" ] ; then
-			echo "$CMD $PARAM -> $ANSWER OPTS: $OPTS"
-		fi
+		say "$CMD $PARAM -> $ANSWER OPTS: $OPTS"
 	fi
-	pushd $CMDDIR >>/dev/null
+	pushd $SHELLSERVERHOME >>/dev/null
 	
 	SOURCE=
 	FOUND=$(echo $OPTS | grep -i source)
@@ -67,14 +83,20 @@ function oneFile(){
 		if [ -x $SCRIPT ] ; then
 			$TRACE_ON
 			CMD="$SOURCE ./$SCRIPT $ANSWER $PARAM"
+			say $CMD
 			if [ -n "$BACKGROUND" ] ; then
-				$CMD &
+				if [ -n "$TRACE" ] ; then 
+					date "+%H:%M:%S: ===" >>/tmp/shsvtrace.log
+					$CMD >>/tmp/shsvtrace.log 2>&1 &
+				else
+					$CMD &
+				fi
 			else
 				$CMD
 			fi
 			$TRACE_OFF
 		else
-			echo "Unknown command: $CMD File: $ANSWER Param: $PARAM"
+			say "Unknown command: $CMD File: $ANSWER Param: $PARAM"
 		fi
 		;;
 	esac  
@@ -100,11 +122,6 @@ if [ ! -d $TASK_DIR ] ; then
 	test $NODE == 'sidu-installer' && chmod uog+rwx $TASK_DIR/../../$NODE
 fi
 cd $TASK_DIR
-if [ "$1" == "-v" ] ; then
-	export VERBOSE=-v
-	export TRACE_ON="set -x"
-	export TRACE_OFF="set +x"
-fi
 	
 while true ; do
 	poll
