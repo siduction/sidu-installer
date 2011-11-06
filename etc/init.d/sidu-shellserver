@@ -16,7 +16,7 @@ BIN=/usr/share/sidu-installer/backend/shellserver.sh
 start() {
   pid=$(getPid)
   if [ -n "$pid" ] ; then
-        echo "shellserver is running yet: $pid"
+        echo "shellserver is still running: $pid"
   else
           start-stop-daemon $VERBOSE --background --exec $BIN --start -- --daemon
   fi
