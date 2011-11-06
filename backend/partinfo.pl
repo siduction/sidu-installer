@@ -42,7 +42,7 @@ close CMD;
 
 # get the info from blkid
 
-open(CMD, "blkid|") || die "blkid failed: $!";
+open(CMD, "/sbin/blkid -c /dev/null|") || die "/sbin/blkid failed: $!";
 my %blkids;
 my ($label, $uuid, $fs, $info2);
 while(<CMD>){
