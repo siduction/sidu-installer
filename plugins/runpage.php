@@ -62,6 +62,10 @@ class RunPage extends Page{
 		$lines[] = "";
 		
 		
+		$curValue = $this->session->userData->getValue('rootfs', 'filesys');
+		$ix = $this->indexOfList('rootfs', 'filesys', NULL, 'opt_filesys');
+		if ($ix <= 0) 
+			$curValue = '-';
 		$lines[] = "# Determines if the HD should be formatted. (mkfs.*)";
 		$lines[] = "# Possible are: yes|no";
 		$lines[] = "# Default value is: yes";
@@ -69,10 +73,6 @@ class RunPage extends Page{
 		$lines[] = "HD_FORMAT='$value'";
 		$lines[] = '';
 
-		$curValue = $this->session->userData->getValue('rootfs', 'filesys');
-		$ix = $this->indexOfList('rootfs', 'filesys', NULL, 'opt_filesys');
-		if ($ix <= 0) 
-			$curValue = '-';
 		$params[] = 'rootfs=' . $curValue;
 		
 		$lines[] = "# Sets the Filesystem type.";
