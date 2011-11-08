@@ -146,8 +146,8 @@ class Session{
 		$_SERVER["REQUEST_METHOD"] = 'get';
 		}
 		
-		$_POST['button_next'] = 'x';
-		//$_POST['button_install'] = 'x';
+		#$_POST['button_next'] = 'x';
+		$_POST['button_install'] = 'x';
 		
 		$_POST['root_pass'] = '123456';
 		$_POST['root_pass2'] = '123456';
@@ -329,8 +329,9 @@ class Session{
 	 * Each line contains a definition key=value
 	 * 
 	 * @param $filename		the name of the file
+	 * @param $ignoredChar	This character will be ignored if it is found before the '='
 	 */
-	function readJavaConfig($filename){
+	function readJavaConfig($filename, $ignoredChar = NULL){
 		$rc = array();
 		if (file_exists($filename)){
 			$file = file($filename);
@@ -340,6 +341,8 @@ class Session{
 					if ($ix > 0){
 						$line = trim($line, "\r\n");
 						$key = substr($line, 0, $ix);
+						if ($ignoredChar != NULL && strpos($key, $ignoredChar) == strlen($key) - 1)
+							$key = substr($key, 0, strlen($key) - 1);
 						$val = substr($line, $ix + 1);
 						$rc[$key] = $val;
 						//$this->trace(TRACE_FINE, "readJavaConfig(): $key=$val");

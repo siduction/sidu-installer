@@ -61,7 +61,7 @@ class Configuration{
 	 * Each line contains a variable definition: key=value
 	 */
 	function read(){
-		$this->data = $this->session->readJavaConfig($this->filename);
+		$this->data = $this->session->readJavaConfig($this->filename, '%');
 		$this->session->trace(TRACE_CONFIG, 'Config.read(): ' 
 			. count($this->data) . ' vars');
 	}
