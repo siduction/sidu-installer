@@ -29,10 +29,16 @@ class DiskInfo {
 		$this->session->trace(TRACE_RARE, 'DiskInfo.writePartitionInfo()');
 		$file = File($this->page->filePartInfo);
 		$partitions = '';
+		$excludes = $this->session->configuration->getValue('rootfs.excluded.dev');
+		if (strlen($excludes) > 0)
+			$excludes = '/' . str_replace('/', '\/', $excludes) . '/';
+		
 		while( (list($no, $line) = each($file))){
 			$line = chop($line);
 			$cols = explode("\t", $line);
 			$dev = $cols[0];
+			if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
+				continue;
 			$infos = array();
 			foreach($cols as $key => $value){
 				$vals = explode(':', $value);
