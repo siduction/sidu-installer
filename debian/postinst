@@ -1,0 +1,7 @@
+#! /bin/bash
+
+found=$(grep "sidu-installer" /etc/hosts)
+if [ -z "$found" ] ; then
+	echo "127.0.0.86 sidu-installer" >>/etc/hosts
+	echo "virtual host installed: sidu-installer"
+fi
