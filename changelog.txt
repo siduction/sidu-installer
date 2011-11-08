@@ -49,3 +49,7 @@ v0.07 Marking i18n entries, exclusion of devices, fix: HD_FORMAT
 * Configuration: %= marks entries which must be translated
 * New: Exclude of some devices can be configured.
 * Fix: HD_FORMAT will be set to 'no' if HD_CHOICE is '-' (no change)
+
+v0.08 Fix passwords, sidu-installer in /etc/hosts
+* Until a general solution is found the passwords are fix.
+* Insertion of the virtual host sidu-installer in /etc/hosts (postinst)
