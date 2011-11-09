@@ -53,3 +53,9 @@ v0.07 Marking i18n entries, exclusion of devices, fix: HD_FORMAT
 v0.08 Fix passwords, sidu-installer in /etc/hosts
 * Until a general solution is found the passwords are fix.
 * Insertion of the virtual host sidu-installer in /etc/hosts (postinst)
+
+v0.09 building password hash, '-' test of passw, inst. ready message
+* Encoding password with mkpasswd
+* Testing password for '-' at the beginning.
+* Replacing the button when the installation has been finished.
+* Minimum length of a password is configurable.

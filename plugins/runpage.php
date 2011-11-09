@@ -13,8 +13,12 @@ class RunPage extends Page{
 	function __construct(&$session){
 		parent::__construct($session, 'run');
 		$this->setDefaultOption('force', 0, true);
-		$this->setReplacement('###BUTTON_OR_INFO###', 
-			$this->getConfiguration('button'), false);
+		$value = $this->getUserData('running');
+		if (! empty($value))
+			$text = $this->getConfiguration('info_running');
+		else
+			$text = $this->getConfiguration('button');
+		$this->setReplacement('###BUTTON_OR_INFO###', $text, false);
 		$rootfs = $session->userData->getValue('rootfs', 'root');
 		$this->setReplacement('###ROOT_FS###', $rootfs);
 	}
@@ -130,11 +134,13 @@ class RunPage extends Page{
 		$lines[] = "";
 				
 		$curValue = $this->session->userData->getValue('user', 'pass');
+		$curValue = $this->session->makePasswordHash($curValue);
 		$params[] = "pw=$curValue"; 
 		$lines[] = "USERPASS_MODULE='configured'";
 		$lines[] = "USERPASS_CRYPT='$curValue'";		
 			
 		$curValue = $this->session->userData->getValue('user', 'root_pass');
+		$curValue = $this->session->makePasswordHash($curValue);
 		$params[] = "rootpw=$curValue"; 
 		$lines[] = "ROOTPASS_MODULE='configured'";
 		$lines[] = "ROOTPASS_CRYPT='$curValue'";
@@ -218,16 +224,8 @@ class RunPage extends Page{
 	 */
 	function onButtonClick($button){
 		$rc = true;
-		$value = $this->session->getField('running');
-		if (! empty($value))
-		{
-			$text = $this->getConfiguration('info_running');
-			$this->setReplacement('###BUTTON_OR_INFO###', $text, false);
-		}
-			
 		if (strcmp($button, 'button_install') == 0){
-			$this->session->userData->setValue('run', 'running', 'T');
-			$this->setField('running', 'T');
+			$this->setUserData('running', 'T');
 			$this->startInstallation();
 		}
 		elseif (strcmp($button, 'button_prev') == 0){

@@ -41,18 +41,7 @@ EOS
 function fll_install(){
 	CONFIG=$HOME/.sidconf
 	mv $CONFIGFILE $CONFIG
-	# @todo: replacing password
-	local P
-	P=$(grep USERPASS_CRYPT= $CONFIG | sed "s/USERPASS_CRYPT='//; s/'$//")
-	HASH=$(mkpasswd --method=sha-256 $P)
-	HASH='$5$kv3wTLYYj/SZm$k5K2oultpIxzoDPpTsJHxAuZ2Rh3drq/9bcxAsuSqw7'
-	perl -i -pe "\$_ = 'USERPASS_CRYPT=\'$HASH\'' . \"\n#A\n\" if /^USERPASS_CRYPT/;" $CONFIG
-	
-	P=$(grep ROOTPASS_CRYPT= $CONFIG | sed "s/ROOTPASS_CRYPT='//; s/'$//;")
-	HASH=$(mkpasswd --method=sha-256 $P)
-	HASH='$5$kv3wTLYYj/SZm$k5K2oultpIxzoDPpTsJHxAuZ2Rh3drq/9bcxAsuSqw7'
-	perl -i -pe "\$_ = 'ROOTPASS_CRYPT=\'$HASH\'' . \"\n#B\n\" if /^ROOTPASS_CRYPT/;" $CONFIG
-	
+	grep CRYPT= $CONFIG	
 	pushd $FLL_SEARCHPATH
 	test -n "$VERBOSE" && echo "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"
 	test -n "$SHELLSERSVERLOG" && echo >>$SHELLSERSVERLOG "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"

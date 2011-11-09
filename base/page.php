@@ -348,13 +348,16 @@ abstract class Page{
 	 * @return true: passwords are valid. false: otherwise
 	 */
 	function validPasswords($field1, $field2, $minLength, $maxLength){
-		$ok = $this->validPassword($field1, $minLength, $maxLength);
-		if (! $this->validPassword($field2, $minLength, $maxLength))
-			$ok = false;
-		if ($ok && strcmp($this->session->getField($this->name, $field1), 
-			$this->session->getField($this->name, $field2))	!= 0)
-				$ok = $this->setFieldError($field, 
-					$this->session->i18n('', 'NOT_EQUAL', 'Not equal!'));
+		if (strncmp($field1, '-') == 0)
+			$ok = $this->setFieldError($field, 
+					$this->session->i18n('', 'NOT_MINUS', '- not allowed at the beginning!'));
+		else{	
+			$ok = $this->validPassword($field1, $minLength, $maxLength);
+			if ($ok && strcmp($this->session->getField($this->name, $field1), 
+				$this->session->getField($this->name, $field2))	!= 0)
+					$ok = $this->setFieldError($field, 
+						$this->session->i18n('', 'NOT_EQUAL', 'Not equal!'));
+		}
 		return $ok;
 			
 	}

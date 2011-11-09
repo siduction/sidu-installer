@@ -110,7 +110,7 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'rootfs';
+		$page = 'run';
 		$_SERVER = array();
 
 		$_SERVER['PATH_TRANSLATED'] = '/usr/share/sidu-installer/home';
@@ -559,6 +559,34 @@ class Session{
 	function getAnswerFileName($prefix, $suffix){
 		$rc = $this->tempDir . $prefix . $this->sessionId . $suffix;
 		return $rc;	
+	}
+	/** Generates a password hash like mkpassword command in linux.
+	 * 
+	 * @param $clearText	the password to encode
+	 * @return a string which can be used as argument for the usermod command
+	 */
+	function makePasswordHash($clearText){
+		if (false){
+			// Get the initial hash:
+			$hash = pack('H*', hash('sha256', $clearText, false));
+			// Get six random bytes:
+			srand(time() ^ (ord($clearText) * 0x777));
+			$salt = pack('c6', rand(0,255), rand(0,255), rand(0,255), rand(0,255), rand(0,255), rand(0,255));
+			// Get the final hash:
+			$hash = pack('H*', hash('sha256', $hash . $salt, false));
+			// Build the full encoded string: $ <method> $ <salt> $ <hash>
+			$output = '$5$' . base64_encode($salt) . '$' . base64_encode($hash);
+			$output = str_replace('+', '.', $output);
+		} else {
+			$handle = popen("/usr/bin/mkpasswd --method=SHA-256 '$clearText'" , 'r');
+			if ($handle != NULL){
+				$output = chop(fgets($handle));
+				fclose($handle);
+			}
+		}
+		if ($this->configuration->getValue('.fixPassword'))
+			$output = '$5$aChnRTTCXTG7$h6z1eVHhVrnBzb6gYjDJrT7q/BARtkDTckTaQyDWyF3';	
+		return $output;
 	}
 }
 ?>
