@@ -34,13 +34,18 @@ class UserPage extends Page{
 	 */
 	function validate(){
 		$ok = true;
-		if (! $this->validPasswords('root_pass', 'root_pass2', 6, 20))
+		$minlength = $this->getConfiguration('minlength');
+		if (strlen($minlength) == 0)
+			$minlength = 6;
+		else
+			$minlength = (int) $minlength;
+		if (! $this->validPasswords('root_pass', 'root_pass2', $minlength, 20))
 			$ok = false;
 		if (! $this->isValidContent('real_name', '^:', '^:', false))
 			$ok = false;
 		if (! $this->isValidContent('name', 'a-z', '-a-z0-9_', true))
 			$ok = false;
-		if (! $this->validPasswords('pass', 'pass2', 6, 20))
+		if (! $this->validPasswords('pass', 'pass2', $minlength, 20))
 			$ok = false;
 		return $ok;
 	}
