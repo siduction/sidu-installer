@@ -24,5 +24,8 @@
 <input class="home_button_usb" type="submit" name="button_usb_install" value="###txt_usb_installer###" />
 </div>
 </div>
+<div class="textblock center">
+<input type="submit" name="button_clear_config" value="###txt_clear_config###" />
+</div>
 </div> <!-- text_area-->
 

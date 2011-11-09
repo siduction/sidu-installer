@@ -59,3 +59,5 @@ v0.09 building password hash, '-' test of passw, inst. ready message
 * Testing password for '-' at the beginning.
 * Replacing the button when the installation has been finished.
 * Minimum length of a password is configurable.
+* Fix: error messages on password check
+* New: Button "clear configuration"

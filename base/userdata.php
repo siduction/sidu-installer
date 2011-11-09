@@ -74,5 +74,8 @@ class UserData{
 			}
 		}
 	}
+	function clear(){
+		$fp = unlink($this->filename);
+	}
 }
 ?>

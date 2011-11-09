@@ -46,6 +46,8 @@ class HomePage extends Page{
 		$rc = true;
 		if (strcmp($button, 'button_next') == 0){
 			$rc = $this->navigation(false);
+		} elseif (strcmp($button, 'button_clear_config') == 0){
+			$this->session->userData->clear();
 		} else {
 			$this->session->log("unknown button: $button");
 		}
