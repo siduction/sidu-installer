@@ -1,5 +1,26 @@
+sidu-installer (0.1-2.1) unstable; urgency=low
+
+  * Fix: startgui.sh: configuration variable START_GUI_HOME for home. Necessary for .Xauthority
+  * Standard poll rate for the website: 3 second
+  * 
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Fri, 11 Nov 2011 00:20:42 +0100
+
+sidu-installer (0.1-2) unstable; urgency=low
+
+  [ Hamatoma ]
+  * Password hash generation with mkpasswd
+  * Password check for '-'
+  * Button "clear configuration"
+  * Fix: Password check
+  * Minimum length of a password is configurable.
+  * Replacing the button when the installation has been finished.
+  * 
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Wed, 09 Nov 2011 23:24:04 +0100
+
 sidu-installer (0.1-1) unstable; urgency=low
 
   * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
 
- -- hamatoma <inosid@hm.f-r-e-i.de>  Sun, 23 Oct 2011 10:25:37 +0200
+ -- hamatoma <siduction@hm.f-r-e-i.de>  Sun, 23 Oct 2011 10:25:37 +0200
