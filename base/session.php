@@ -588,5 +588,15 @@ class Session{
 			$output = '$5$aChnRTTCXTG7$h6z1eVHhVrnBzb6gYjDJrT7q/BARtkDTckTaQyDWyF3';	
 		return $output;
 	}
+	/** Appends escape sequences for a shell.
+	 * 
+	 * $ will be replaced by '\$'
+	 * @param $text the text to work
+	 * @return the text with escape characters
+	 */
+	function escShell($text){
+		$rc = str_replace('$', '\\$', $text);
+		return $rc;
+	}
 }
 ?>

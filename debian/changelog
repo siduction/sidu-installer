@@ -1,8 +1,9 @@
-sidu-installer (0.1-2.1) unstable; urgency=low
+sidu-installer (0.1-3) unstable; urgency=low
 
-  * Fix: startgui.sh: configuration variable START_GUI_HOME for home. Necessary for .Xauthority
-  * Standard poll rate for the website: 3 second
-  * 
+  * Fix: startgui.sh: configuration variable START_GUI_HOME for home. Necessary for .Xauthority.
+  * Standard poll rate for the website: 3 second.
+  * Shows the duration of the installation.
+  * Fix: $ in password hash must be quoted.
 
  -- Hamatoma <siduction@hm.f-r-e-i.de>  Fri, 11 Nov 2011 00:20:42 +0100
 

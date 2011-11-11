@@ -14,10 +14,21 @@ class RunPage extends Page{
 		parent::__construct($session, 'run');
 		$this->setDefaultOption('force', 0, true);
 		$value = $this->getUserData('running');
-		if (! empty($value))
-			$text = $this->getConfiguration('info_running');
-		else
+		if (empty($value))
 			$text = $this->getConfiguration('button');
+		else{
+			$duration = $this->getUserData('duration');
+			if (empty($duration)){
+				$duration = time() - (int) $value;
+				if ($duration > 3600)
+					$duration = sprintf("%d:%02d:%02d", $duration / 3600, $duration % 3600 / 60, $duration % 60);
+				else					
+					$duration = sprintf("%02d:%02d", $duration % 3600 / 60, $duration % 60);
+			}
+			$this->setUserData('duration', $duration);
+			$text = $this->getConfiguration('info_running');
+			$text = str_replace('###DURATION###', $duration, $text);
+		}
 		$this->setReplacement('###BUTTON_OR_INFO###', $text, false);
 		$rootfs = $session->userData->getValue('rootfs', 'root');
 		$this->setReplacement('###ROOT_FS###', $rootfs);
@@ -137,12 +148,14 @@ class RunPage extends Page{
 		$curValue = $this->session->makePasswordHash($curValue);
 		$params[] = "pw=$curValue"; 
 		$lines[] = "USERPASS_MODULE='configured'";
+		$curValue = $this->session->escShell($curValue);
 		$lines[] = "USERPASS_CRYPT='$curValue'";		
 			
 		$curValue = $this->session->userData->getValue('user', 'root_pass');
 		$curValue = $this->session->makePasswordHash($curValue);
 		$params[] = "rootpw=$curValue"; 
 		$lines[] = "ROOTPASS_MODULE='configured'";
+		$curValue = $this->session->escShell($curValue);
 		$lines[] = "ROOTPASS_CRYPT='$curValue'";
 		
 		$curValue = $this->session->userData->getValue('network', 'host');
@@ -225,7 +238,7 @@ class RunPage extends Page{
 	function onButtonClick($button){
 		$rc = true;
 		if (strcmp($button, 'button_install') == 0){
-			$this->setUserData('running', 'T');
+			$this->setUserData('running', time());
 			$this->startInstallation();
 		}
 		elseif (strcmp($button, 'button_prev') == 0){
