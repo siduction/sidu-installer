@@ -109,7 +109,7 @@ class BootPage extends Page{
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
-		$rc = array('loader', 'target', 'zone');
+		$rc = array('loader', 'target', 'region', 'city');
 		return $rc;
 	}
 	/** Handles the button click of "refresh".
@@ -137,6 +137,9 @@ class BootPage extends Page{
 		} elseif (strcmp($button, 'button_prev') == 0){
 			$redraw = $this->navigation(true);
 		} elseif (strcmp($button, 'button_next') == 0){
+			$timezone = $this->session->getField('region') . '/' . $this->session->getField('city');
+			$this->session->exec(NULL, SVOPT_DEFAULT, 
+					'timezoneinfo', array('set',  $timezone), 0);
 			$redraw = $this->navigation(false);
 		} else {
 			$this->session->log("unknown button: $button");

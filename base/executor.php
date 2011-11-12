@@ -53,6 +53,8 @@ class Executor{
 		$filename = $this->dirTask . $this->session->sessionId 
 			. '.' . strval(time()) . '.' 
 			. strval(++$this->fileNo) . '.cmd';
+		if ($answer == NULL)
+			$answer = $this->session->tempDir . "/answer.dummy";
 		$tmpName = $filename . ".tmp";
 		if (file_exists($answer))
 			unlink($answer);
