@@ -1,0 +1,3 @@
+<div class="textblock warning">
+###txt_wait_for_partinfo###
+</div>

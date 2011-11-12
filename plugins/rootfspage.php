@@ -17,7 +17,11 @@ class RootfsPage extends Page{
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'rootfs');
-		$this->diskInfo = new DiskInfo($session, $this);
+		$value = $this->getUserData('reload.partinfo');
+		$forceRebuild = ! empty($value);
+		if ($forceRebuild)
+			$this->setUserData('reload.partinfo', '');
+		$this->diskInfo = new DiskInfo($session, $this, $forceRebuild);
 		$this->setDefaultOption('disk', 0, true);
 		$this->setDefaultOption('disk2', 0, true);
 		$this->setDefaultOption('partman', 0, true);
@@ -36,7 +40,10 @@ class RootfsPage extends Page{
 		$this->fillOptions('root', true);
 		$this->fillOptions('disk2', true);
 		$this->fillRows('partinfo');
-		$this->diskInfo->buildInfoTable();		
+		$this->diskInfo->buildInfoTable();
+		$text = $this->diskInfo->getWaitForPartitionMessage();
+		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text, 
+			$this->content);
 	}
 	/** Returns an array containing the input field names.
 	 * 
@@ -81,6 +88,8 @@ class RootfsPage extends Page{
 				
 				$params = explode('|', $params);
 				$this->session->exec($answer, $options, $command, $params, 0);
+				// Partition info is potentially changed. Reload necessary:
+				$this->setUserData('reload.partinfo', 'T');
 				$redraw = $this->startWait($answer, $program, $description, $progress);
 				$this->session->trace(TRACE_RARE, 'onButton(): redraw: ' . strval($redraw));
 			}

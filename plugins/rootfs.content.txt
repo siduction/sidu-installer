@@ -1,5 +1,6 @@
 <div id="text_area">
 <h1>###txt_title###</h1>
+###WAIT_FOR_PARTINFO###
 <div class="textblock">
 <p>###txt_intro_partman###
 </p>

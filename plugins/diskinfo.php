@@ -18,10 +18,11 @@ class DiskInfo {
 	var $hasInfo;
 	/** Constructor.
 	 * 
-	 * @param $session	the session info
-	 * @param $page		the current plugin. Type: Derivation of Page
+	 * @param $session		the session info
+	 * @param $page			the current plugin. Type: Derivation of Page
+	 * @param $forceRebuild	Deletes the partition info file to force rebuilding
 	 */
-	function __construct(&$session, $page){
+	function __construct(&$session, $page, $forceRebuild){
 		$this->session = $session;
 		$this->hasInfo = false;
 		$this->page = $page;
@@ -32,6 +33,12 @@ class DiskInfo {
 		if (! file_exists($this->filePartInfo))
 			$this->filePartInfo = $session->configuration->getValue(
 				'diskinfo.file.partinfo');
+			
+		if ($forceRebuild && file_exists($this->filePartInfo)){
+			$this->session->userData->setValue('', 'partinfo', '');
+			unlink($this->filePartInfo);
+		}
+		
 		$wait = (int) $session->configuration->getValue('diskinfo.wait.partinfo');
 		$maxWait = (int) $session->configuration->getValue('diskinfo.wait.partinfo.creation');
 		if ($session->testFile($this->filePartInfo, 
@@ -99,7 +106,8 @@ class DiskInfo {
 		$this->session->trace(TRACE_RARE, 'DiskInfo.readPartitionInfo()');
 		if ($force || $this->partitions == NULL)
 		{
-			$this->importPartitionInfo();
+			if ($this->hasInfo)
+				$this->importPartitionInfo();
 			$value = $this->session->userData->getValue('', 'partinfo');
 			$disks = array();
 			$devs = '-';
@@ -206,6 +214,21 @@ class DiskInfo {
 			}
 		}
 	}
+	/** Returns a message that we must wait for the partition info.
+	 * 
+	 * @return '': Partition info is available. Otherwise: the info message
+	 */
+	function getWaitForPartitionMessage(){
+		if ($this->hasInfo)
+			$rc = '';
+		else{
+			$rc = $this->session->readFileFromPlugin('waitforpartinfo.txt', false);
+			$text = $this->session->configuration->getValue('diskinfo.txt_wait_for_partinfo');
+			$rc = str_replace('###txt_wait_for_partinfo###', $text, $rc);
+		}
+		return $rc;
+	}
+	
 }
 /**
  * Implements a storage for a partition info.

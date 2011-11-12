@@ -15,7 +15,7 @@ class MountpointPage extends Page{
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'mountpoint');
-		$this->diskInfo = new DiskInfo($session, $this);
+		$this->diskInfo = new DiskInfo($session, $this, false);
 		$this->setDefaultOption('add_dev', 0, false);
 		$this->setDefaultOption('add_label', 0, false);
 		$this->setDefaultOption('add_mount', 0, false);
@@ -34,7 +34,11 @@ class MountpointPage extends Page{
 		$this->fillOptions('add_mount');
 		$this->fillOptions('mountonboot');
 		$this->fillRows('mounts');		
-		$this->fillRows('partinfo');		
+		$this->fillRows('partinfo');
+		$text = $this->diskInfo->getWaitForPartitionMessage();
+		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text, 
+			$this->content);
+		
 	}
 	/** Returns an array containing the input field names.
 	 * 
