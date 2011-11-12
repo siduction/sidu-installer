@@ -1,7 +1,7 @@
 <div id="text_area">
 <h1>###txt_partition###</h1>
-<div class="textblock">
 ###WAIT_FOR_PARTINFO###
+<div class="textblock">
 <table class="table_col5">
 	<tr>
 		<th>###txt_device###</th>
