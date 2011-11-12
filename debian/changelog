@@ -1,3 +1,10 @@
+sidu-installer (0.2-2) unstable; urgency=low
+
+  * Fix: partition devices without digits corrupt the output
+  * Debug code in partinfo.pl
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Sat, 12 Nov 2011 22:31:26 +0100
+
 sidu-installer (0.2-1) unstable; urgency=low
 
   * Sets the timezone.

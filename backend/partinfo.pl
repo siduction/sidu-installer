@@ -1,5 +1,9 @@
 #! /usr/bin/perl
 use strict;
+my $fdisk = shift;
+$fdisk = "fdisk -l |" unless $fdisk;
+my $blkid = shift;
+$blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
 
 my $verbose = 0;
 my $mountpoint = "/tmp/partinfo-mount";
@@ -23,17 +27,17 @@ if (! -d $mountpoint){
 }
 # get the info from fdisk:
 my %devs;
-open(CMD, "fdisk -l|") || die "fdisk failed: $!";
+open(CMD, $fdisk) || die "$fdisk failed: $!";
 my ($dev, $size, $ptype, $info);
 while(<CMD>){
-	#if (/^(\S+)\s+\d+\s+\d+\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)/){
+	s/\*/ /;
 	if (/^(\S+)\s+\d+\s+\d+\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)/){
 		$dev = $1;
 		$size = $2;
 		$ptype = $3;
 		$info = $4;
-		# forget extended and swap:
-		if ($ptype != 5 && $ptype != 82){
+		# forget extended:
+		if ($ptype != 5){
 			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 		}
 	}
@@ -42,7 +46,7 @@ close CMD;
 
 # get the info from blkid
 
-open(CMD, "/sbin/blkid -c /dev/null|") || die "/sbin/blkid failed: $!";
+open(CMD, $blkid) || die "$blkid failed: $!";
 my %blkids;
 my ($label, $uuid, $fs, $info2);
 while(<CMD>){
@@ -83,14 +87,17 @@ foreach $dev (keys %devs){
 	}
 }
 
-my (%sort, $key);
+my (%sorted, $key);
 foreach $dev (keys %blkids){
-	$dev =~ /(\D+)(\d+)/;
-	$key = sprintf ("%s%03d", $1, $2);
-	$sort{$key} = $dev;
+	if ($dev =~ /(\D+)(\d+)/){
+		$key = $1 . sprintf ("%03d", $2);
+	} else {
+		$key = $dev;
+	} 
+	$sorted{$key} = $dev;
 }
-foreach $key (sort keys %sort){
-	$dev = $sort{$key};
+foreach $key (sort keys %sorted){
+	$dev = $sorted{$key};
 	print $dev, "\t", $blkids{$dev}, "\n";
 }
 # searches for extended info of a partition
