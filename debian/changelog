@@ -8,6 +8,7 @@ sidu-installer (0.1-5) unstable; urgency=low
   * Fix: Deletes user data only if it exists.
   * Fix: Preloading can have 2 or 3 arguments.
   * Message when we wait for the partition info.
+  * Partition info will be cleared if no info is available.
 
  -- Hamatoma <siduction@hm.f-r-e-i.de>  Sat, 12 Nov 2011 11:04:06 +0100
 

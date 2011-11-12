@@ -48,7 +48,20 @@ class DiskInfo {
 		$this->hasInfo = file_exists($this->filePartInfo);
 		if ($this->hasInfo)
 			$this->readPartitionInfo(true);
+		else
+			$this->clearPartitionInfo();
 	}
+	/** Sets all gui info related with partition info to undefined.
+	 */
+	function clearPartitionInfo(){
+		$this->session->userData->setValue('rootfs', 'opt_disk', '-');
+		$this->session->userData->setValue('rootfs', 'opt_disk2', '-');
+		$this->session->userData->setValue('mountpoint', 'opt_disk2', '-');
+		$this->session->userData->setValue('rootfs', 'opt_root', '-');
+		$this->session->userData->setValue('mountpoint', 'opt_add_dev', '-');
+		$this->session->userData->setValue('mountpoint', 'opt_add_label', '-');
+		$this->page->setRowCount('partinfo', 0);
+	}	
 	/** Gets the data of the partition info and put it into into the user data.
 	 */
 	function importPartitionInfo(){
@@ -97,7 +110,7 @@ class DiskInfo {
 		// strip the first separator:
 		$partitions = substr($partitions, 1);
 		$this->session->userData->setValue('', 'partinfo', $partitions);
-	}	
+	}
 	/** Reads the partition infos from the user data.
 	 * 
 	 * @param $force	true: the data will be read always. false: reading is done 
@@ -197,9 +210,8 @@ class DiskInfo {
 	/** Builds dynamic part of the partition info table.
 	 */
 	function buildInfoTable(){
-		$this->readPartitionInfo();
 		$disk = $this->session->getField('disk2');
-		if (! empty($disk)){
+		if ($this->hasInfo && ! empty($disk)){
 			$partitions = $this->getPartitionsOfDisk($disk);
 			$this->page->setRowCount('partinfo', 0);
 			foreach ($partitions as $dev => $item){
