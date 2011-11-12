@@ -18,11 +18,21 @@ class HomePage extends Page{
 			$count = (int) $this->getConfiguration('preload.count');
 			for ($ix = 0; $ix < $count; $ix++){
 				$value = $this->getConfiguration("preload.$ix");
-				list ($answer, $command, $param) = explode(CONFIG_SEPARATOR, $value);
+				$cols = explode(CONFIG_SEPARATOR, $value);
+				if (count($cols) < 2){
+					$this->session->log("wrong preload [$ix]:" . $value);
+					$cols[0] = 'echo';
+					$cols[1] = 'error';
+					$cols[2] = $value;
+				}
+				$answer = $cols[0];
+				$command = $cols[1];
+				$param = count($cols) <= 2 ? '' : $cols[2];
+				
 				if (strpos($param, '|') > 0)
 					$param = explode('|', $param);
 				$opt = '';	
-				if (strncmp($command, "&", 1) == 0){
+				if (strncmp($command, '&', 1) == 0){
 					$opt = SVOPT_BACKGROUND;
 					$command = substring($command, 1);
 				}
