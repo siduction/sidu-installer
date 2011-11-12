@@ -74,8 +74,11 @@ class UserData{
 			}
 		}
 	}
+	/** Clears the user data.
+	*/
 	function clear(){
-		$fp = unlink($this->filename);
+		if (file_exists($this->filename))
+			$fp = unlink($this->filename);
 	}
 }
 ?>
