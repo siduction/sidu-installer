@@ -80,7 +80,7 @@ class Session{
 	function __construct(){
 		global $_SERVER;
 		
-		$doTrace = False;
+		$doTrace = false;
 		$server = $_SERVER;
 		$this->charset = 'UTF-8';
 		$this->tempDir = NULL;
@@ -110,7 +110,7 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'run';
+		$page = 'rootfs';
 		$_SERVER = array();
 
 		$_SERVER['PATH_TRANSLATED'] = '/usr/share/sidu-installer/home';
@@ -146,8 +146,8 @@ class Session{
 		$_SERVER["REQUEST_METHOD"] = 'get';
 		}
 		
-		#$_POST['button_next'] = 'x';
-		$_POST['button_install'] = 'x';
+		$_POST['button_next'] = 'x';
+		#$_POST['button_install'] = 'x';
 		
 		$_POST['root_pass'] = '123456';
 		$_POST['root_pass2'] = '123456';
@@ -596,6 +596,40 @@ class Session{
 	 */
 	function escShell($text){
 		$rc = str_replace('$', '\\$', $text);
+		return $rc;
+	}
+	/** Forces the reload of the current page.
+	 * 
+	 * @param $wait	The time in seconds of the reload
+	 */
+	function forceReload($wait){
+		$this->metaDynamic = "<meta http-equiv=\"refresh\" content=\"$wait; URL=" . $this->urlForm . '" />';
+	}
+	/** Tests wheter the given file exists.
+	 * 
+	 * The file cretion will be forced:
+	 * The file doesnt exist and:
+	 *   This is the first time
+	 *   The timeForCreation is left since the last creation
+	 * @param $file				the file to test
+	 * @param $id				the key in the user data
+	 * @param $wait				the number of seconds until the next reload
+	 * @param $timeForCreation	the number of seconds needed to create the file
+	 * 							
+	 * @return true: the file must be created. false: otherwise 
+	 */
+	function testFile($file, $id, $timeForCreation){
+		$rc = false;
+		if (! file_exists($file)){
+			$created = $this->userData->getValue('', $id);
+			if (empty($created)){
+				$rc = true;
+				$this->userData->setValue('', $id, (string) time());
+			} elseif (time() - (int) $created - 3 >= $timeForCreation) {
+				$this->userData->setValue('', $id, '');
+			}
+			$this->forceReload(3);
+		}
 		return $rc;
 	}
 }

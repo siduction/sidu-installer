@@ -27,7 +27,6 @@ class MountpointPage extends Page{
 	 * Overwrites the method in the baseclass.
 	 */
 	function build(){
-		$this->diskInfo->readPartitionInfo();
 		$this->readContentTemplate();
 		$this->fillOptions('disk2', true);
 		$this->fillOptions('add_dev', true);
@@ -49,7 +48,6 @@ class MountpointPage extends Page{
 	/** Handles the "add mountpoint" button.
 	 */
 	function addMount(){
-		$this->diskInfo->readPartitionInfo();
 		$ok = true;
 		$dev = $this->session->getField('add_dev');
 		$label = $this->session->getField('add_label');

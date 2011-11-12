@@ -12,6 +12,10 @@ class DiskInfo {
 	var $session;
 	/// an array of PartitionInfo.
 	var $partitions;
+	/// the file created by the shellserver
+	var $filePartInfo;
+	/// True: the partition info is avaliable.
+	var $hasInfo;
 	/** Constructor.
 	 * 
 	 * @param $session	the session info
@@ -19,17 +23,32 @@ class DiskInfo {
 	 */
 	function __construct(&$session, $page){
 		$this->session = $session;
+		$this->hasInfo = false;
 		$this->page = $page;
 		$this->name = $page->name;
 		$this->partitions = NULL;
+		$this->filePartInfo = $session->configuration->getValue(
+			'diskinfo.file.demo.partinfo');
+		if (! file_exists($this->filePartInfo))
+			$this->filePartInfo = $session->configuration->getValue(
+				'diskinfo.file.partinfo');
+		$wait = (int) $session->configuration->getValue('diskinfo.wait.partinfo');
+		$maxWait = (int) $session->configuration->getValue('diskinfo.wait.partinfo.creation');
+		if ($session->testFile($this->filePartInfo, 
+				'partinfo.created', $wait, $maxWait))
+			$session->exec($this->filePartInfo, SVOPT_DEFAULT,
+				'partinfo', NULL, 0);
+		$this->hasInfo = file_exists($this->filePartInfo);
+		if ($this->hasInfo)
+			$this->readPartitionInfo(true);
 	}
-	/** Writes the partition info into the user data.
+	/** Gets the data of the partition info and put it into into the user data.
 	 */
-	function writePartitionInfo(){
-		$this->session->trace(TRACE_RARE, 'DiskInfo.writePartitionInfo()');
-		$file = File($this->page->filePartInfo);
+	function importPartitionInfo(){
+		$this->session->trace(TRACE_RARE, 'DiskInfo.importPartitionInfo()');
+		$file = File($this->filePartInfo);
 		$partitions = '';
-		$excludes = $this->session->configuration->getValue('rootfs.excluded.dev');
+		$excludes = $this->session->configuration->getValue('diskinfo.excluded.dev');
 		if (strlen($excludes) > 0)
 			$excludes = '/' . str_replace('/', '\/', $excludes) . '/';
 		
@@ -80,10 +99,8 @@ class DiskInfo {
 		$this->session->trace(TRACE_RARE, 'DiskInfo.readPartitionInfo()');
 		if ($force || $this->partitions == NULL)
 		{
-			// @todo Simulation!
+			$this->importPartitionInfo();
 			$value = $this->session->userData->getValue('', 'partinfo');
-			if (empty($value))
-				$this->writePartitionInfo();
 			$disks = array();
 			$devs = '-';
 			$labels = '-';

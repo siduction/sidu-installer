@@ -238,7 +238,7 @@ class RunPage extends Page{
 	function onButtonClick($button){
 		$rc = true;
 		if (strcmp($button, 'button_install') == 0){
-			$this->setUserData('running', time());
+			$this->setUserData('running', strval(time()));
 			$this->startInstallation();
 		}
 		elseif (strcmp($button, 'button_prev') == 0){

@@ -22,12 +22,6 @@ class RootfsPage extends Page{
 		$this->setDefaultOption('disk2', 0, true);
 		$this->setDefaultOption('partman', 0, true);
 		$this->setDefaultOption('filesys', 0, true);
-		$this->filePartInfo = $this->getConfiguration('file.demo.partinfo');
-		if (! file_exists($this->filePartInfo))
-			$this->filePartInfo = $this->getConfiguration('file.partinfo');
-		if (! file_exists($this->filePartInfo))
-			$session->exec($this->filePartInfo, SVOPT_DEFAULT,
-				 'partinfo', NULL, 0);
 	}
 	/** Builds the core content of the page.
 	 * 
@@ -35,14 +29,14 @@ class RootfsPage extends Page{
 	 */
 	function build(){
 		$this->session->trace(TRACE_RARE, 'RootfsPage.build()');
-		$this->diskInfo->readPartitionInfo();
 		$this->readContentTemplate();
 		$this->fillOptions('disk', true);
 		$this->fillOptions('partman');
 		$this->fillOptions('filesys');
 		$this->fillOptions('root', true);
 		$this->fillOptions('disk2', true);
-		$this->fillRows('partinfo');		
+		$this->fillRows('partinfo');
+		$this->diskInfo->buildInfoTable();		
 	}
 	/** Returns an array containing the input field names.
 	 * 

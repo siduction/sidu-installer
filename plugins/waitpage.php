@@ -14,7 +14,7 @@ class WaitPage extends Page{
 	function __construct(&$session){
 		parent::__construct($session, 'wait');
 		$sleep = (int) $this->getConfiguration('refresh');
-		$session->metaDynamic = "<meta http-equiv=\"refresh\" content=\"$sleep; URL=" . $session->urlForm . '" />';
+		$session->forceReload($sleep);
 	}
 	/** Reads one entry of the progress file.
 	 * 
