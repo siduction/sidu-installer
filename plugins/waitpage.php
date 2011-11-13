@@ -64,7 +64,7 @@ class WaitPage extends Page{
 		$demoText = '';
 		$file = $this->getUserData('answer');
 		if (file_exists($file)){
-			unlink($file);
+			$this->setUserData('file.answer', $file);
 			$this->stop('wait.ready');
 		} else{
 			$this->readContentTemplate();

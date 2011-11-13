@@ -13,4 +13,8 @@
 <div class="textblock center">
 <input type="submit" name="button_reboot" value="###txt_reboot###" />
 </div>
+<div class="textblock details">
+<h2>###txt_details###</h2>
+<pre>###DETAILS###
+</pre>
 </div> <!--text_area-->

@@ -4,6 +4,7 @@
 # A progress info is written
 #set -x
 ANSWER=$1
+ANSWER_TEMP=$ANSWER.tmp
 PARAMFILE=$2
 ETC_CONFIG=/etc/sidu-installer/shellserver.conf
 
@@ -54,9 +55,11 @@ EOS
 	test -z "$CMD" && test -e fll-installer && CMD=./fll-installer
 	test -z "$CMD" && CMD=$BIN_FLL_INSTALLER
 	test -n "$SHELLSERVERLOG" && echo >> $SHELLSERVERLOG "pwd=$(pwd) ; ./fll-installer -i $PROGRESSFILE"
-	$CMD -i $PROGRESSFILE
-	touch $ANSWER
+	$CMD -i $PROGRESSFILE >$ANSWER_TEMP 2>&1
+	mv $ANSWER_TEMP $ANSWER
+	test -n "$VERBOSE" && ls -ld $ANSWER
 	rm -f $PROGRESSFILE
+	test -n "$VERBOSE" && echo $PROGRESSFILE was removed
 }
 
 fll_install

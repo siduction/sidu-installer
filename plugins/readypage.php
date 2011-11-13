@@ -43,6 +43,9 @@ class ReadyPage extends Page{
 		$text = $this->getConfiguration('txt_runtime');
 		$text = str_replace('###DURATION###', $duration, $text);
 		$this->content = str_replace('###txt_runtime###', $text, $this->content);
+		$answer = $this->session->userData->getValue('wait', 'file.answer');
+		$text = ! file_exists($answer) ? '' : $this->session->readFile($answer);
+		$this->content = str_replace('###DETAILS###', $text, $this->content);
 		return $this->content;
 	}	
 	/** Will be called on a button click.

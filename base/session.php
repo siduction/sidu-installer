@@ -174,8 +174,10 @@ class Session{
 		else 
 			$this->fields = $_GET;
 		$this->trace(TRACE_CONFIG, '_SERVER:');
-		foreach ($_SERVER as $key => $value)
-			$this->trace(TRACE_CONFIG, $key . '=' . $value);
+		#foreach ($_SERVER as $key => $value)
+		#	$this->trace(TRACE_CONFIG, $key . '=' . $value);
+		if (! empty($_SERVER['TRACE_FLAGS']))
+			$this->traceFlag = $_SERVER['TRACE_FLAGS']; 
 		$mode = $_SERVER['REQUEST_METHOD'];
 		$this->usePost = strcasecmp($mode, 'post') == 0;
 		$this->scriptFile = $_SERVER['SCRIPT_FILENAME'];
