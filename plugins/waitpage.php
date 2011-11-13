@@ -68,13 +68,19 @@ class WaitPage extends Page{
 			$this->stop('wait.ready');
 		} else{
 			$this->readContentTemplate();
+			$intro = $this->getConfiguration('txt_intro'); 
+			$value = $this->getUserData('program');
+			if (strpos($value, ' ') > 0)
+				$intro = $value;
+			else
+				$intro = str_replace('###PROGRAM###', $value, $intro);
+			$this->content = str_replace('###txt_intro###', $intro, $this->content);
+			
 			// We bring forward the replacement because of the texts contain markers themself.
 			$this->replaceTextMarkers();
 			$this->replaceMarkers();
 			$value = $this->getUserData('description');
 			$this->content = str_replace('###DESCRIPTION###', $value, $this->content);
-			$value = $this->getUserData('program');
-			$this->content = str_replace('###PROGRAM###', $value, $this->content);
 			$procent = -1;
 			$state = "";
 			if (! file_exists('/etc/inosid/demo_progress')){

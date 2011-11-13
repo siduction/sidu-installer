@@ -226,9 +226,9 @@ class RunPage extends Page{
 		
 		$options = 'background requestfile';
 		$command = 'install';
-		
+		$text = $this->getConfiguration('wait.intro');
 		$this->session->exec($answer, $options, $command, $params, 0);
-		$redraw = $this->startWait($answer, $program, $description, $progress);
+		$redraw = $this->startWait($answer, $text, $description, $progress);
 
 	}	
 	/** Will be called on a button click.
