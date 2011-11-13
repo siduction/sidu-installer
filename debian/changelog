@@ -13,6 +13,13 @@ sidu-installer (0.2-2) unstable; urgency=low
 
  -- Hamatoma <siduction@hm.f-r-e-i.de>  Sat, 12 Nov 2011 22:31:26 +0100
 
+sidu-installer (0.2-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * fixed typo and added some spaces
+
+ -- Ferdinand Thommes <devil@siduction.org>  Sat, 12 Nov 2011 21:40:29 +0100
+
 sidu-installer (0.2-1) unstable; urgency=low
 
   * Sets the timezone.
