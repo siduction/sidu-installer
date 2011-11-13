@@ -63,7 +63,10 @@ class WaitPage extends Page{
 		$this->session->trace(TRACE_RARE, 'WaitPage.build()');
 		$demoText = '';
 		$file = $this->getUserData('answer');
-		if (file_exists($file)){
+		$value = $this->getUserData('blocked');
+		if (! empty($value))
+			$this->stop('blocked is set');
+		elseif (file_exists($file)){
 			$this->setUserData('file.answer', $file);
 			$this->stop('wait.ready');
 		} else{

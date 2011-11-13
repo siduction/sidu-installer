@@ -13,6 +13,9 @@ class ReadyPage extends Page{
 	function __construct(&$session){
 		parent::__construct($session, 'ready');
 		$this->setDefaultOption('force', 0, true);
+		// Midori bug: midori calls page wait after reaching page ready.
+		// Therefore we must block wait:
+		$session->userData->setValue('wait', 'blocked', 'T');
 		$duration = $session->userData->getValue('run', 'duration');
 		if (empty($duration)){
 			$duration = time() - (int) $value;
