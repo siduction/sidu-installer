@@ -1,3 +1,11 @@
+sidu-installer (0.3-1) unstable; urgency=low
+
+  * Root partitions will be filtered (size, no swap). 
+  * Fix: index access on default values, if none is defined.
+  * No default root partition (too dangerous). Error message if not choosen.
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Sun, 13 Nov 2011 00:50:36 +0100
+
 sidu-installer (0.2-2) unstable; urgency=low
 
   * Fix: partition devices without digits corrupt the output

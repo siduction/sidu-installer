@@ -125,7 +125,10 @@ class DiskInfo {
 			$disks = array();
 			$devs = '-';
 			$labels = '-';
+			$rootDevs = '-';
 			$info = $this->session->userData->getValue('', 'partinfo');
+			$minSize = (int) $this->session->configuration->getValue('diskinfo.root.minsize.mb');
+			
 			$this->partitions = array();
 			if (!empty($info)){
 				$parts = explode(SEPARATOR_PARTITION, $info);
@@ -138,6 +141,9 @@ class DiskInfo {
 						$disks[$disk] = 1;
 					}
 					$this->partitions[$item->device] = $item;
+					// Ignore too small partitions and swap:
+					if ($item->megabytes >= $minSize && strcmp($item->partType, '82') != 0)
+						$rootDevs .= ';' . $item->device;
 					$devs .= ';' . $item->device;
 					if (! empty($item->label)){
 						$labels .= ';' . $item->label;
@@ -150,7 +156,7 @@ class DiskInfo {
 				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist);
 				$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
 				$this->session->userData->setValue('mountpoint', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('rootfs', 'opt_root', substr($devs, 2));
+				$this->session->userData->setValue('rootfs', 'opt_root', $rootDevs);
 				$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
 				$this->session->userData->setValue('mountpoint', 'opt_add_label', $labels);
 			}
@@ -251,7 +257,7 @@ class PartitionInfo{
 	var $device;
 	/// volume label
 	var $label;
-	/// size and unit, e.g. 1.2 GB
+	/// size and unit, e.g. 11GB
 	var $size;
 	/// partition type
 	var $partType;
@@ -259,6 +265,8 @@ class PartitionInfo{
 	var $filesystem;
 	/// additional info
 	var $info;
+	/// size in MByte
+	var $megabytes;
 	/** Constructor.
 	 * 
 	 * @param $info		the partition info, separated by "\t"
@@ -272,6 +280,7 @@ class PartitionInfo{
 				$this->info) 
 			= explode(SEPARATOR_INFO, $info);
 		$size = (int) $size;
+		$this->megabytes = $size / 1000;
 		if ($size < 10*1000)
 			$size = sprintf('%dMB', $size);
 		elseif ($size < 10*1000*1000)

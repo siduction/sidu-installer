@@ -244,7 +244,12 @@ abstract class Page{
 			$key = 'opt_' . $field;
 			$value = $this->getConfiguration($key);
 			$list = explode(OPT_SEPARATOR, $value);
-			$selected = $list[$index];
+			if ($index < count($list))
+				$selected = $list[$index];
+			elseif (count($list) == 0)
+				$selected = '-';
+			else
+				$selected = $list[0];
 			$this->setUserData($field, $selected);
 		}
 	}

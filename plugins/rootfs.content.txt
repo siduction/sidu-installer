@@ -45,6 +45,7 @@
 		<td></td>
 	</tr>
 </table>
+<div>###ERROR_ROOT###</div>
 </div>
 <div class="textblock">
 <p>###txt_intro_info###

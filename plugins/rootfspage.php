@@ -22,6 +22,8 @@ class RootfsPage extends Page{
 		if ($forceRebuild)
 			$this->setUserData('reload.partinfo', '');
 		$this->diskInfo = new DiskInfo($session, $this, $forceRebuild);
+			
+		$this->setDefaultOption('filesys', 1, true);
 		$this->setDefaultOption('disk', 0, true);
 		$this->setDefaultOption('disk2', 0, true);
 		$this->setDefaultOption('partman', 0, true);
@@ -93,9 +95,14 @@ class RootfsPage extends Page{
 				$redraw = $this->startWait($answer, $program, $description, $progress);
 				$this->session->trace(TRACE_RARE, 'onButton(): redraw: ' . strval($redraw));
 			}
-		} elseif (strcmp($button, "button_next") == 0){
-			$redraw = $this->navigation(false);
-		} elseif (strcmp($button, "button_prev") == 0){
+		} elseif (strcmp($button, 'button_next') == 0){
+			$value = $this->session->getField('root');
+			if (strcmp($value, '-') == 0)
+				$redraw = ! $this->setFieldError('root', 
+					$this->i18n('ERR_EMPTY_ROOT', 'No root partition chosen!'));
+			else
+				$redraw = $this->navigation(false);
+		} elseif (strcmp($button, 'button_prev') == 0){
 			$redraw = $this->navigation(true);
 		} elseif (strncmp($button, 'button_del_', 11) == 0){
 			$ix = (int) substr($button, 11);
