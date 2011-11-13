@@ -1,3 +1,10 @@
+sidu-installer (0.3-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * changes to the textphrases and fixed typos
+
+ -- Ferdinand Thommes <devil@siduction.org>  Sun, 13 Nov 2011 08:34:39 +0100
+
 sidu-installer (0.3-1) unstable; urgency=low
 
   * Root partitions will be filtered (size, no swap). 
