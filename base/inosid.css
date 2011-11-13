@@ -46,6 +46,12 @@ body {
 }
 .navigation{
 }
+.next_button{
+	text-align: right;
+}
+.prev_button{
+	text-align: right;
+}
 .logo{
 }
 .button_one_only{

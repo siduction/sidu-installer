@@ -28,6 +28,7 @@ class RunPage extends Page{
 			$this->setUserData('duration', $duration);
 			$text = $this->getConfiguration('info_running');
 			$text = str_replace('###DURATION###', $duration, $text);
+			$this->session->gotoPage('ready', 'runpage');
 		}
 		$this->setReplacement('###BUTTON_OR_INFO###', $text, false);
 		$rootfs = $session->userData->getValue('rootfs', 'root');

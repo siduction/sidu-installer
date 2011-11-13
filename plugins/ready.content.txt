@@ -1,0 +1,16 @@
+<div id="text_area">
+<h1>###txt_title###</h1>
+
+<div class="textblock">
+###txt_intro###
+</div>
+<div class="textblock center">
+###txt_runtime###
+</div>
+<div class="textblock">
+###txt_help###
+</div>
+<div class="textblock center">
+<input type="submit" name="button_reboot" value="###txt_reboot###" />
+</div>
+</div> <!--text_area-->
