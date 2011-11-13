@@ -71,16 +71,16 @@ if (! file_exists($pageDefinition)){
  * @return the template with expanded markers
  */
 function replaceInTemplate(&$session, $pagename, $pageText){
-	$isHome = strcmp($pagename, 'home') == 0;
-	$isWait = strcmp($pagename, 'wait') == 0;
-	if ($isHome || $isWait)
+	$prevPage = $session->getPrevPage($pagename);
+	if ($prevPage == NULL)
 		$button = '&nbsp;';
 	else 
 		$button = $session->configuration->getValue('.gui.button.prev');
 	$pageText = str_replace('###BUTTON_PREV###', $button, $pageText);
 				
 	// Is this the last page?
-	if ($isWait || ! $isHome && strcmp($session->getNextPage($pagename), 'home') == 0)
+	$nextPage = $session->getNextPage($pagename);
+	if ($nextPage == NULL)
 		$button = '&nbsp;';
 	else 
 		$button = $session->configuration->getValue('.gui.button.next');

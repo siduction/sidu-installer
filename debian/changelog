@@ -1,3 +1,9 @@
+sidu-installer (0.4-2) unstable; urgency=low
+
+  * No "back" button in ready page
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Sun, 13 Nov 2011 12:13:37 +0100
+
 sidu-installer (0.4-1) unstable; urgency=low
 
   * New frontend plugin: readypage.php

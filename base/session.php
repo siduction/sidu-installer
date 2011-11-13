@@ -110,7 +110,7 @@ class Session{
 	function simulateServer(){
 		global $_SERVER, $_POST, $_GET;
 		$this->trace(TRACE_FINE, 'simulateServer()');
-		$page = 'rootfs';
+		$page = 'ready';
 		$_SERVER = array();
 
 		$_SERVER['PATH_TRANSLATED'] = '/usr/share/sidu-installer/home';
@@ -494,12 +494,12 @@ class Session{
 	/** Returns the previous page (name of the plugin).
 	 * 
 	 * @param $current	the name of the current plugin.
-	 * @return "home": there is no previous page. Otherwise: the name of the previous plugin
+	 * @return NULL: there is no previous page. Otherwise: the name of the previous plugin
 	 */
 	function getPrevPage($current){
 		$plugins = explode(CONFIG_SEPARATOR, $this->configuration->getValue('.gui.pages'));
-		$rc = 'home';
-		$last = 'home';
+		$rc = NULL;
+		$last = NULL;
 		foreach ($plugins as $key => $name){
 			$name = trim($name);
 			if (strcmp($name, $current) == 0){
@@ -514,12 +514,12 @@ class Session{
 	/** Returns the next page (name of the plugin).
 	 * 
 	 * @param $current	the name of the current plugin.
-	 * @return "home": there is no next page. Otherwise: the name of the next plugin
+	 * @return NULL: there is no next page. Otherwise: the name of the next plugin
 	 */
 	function getNextPage($current){
 		$list = $this->configuration->getValue('.gui.pages');
 		$plugins = explode(CONFIG_SEPARATOR, $list);
-		$rc = 'home';
+		$rc = NULL;
 		foreach ($plugins as $key => $name){
 			if (strcmp(trim($name), $current) == 0){
 				if ($key < count($plugins) - 1)
