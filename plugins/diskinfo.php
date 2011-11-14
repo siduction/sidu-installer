@@ -47,7 +47,7 @@ class DiskInfo {
 				'partinfo', NULL, 0);
 		$this->hasInfo = file_exists($this->filePartInfo);
 		if ($this->hasInfo)
-			$this->readPartitionInfo(true);
+			$this->readPartitionInfo();
 		else
 			$this->clearPartitionInfo();
 	}
@@ -112,55 +112,57 @@ class DiskInfo {
 		$this->session->userData->setValue('', 'partinfo', $partitions);
 	}
 	/** Reads the partition infos from the user data.
-	 * 
-	 * @param $force	true: the data will be read always. false: reading is done 
 	 */
-	function readPartitionInfo($force = false){
+	function readPartitionInfo(){
 		$this->session->trace(TRACE_RARE, 'DiskInfo.readPartitionInfo()');
-		if ($force || $this->partitions == NULL)
-		{
-			if ($this->hasInfo)
-				$this->importPartitionInfo();
-			$value = $this->session->userData->getValue('', 'partinfo');
-			$disks = array();
-			$devs = '-';
-			$labels = '-';
-			$rootDevs = '-';
-			$info = $this->session->userData->getValue('', 'partinfo');
-			$minSize = (int) $this->session->configuration->getValue('diskinfo.root.minsize.mb');
-			
-			$this->partitions = array();
-			if (!empty($info)){
-				$parts = explode(SEPARATOR_PARTITION, $info);
-				foreach($parts as $key => $info){
-					$item = new PartitionInfo($info);
-					$disk = preg_replace('/[0-9]/', '', $item->device);
-					if (empty($disk))
-						continue;
-					if (! isset($disks[$disk])){
-						$disks[$disk] = 1;
-					}
-					$this->partitions[$item->device] = $item;
-					// Ignore too small partitions and swap:
-					if ($item->megabytes >= $minSize && strcmp($item->partType, '82') != 0)
-						$rootDevs .= ';' . $item->device;
-					$devs .= ';' . $item->device;
-					if (! empty($item->label)){
-						$labels .= ';' . $item->label;
-					}
+		$isRootFs = strcmp($this->name, 'rootfs') == 0; 
+		if ($this->hasInfo)
+			$this->importPartitionInfo();
+		$excludedPartition = $isRootFs ? "" : $this->session->userData->getValue('rootfs', 'root');
+		$value = $this->session->userData->getValue('', 'partinfo');
+		$disks = array();
+		$devs = '-';
+		$labels = '-';
+		$info = $this->session->userData->getValue('', 'partinfo');
+		$minSize = (int) $this->session->configuration->getValue('diskinfo.root.minsize.mb');
+		
+		$this->partitions = array();
+		if (!empty($info)){
+			$parts = explode(SEPARATOR_PARTITION, $info);
+			foreach($parts as $key => $info){
+				$item = new PartitionInfo($info);
+				$ignored = strcmp($item->device, $excludedPartition) == 0
+					# swap:
+					|| strcmp($item->partType, '82') == 0
+					|| $isRootFs && $item->megabytes < $minSize;
+				$disk = preg_replace('/[0-9]/', '', $item->device);
+				if (empty($disk))
+					continue;
+				if (! isset($disks[$disk])){
+					$disks[$disk] = 1;
 				}
-				$disklist = '';
-				foreach ($disks as $key => $val)
-					$disklist .= ';' . $key;
-					
+				$this->partitions[$item->device] = $item;
+				// Ignore too small partitions and swap:
+				if (! $ignored)
+					$devs .= ';' . $item->device;
+				if (! empty($item->label)){
+					$labels .= ';' . $item->label;
+				}
+			}
+			$disklist = '';
+			foreach ($disks as $key => $val)
+				$disklist .= ';' . $key;
+				
+			if ($isRootFs){
 				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist);
 				$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
+				$this->session->userData->setValue('rootfs', 'opt_root', $devs);
+			} else {
 				$this->session->userData->setValue('mountpoint', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('rootfs', 'opt_root', $rootDevs);
 				$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
 				$this->session->userData->setValue('mountpoint', 'opt_add_label', $labels);
 			}
-		}	
+		}
 	}	
 	/** Gets the label of a device.
 	 * 
