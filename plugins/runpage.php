@@ -57,7 +57,8 @@ class RunPage extends Page{
 		$answer = $this->session->getAnswerFileName('inst', '.ready');
 		$shellConfig = $this->session->getAnswerFileName('inst', '.conf');
 		$lines = array();
-		$lines[] = "REGISTERED=' SYSTEM_MODULE HD_MODULE HD_FORMAT HD_FSTYPE HD_CHOICE HD_MAP HD_IGNORECHECK SWAP_MODULE SWAP_AUTODETECT SWAP_CHOICES NAME_MODULE NAME_NAME USER_MODULE USER_NAME USERPASS_MODULE USERPASS_CRYPT ROOTPASS_MODULE ROOTPASS_CRYPT HOST_MODULE HOST_NAME SERVICES_MODULE SERVICES_START BOOT_MODULE BOOT_LOADER BOOT_DISK BOOT_WHERE AUTOLOGIN_MODULE INSTALL_READY HD_AUTO'";
+		# This must be the first entry, because of changing with NAME_NAME:
+		$lines[] = "REGISTERED=' SYSTEM_MODULE HD_MODULE HD_FORMAT HD_FSTYPE HD_CHOICE HD_MAP HD_IGNORECHECK SWAP_MODULE SWAP_AUTODETECT SWAP_CHOICES NAME_MODULE USER_MODULE USER_NAME USERPASS_MODULE USERPASS_CRYPT ROOTPASS_MODULE ROOTPASS_CRYPT HOST_MODULE HOST_NAME SERVICES_MODULE SERVICES_START BOOT_MODULE BOOT_LOADER BOOT_DISK BOOT_WHERE AUTOLOGIN_MODULE INSTALL_READY HD_AUTO'";
 		$lines[] = '';
 		$lines[] = "SYSTEM_MODULE='configured'";
 		$lines[] = "HD_MODULE='configured'";
@@ -71,7 +72,6 @@ class RunPage extends Page{
 		$params[] = "configfile=$shellConfig";
 		
 		$curValue = $this->session->userData->getValue('rootfs', 'root');
-		$params[] = "rootpart=$curValue";
 		$lines[] = "# Here the siduction-System will be installed";
 		$lines[] = "# This value will be checked by function module_hd_check";
 		$lines[] = "HD_CHOICE='$curValue'";
@@ -89,8 +89,6 @@ class RunPage extends Page{
 		$lines[] = "HD_FORMAT='$value'";
 		$lines[] = '';
 
-		$params[] = 'rootfs=' . $curValue;
-		
 		$lines[] = "# Sets the Filesystem type.";
 		$lines[] = "# Possible are: ext3|ext4|ext2|reiserfs|jfs";
 		$lines[] = "# Default value is: ext4";
@@ -106,7 +104,6 @@ class RunPage extends Page{
 			$mounts .= ';' . $list[0] . '|' . $list[3] . '|' . $list[2] . '|' . $list[1];
 			$map .= ' ' . $list[0] . ':' . $list[3];
 		}
-		$params[] = substr($mounts, 1);
 		$lines[] = "# Here you can give additional mappings. (Experimental) You need to have the partitions formatted yourself and give the correct mappings like: /dev/hda4:/boot /dev/hda5:/var /dev/hda6:/tmp";
 		$lines[] = "HD_MAP='$map'";
 		$lines[] = "";
@@ -115,7 +112,6 @@ class RunPage extends Page{
 		$lines[] = "# Possible are: yes|no";
 		$lines[] = "# Default value is: no";
 		$ix = $this->indexOfList('run', 'force', NULL, 'opt_force');
-		$params[] = "force=$ix";
 		$curValue = $ix == 0 ? 'no' : 'yes';
 		$lines[] = "HD_IGNORECHECK='$curValue'";
 		$lines[] = "";
@@ -133,41 +129,37 @@ class RunPage extends Page{
 		$lines[] = "";
 		
 		$curValue = $this->session->userData->getValue('user', 'real_name');
-		$params[] = "username=$curValue";
-		 
 		$lines[] = "NAME_MODULE='configured'";
-		$lines[] = "NAME_NAME='$curValue'";
+		if (! empty($curValue)){
+			$lines[] = "NAME_NAME='$curValue'";
+			$lines[0] = $lines[0] . ' NAME_NAME';
+		}
 		$lines[] = "";
 		
 		$curValue = $this->session->userData->getValue('user', 'name');
-		$params[] = "login=$curValue"; 
 		$lines[] = "USER_MODULE='configured'";
 		$lines[] = "USER_NAME='$curValue'";
 		$lines[] = "";
 				
 		$curValue = $this->session->userData->getValue('user', 'pass');
 		$curValue = $this->session->makePasswordHash($curValue);
-		$params[] = "pw=$curValue"; 
 		$lines[] = "USERPASS_MODULE='configured'";
 		$curValue = $this->session->escShell($curValue);
 		$lines[] = "USERPASS_CRYPT='$curValue'";		
 			
 		$curValue = $this->session->userData->getValue('user', 'root_pass');
 		$curValue = $this->session->makePasswordHash($curValue);
-		$params[] = "rootpw=$curValue"; 
 		$lines[] = "ROOTPASS_MODULE='configured'";
 		$curValue = $this->session->escShell($curValue);
 		$lines[] = "ROOTPASS_CRYPT='$curValue'";
 		
 		$curValue = $this->session->userData->getValue('network', 'host');
-		$params[] = "hostname=$curValue"; 
 		$lines[] = "HOST_MODULE='configured'";
 		$lines[] = "HOST_NAME='$curValue'";
 		$lines[] = "";
 		
 		$services = "cups";
 		$ix = $this->indexOfList('network', 'ssh', NULL, 'opt_ssh');
-		$params[] = "ssh=$ix";
 		if ($ix == 1)
 			$services .= " ssh";
 		$lines[] = "SERVICES_MODULE='configured'";
@@ -180,7 +172,6 @@ class RunPage extends Page{
 		$ix = $this->indexOfList('boot', 'loader', NULL, 'opt_loader');
 		$curValue = ($ix == 0 ? "-" : $this->session->userData->getValue('boot', 'loader'));
 		$curValue = strtolower($curValue);
-		$params[] = "bootmanager=$curValue"; 
 		$lines[] = "BOOT_MODULE='configured'";
 		$lines[] = "# Chooses the Boot-Loader";
 		$lines[] = "# Possible are: grub";
@@ -196,22 +187,17 @@ class RunPage extends Page{
 		
 		$ix = $this->indexOfList('boot', 'target', NULL, 'opt_target');
 		$curValue = ($ix == 0 ? 'mbr' : 'partition');
-		$params[] = "bootdest=$curValue"; 
 		$lines[] = "# Where the Boot-Loader will be installed";
 		$lines[] = "# Possible are: mbr|partition";
 		$lines[] = "# Default value is: mbr";
 		$lines[] = "BOOT_WHERE='$curValue'";
 		$lines[] = "";
 		
-		$params[] = 'timezone=' . $this->session->userData->getValue('boot', 'region')
-			. '/' . $this->session->userData->getValue('boot', 'city');
-		
 		$lines[] = "AUTOLOGIN_MODULE='configured'";
 		$lines[] = "INSTALL_READY='yes'";
 		$lines[] = "";
 		$lines[] = "# mount partitions on boot. Default value is: yes";
 		$ix = $this->indexOfList('mountpoint', 'mountonboot', NULL, 'opt_mountonboot');
-		$params[] = "mountonboot=$ix";
 		$curValue = $ix == 0 ? 'no' : 'yes';
 		$lines[] = "HD_AUTO='$curValue'";
 		$lines[] = "";

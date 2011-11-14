@@ -2,6 +2,12 @@ sidu-installer (0.6-1) unstable; urgency=low
 
   * gdisk can be started
   * usb-installer can be started
+  * Filter on mount devices: not rootfs and not swap
+  * Filter on rootfs: not swap
+  * Fix: Empty real name is now working
+  * Code review: Removed unused items in parameter file
+  * Code review: readPartitionInfo() will be called one time only.
+  * CSS: Reduced height.
 
  -- Hamatoma <siduction@hm.f-r-e-i.de>  Sun, 13 Nov 2011 23:51:25 +0100
 
