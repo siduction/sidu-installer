@@ -56,6 +56,14 @@ class HomePage extends Page{
 		$rc = true;
 		if (strcmp($button, 'button_next') == 0){
 			$rc = $this->navigation(false);
+		} elseif (strcmp($button, 'button_usb_install') == 0){
+			# background;startgui;gdisk|###DISK###|root|console
+			$answer = NULL;
+			$options = SVOPT_BACKGROUND;
+			$command = 'startgui';
+			//APPL, ARGS, USER, OPTS
+			$params = array('install-usb-gui.bash', '', 'root', 'console');
+			$this->session->exec($answer, $options, $command, $params, 0);
 		} elseif (strcmp($button, 'button_clear_config') == 0){
 			$this->session->userData->clear();
 		} else {

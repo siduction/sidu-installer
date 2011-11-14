@@ -1,3 +1,10 @@
+sidu-installer (0.6-1) unstable; urgency=low
+
+  * gdisk can be started
+  * usb-installer can be started
+
+ -- Hamatoma <siduction@hm.f-r-e-i.de>  Sun, 13 Nov 2011 23:51:25 +0100
+
 sidu-installer (0.5-2) unstable; urgency=low
 
   * Workaround for Midori: blocking page wait after reaching page ready.
