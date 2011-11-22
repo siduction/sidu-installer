@@ -1,7 +1,31 @@
 #! /bin/bash
-
+set -e
+OPT=+e
+set $OPT
 found=$(grep "sidu-installer" /etc/hosts)
 if [ -z "$found" ] ; then
 	echo "127.0.0.86 sidu-installer" >>/etc/hosts
 	echo "virtual host installed: sidu-installer"
 fi
+
+# Create the links from the toolkit:
+pushd /usr/share/sidu-installer
+SRC=../siguibui/
+function MkLink(){
+	if [ ! -L $1 ] ; then
+		ln -s $2/$1 $1
+	fi
+}
+MkLink index.php $SRC
+MkLink base $SRC
+
+# Create the links to the shellserver:
+cd /usr/share/siguibui/backend
+SRC=../../sidu-installer/backend
+MkLink install.sh $SRC
+MkLink partinfo.pl $SRC
+MkLink partinfo.sh $SRC
+MkLink timezoneinfo.sh $SRC
+popd
+exit 0
+ 

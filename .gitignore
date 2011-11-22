@@ -10,3 +10,4 @@ currenttimezone.txt
 timezoneinfo.txt
 debian/sidu-installer.debhelper.log
 debian/sidu-installer
+base/*

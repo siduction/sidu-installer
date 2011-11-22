@@ -1,17 +1,22 @@
 Source: sidu-installer
 Section: admin
 Priority: optional
-Maintainer: Hamatoma <inosid@hm.f-r-e-i.de>
+Maintainer: J. Hamatoma <hamatoma@gmx.de>
 Build-Depends: debhelper (>= 8.0.0)
 Standards-Version: 3.9.2
 Homepage: http://siduction.org
-Vcs-Git: git3@git.siduction.org:packages/siduction-repository/sidu-installer
-Vcs-Browser: http://git.siduction.org/?p=packages/siduction-repository/sidu-installer.git;a=summary
+Vcs-git: git://git.siduction.org:packages/siduction-repository/sidu-installer
+Vcs-Browser: http://git.siduction.org/?p=packages/siduction-repository/sidu-installer.git
 
 Package: sidu-installer
 Architecture: all
-Depends: ${misc:Depends}
-#	fll-installer
+Depends: ${misc:Depends}, 
+	bash (>= 1.0),
+	python (>= 2.0),
+	perl (>= 5.0),
+	php5-cgi (>= 5.0),
+	pywwetha (>= 0.2),
+	siguibui (>= 0.3)
 Suggests: gparted
 Description: GUI for the siduction installer
  sidu-installer provides a graphical user interface for the siduction installer.

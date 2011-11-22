@@ -4,6 +4,7 @@ CMD=$2
 PARAM=$3
 TEMP1=$ANSWER.tmp
 TEMP2=/tmp/$$.data
+set -x
 case "$CMD" in
 all)
 	pushd /usr/share/zoneinfo >/dev/null
@@ -31,6 +32,6 @@ set)
 	exit 1
 	;;
 esac
-
+set +x
 
 

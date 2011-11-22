@@ -1,0 +1,28 @@
+#! /bin/bash
+set -e
+OPT=+e
+set $OPT
+found=$(grep "sidu-installer" /etc/hosts)
+if [ -z "$found" ] ; then
+	sed -i -e '127.0.0.86[ \t]*sidu-installer/d' /etc/hosts
+	echo "virtual host removed: sidu-installer"
+fi
+
+# delete the links from the toolkit:
+function RmLink(){
+	if [ -L $1 ] ; then
+		rm -f $1
+	fi
+}
+pushd /usr/share/sidu-installer
+RmLink index.php
+RmLink base
+
+# Remove the links to the shellserver:
+cd /usr/share/siguibui/backend
+RmLink install.sh
+RmLink partinfo.pl
+RmLink partinfo.sh
+RmLink timezoneinfo.sh
+popd
+exit 0

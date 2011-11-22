@@ -16,17 +16,6 @@ class ReadyPage extends Page{
 		// Midori bug: midori calls page wait after reaching page ready.
 		// Therefore we must block wait:
 		$session->userData->setValue('wait', 'blocked', 'T');
-		$duration = $session->userData->getValue('run', 'duration');
-		if (empty($duration)){
-			$duration = time() - (int) $value;
-			if ($duration > 3600)
-				$duration = sprintf("%d:%02d:%02d", $duration / 3600, $duration % 3600 / 60, $duration % 60);
-			else					
-				$duration = sprintf("%02d:%02d", $duration % 3600 / 60, $duration % 60);
-		}
-		$session->userData->setValue('run', 'duration', $duration);
-
-		# $this->setReplacement('###ROOT_FS###', $rootfs);
 	}
 	/** Returns an array containing the input field names.
 	 * 
