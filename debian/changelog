@@ -1,3 +1,10 @@
+sidu-installer (0.7-3) unstable; urgency=low
+
+  * Fix: Dependency sudo removed.
+  * Fix: sudoers.d and init.d not necessary
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Thu, 24 Nov 2011 22:52:17 +0100
+
 sidu-installer (0.7-2) unstable; urgency=low
 
   * Improvements in postinst
@@ -21,7 +28,6 @@ sidu-installer (0.7-1.1) unstable; urgency=low
   * FTBFS: sudoers.d in debian/install outcommented 
 
  -- Alf Gaida <info@g-com.eu>  Thu, 24 Nov 2011 01:42:37 +0100
->>>>>>> 5ba5e1ff759a1466ffab1a1cb27ebe04dad55e99
 
 sidu-installer (0.7-1) unstable; urgency=low
 
