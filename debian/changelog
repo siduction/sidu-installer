@@ -5,6 +5,24 @@ sidu-installer (0.7-2) unstable; urgency=low
 
  -- J. Hamatoma <hamatoma@gmx.de>  Thu, 24 Nov 2011 21:30:09 +0100
 
+sidu-installer (0.7-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * added sidu-installer.desktop file
+  * added sidu-installer.svg. thxx to se7en
+  * modified /debian/rules to build icons
+
+ -- Ferdinand Thommes <devil@siduction.org>  Thu, 24 Nov 2011 19:16:18 +0100
+
+sidu-installer (0.7-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * doc-base.Ex deleted
+  * FTBFS: sudoers.d in debian/install outcommented 
+
+ -- Alf Gaida <info@g-com.eu>  Thu, 24 Nov 2011 01:42:37 +0100
+>>>>>>> 5ba5e1ff759a1466ffab1a1cb27ebe04dad55e99
+
 sidu-installer (0.7-1) unstable; urgency=low
 
   * Separation of the packet siguibui: some files are moved
