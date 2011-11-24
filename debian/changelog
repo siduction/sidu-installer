@@ -1,3 +1,10 @@
+sidu-installer (0.7-1.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * added sidu-installer.desktop file
+
+ -- Ferdinand Thommes <devil@siduction.org>  Thu, 24 Nov 2011 18:56:12 +0100
+
 sidu-installer (0.7-1.1) unstable; urgency=low
 
   * Non-maintainer upload.
