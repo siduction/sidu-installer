@@ -1,0 +1,11 @@
+Document: sidu-installer
+Title: Debian sidu-installer Manual
+Author: Alf Gaida <agaida@siduction.org>
+Abstract: This manual describes what sidu-installer is
+ and how it can be used to
+ manage online manuals on Debian systems.
+Section: unknown
+
+Format: text
+Files: /usr/share/doc/sidu-installer/sidu-installer.text.gz
+

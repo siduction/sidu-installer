@@ -1,3 +1,11 @@
+sidu-installer (0.7-1.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * doc-base.Ex renamed to doc-base
+  * FTBFS: sudoers.d in debian/install outcommented 
+
+ -- Alf Gaida <info@g-com.eu>  Thu, 24 Nov 2011 01:37:50 +0100
+
 sidu-installer (0.7-1) unstable; urgency=low
 
   * Separation of the packet siguibui: some files are moved
