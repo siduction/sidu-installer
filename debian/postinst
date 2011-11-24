@@ -1,9 +1,9 @@
 #! /bin/bash
 set -e
-OPT=+e
-set $OPT
-found=$(grep "sidu-installer" /etc/hosts)
-if [ -z "$found" ] ; then
+
+if ! grep "sidu-installer" /etc/hosts ; then
+	# if the last newline is missing:
+	echo "" >>/etc/hosts
 	echo "127.0.0.86 sidu-installer" >>/etc/hosts
 	echo "virtual host installed: sidu-installer"
 fi

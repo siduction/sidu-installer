@@ -1,3 +1,10 @@
+sidu-installer (0.7-2) unstable; urgency=low
+
+  * Improvements in postinst
+  * Dependency bash removed
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Thu, 24 Nov 2011 21:30:09 +0100
+
 sidu-installer (0.7-1) unstable; urgency=low
 
   * Separation of the packet siguibui: some files are moved
