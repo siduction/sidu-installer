@@ -4,6 +4,6 @@ images		usr/share/sidu-installer/
 images/favicon.ico usr/share/sidu-installer/
 backend		usr/share/sidu-installer/
 etc/sidu-installer	etc
-# etc/sudoers.d		etc
+etc/sudoers.d		etc
 etc/pywwetha		etc
 usr/bin		usr
