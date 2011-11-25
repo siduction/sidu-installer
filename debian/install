@@ -5,4 +5,5 @@ images/favicon.ico usr/share/sidu-installer/
 backend		usr/share/sidu-installer/
 etc/sidu-installer	etc
 etc/pywwetha		etc
+etc/virtualhosts.d	etc/pywwetha
 usr/bin		usr
