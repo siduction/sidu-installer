@@ -1,5 +1,5 @@
 #! /bin/sh
 sudo /etc/init.d/pywwetha start
 sudo /etc/init.d/siguibui start
-sudo /etc/init.d/pywwetha add-host sidu-installer
+sudo /usr/bin/pywwetha-control add-host sidu-installer
 x-www-browser http://sidu-installer:8086
