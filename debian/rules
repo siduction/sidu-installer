@@ -28,11 +28,11 @@ create-icons:
 		mkdir -p "icons/hicolor/$${i}x$${i}/apps" ; \
 		inkscape --export-width=$${i} \
 			 --export-height=$${i} \
-			 --export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/siduction-irc.png" \
-				$(CURDIR)/icons/siduction-irc.svg ; \
+			 --export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/sidu-installer.png" \
+				$(CURDIR)/icons/sidu-installer.svg ; \
 	done
 	
 	# create XPM icons for the debian menu system
 	mkdir -p icons/pixmaps
-	convert icons/hicolor/32x32/apps/siduction-irc.png icons/pixmaps/siduction-irc.xpm
-	convert icons/hicolor/16x16/apps/siduction-irc.png icons/pixmaps/siduction-irc-16.xpm
+	convert icons/hicolor/32x32/apps/sidu-installer.png icons/pixmaps/sidu-installer.xpm
+	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm

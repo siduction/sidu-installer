@@ -5,6 +5,28 @@ sidu-installer (0.8-3) unstable; urgency=low
 
  -- J. Hamatoma <hamatoma@gmx.de>  Sat, 26 Nov 2011 18:09:34 +0100
 
+sidu-installer (0.8-2.3) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * added icons to /debian/install
+
+ -- Ferdinand Thommes <devil@siduction.org>  Sat, 26 Nov 2011 12:06:57 +0100
+
+sidu-installer (0.8-2.2) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * a few fixes by hendrikL
+
+ -- Alf Gaida <agaida@ramme>  Sat, 26 Nov 2011 10:16:38 +0100
+
+sidu-installer (0.8-2.1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * fixed /debian/rules to create icons, renamed siduction-installer.svg
+    to sidu-installer.svg
+
+ -- Ferdinand Thommes <devil@siduction.org>  Sat, 26 Nov 2011 09:53:20 +0100
+
 sidu-installer (0.8-2) unstable; urgency=low
 
   * The prefix /dev/ will not be shown. That improves the design in iceweasel (shorter comboboxes).
