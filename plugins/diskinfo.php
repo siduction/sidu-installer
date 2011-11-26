@@ -75,7 +75,7 @@ class DiskInfo {
 		while( (list($no, $line) = each($file))){
 			$line = chop($line);
 			$cols = explode("\t", $line);
-			$dev = $cols[0];
+			$dev = str_replace('/dev/', '', $cols[0]);
 			if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
 				continue;
 			$infos = array();

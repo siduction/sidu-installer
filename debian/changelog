@@ -1,3 +1,9 @@
+sidu-installer (0.8-2) unstable; urgency=low
+
+  * The prefix /dev/ will not be shown. That improves the design in iceweasel (shorter comboboxes).
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sat, 26 Nov 2011 09:20:14 +0100
+
 sidu-installer (0.8-1) unstable; urgency=low
 
   * sidu-installer adds the virtual host if necessary

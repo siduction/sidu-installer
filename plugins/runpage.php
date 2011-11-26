@@ -71,7 +71,7 @@ class RunPage extends Page{
 		$params[] = "progress=$progress";
 		$params[] = "configfile=$shellConfig";
 		
-		$curValue = $this->session->userData->getValue('rootfs', 'root');
+		$curValue = '/dev/' . $this->session->userData->getValue('rootfs', 'root');
 		$lines[] = "# Here the siduction-System will be installed";
 		$lines[] = "# This value will be checked by function module_hd_check";
 		$lines[] = "HD_CHOICE='$curValue'";
@@ -101,8 +101,8 @@ class RunPage extends Page{
 			$value = $this->session->userData->getValue('mountpoint', "mounts.row$ix");
 			// /dev/sda9|data|ext4|/data|BUTTON_DEL_1
 			$list = explode('|', $value);
-			$mounts .= ';' . $list[0] . '|' . $list[3] . '|' . $list[2] . '|' . $list[1];
-			$map .= ' ' . $list[0] . ':' . $list[3];
+			$mounts .= ';/dev/' . $list[0] . '|' . $list[3] . '|' . $list[2] . '|' . $list[1];
+			$map .= ' /dev/' . $list[0] . ':' . $list[3];
 		}
 		$lines[] = "# Here you can give additional mappings. (Experimental) You need to have the partitions formatted yourself and give the correct mappings like: /dev/hda4:/boot /dev/hda5:/var /dev/hda6:/tmp";
 		$lines[] = "HD_MAP='$map'";
