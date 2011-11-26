@@ -1,7 +1,7 @@
 #! /bin/bash
 set -e
 
-if ! grep "sidu-installer" /etc/hosts ; then
+if ! grep -q "sidu-installer" /etc/hosts ; then
 	# if the last newline is missing:
 	echo "" >>/etc/hosts
 	echo "127.0.0.86 sidu-installer" >>/etc/hosts
@@ -9,7 +9,7 @@ if ! grep "sidu-installer" /etc/hosts ; then
 fi
 
 # Create the links from the toolkit:
-pushd /usr/share/sidu-installer
+pushd /usr/share/sidu-installer >/dev/null
 SRC=../siguibui/
 function MkLink(){
 	if [ ! -L $1 ] ; then
@@ -26,6 +26,6 @@ MkLink install.sh $SRC
 MkLink partinfo.pl $SRC
 MkLink partinfo.sh $SRC
 MkLink timezoneinfo.sh $SRC
-popd
+popd >/dev/null
 exit 0
  

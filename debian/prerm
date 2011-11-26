@@ -1,10 +1,8 @@
 #! /bin/bash
 set -e
-OPT=+e
-set $OPT
-found=$(grep "sidu-installer" /etc/hosts)
-if [ -z "$found" ] ; then
-	sed -i -e '127.0.0.86[ \t]*sidu-installer/d' /etc/hosts
+
+if grep -q sidu-installer /etc/hosts ; then
+	sed -i -e '127.0.0.[0-9 \t]*sidu-installer/d' /etc/hosts
 	echo "virtual host removed: sidu-installer"
 fi
 
@@ -14,7 +12,7 @@ function RmLink(){
 		rm -f $1
 	fi
 }
-pushd /usr/share/sidu-installer
+pushd /usr/share/sidu-installer >/dev/null
 RmLink index.php
 RmLink base
 
@@ -24,5 +22,5 @@ RmLink install.sh
 RmLink partinfo.pl
 RmLink partinfo.sh
 RmLink timezoneinfo.sh
-popd
+popd >/dev/null
 exit 0

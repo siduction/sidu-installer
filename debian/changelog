@@ -1,3 +1,10 @@
+sidu-installer (0.8-3) unstable; urgency=low
+
+  * Adding virtual host by restarting pywwetha
+  * Needless messages removed from install scripts
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sat, 26 Nov 2011 18:09:34 +0100
+
 sidu-installer (0.8-2) unstable; urgency=low
 
   * The prefix /dev/ will not be shown. That improves the design in iceweasel (shorter comboboxes).
