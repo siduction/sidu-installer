@@ -1,10 +1,14 @@
 sidu-installer (0.8-4) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * Added dependencies whois (mkpasswd) and tzdata (timezone)
   * Fix: timezone info: new directory structure
   * Fix: prerm: syntax error on removing virtual host 
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 27 Nov 2011 10:31:02 +0100
+  [ Ferdinand Thommes ]
+  * added infrastructure to /icons file
+
+ -- Ferdinand Thommes <devil@siduction.org>  Sun, 27 Nov 2011 11:33:24 +0100
 
 sidu-installer (0.8-3) unstable; urgency=low
 
