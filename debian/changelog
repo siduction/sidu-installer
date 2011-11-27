@@ -1,3 +1,9 @@
+sidu-installer (0.8-4+nmu1) unstable; urgency=low
+
+  * fix sidu-installer.svg
+
+ -- Torsten Wohlfarth <towo@siduction.org>  Sun, 27 Nov 2011 16:45:51 +0100
+
 sidu-installer (0.8-4) unstable; urgency=low
 
   [ J. Hamatoma ]
