@@ -1,3 +1,11 @@
+sidu-installer (0.8-4) unstable; urgency=low
+
+  * Added dependencies whois (mkpasswd) and tzdata (timezone)
+  * Fix: timezone info: new directory structure
+  * Fix: prerm: syntax error on removing virtual host 
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 27 Nov 2011 10:31:02 +0100
+
 sidu-installer (0.8-3) unstable; urgency=low
 
   * Adding virtual host by restarting pywwetha

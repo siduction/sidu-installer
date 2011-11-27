@@ -2,7 +2,7 @@
 set -e
 
 if grep -q sidu-installer /etc/hosts ; then
-	sed -i -e '127.0.0.[0-9 \t]*sidu-installer/d' /etc/hosts
+	sed -i -e '/127\.0\.0\.[0-9 \t]*sidu-installer/d' /etc/hosts
 	echo "virtual host removed: sidu-installer"
 fi
 

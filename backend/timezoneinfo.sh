@@ -7,9 +7,17 @@ TEMP2=/tmp/$$.data
 set -x
 case "$CMD" in
 all)
-	pushd /usr/share/zoneinfo >/dev/null
-	find -maxdepth 2 -type f | grep -v posix | grep -v right | grep -v SystemV \
-		| sed 's/^\.\///' | grep -v "/.*/" | grep "/" | sort >$TEMP1
+	# The directory structure has changed 2011.
+	# Is this the new structure?
+	if [ -f /usr/share/zoneinfo/posix/Europe/Berlin ] ; then
+		pushd /usr/share/zoneinfo/posix >/dev/null
+		find -maxdepth 2 \( -type f -o -type l \) | grep -v right | grep -v SystemV \
+			| sed 's/^\.\///' | grep -v "/.*/" | grep "/" | sort >$TEMP1
+	else
+		pushd /usr/share/zoneinfo >/dev/null
+		find -maxdepth 2 -type f | grep -v posix | grep -v right | grep -v SystemV \
+			| sed 's/^\.\///' | grep -v "/.*/" | grep "/" | sort >$TEMP1
+	fi
 	popd >/dev/null
 	mv $TEMP1 $ANSWER
 	;;

@@ -1,5 +1,6 @@
 #! /bin/sh
 
+# Restart forces the check of virtual hosts:
 sudo /etc/init.d/pywwetha restart
 sudo /etc/init.d/siguibui start
 x-www-browser http://sidu-installer:8086
