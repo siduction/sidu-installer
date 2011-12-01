@@ -3,27 +3,30 @@ body {
   background: #fffff0;
   font-size: 12px;
   margin: 1.5ex 1em;
-  background: orange;
+  background: #162d50;
 }
 #main_area{
-	width: 800px;
-	min-height: 400px;
+	margin-left: auto;
+	margin-right: auto;
+	width: 60em;
 }
 #header{
-	height: 30px;
+	height: 33px;
 	margin-top: 10px;
 	font-size: 20px;
-	background: #d3d3d3;
-	padding: 0.5em;
+	background: #cccccc;
+	padding: 1em;
 	text-align: center;
+	border: 1px #000000 solid
 }
 #content{
-	background: #f3f3f3;
+	background: #ffffff;
 	padding: 1em;
+	border: 1px #000000 solid
 }
 #content h1{
 	text-align: center;
-	color: orange;
+	color: #ff6600;
 	font-size: 2em;
 }
 #text_area{
@@ -50,7 +53,7 @@ body {
 	text-align: right;
 }
 .prev_button{
-	text-align: right;
+	text-align: left;
 }
 .logo{
 }
@@ -60,7 +63,7 @@ body {
 .textblock{
 	padding: 1em;
 	margin: 0.5em;
-	border: 1px orange solid;
+	border: 1px #ff6600 solid;
 	float: none;	
 }
 .warning{
@@ -74,7 +77,7 @@ th { text-align: left; font-weight: bold; }
 
 table.table_col5 tr td { width: 20% }
 td { vertical-align: top; }
-.horicontal_line { border-top: 1px orange solid; margin-top: 1em; margin-bottom: 1em;}
+.horicontal_line { border-top: 1px #ff6600 solid; margin-top: 1em; margin-bottom: 1em;}
 
 #table_partition_mount, #table_partition_partman, #table_partition_root{ 
 	width: 100%; 
@@ -98,7 +101,7 @@ td { vertical-align: top; }
 	border: black 1px solid;
 }
 .wait_progress{
-	background-color: orange;
+	background-color: #ff6600;
 	text-align: center;
 	color: black;
 }
