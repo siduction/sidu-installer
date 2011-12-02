@@ -1,8 +1,15 @@
+sidu-installer (0.9.1) unstable; urgency=low
+
+  * nome css-fixes by se7en 
+  * fix lintian warning - native-package-with-dash-version
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 02 Dec 2011 08:36:16 +0100
+
 sidu-installer (0.8-4+nmu2) unstable; urgency=low
 
   * new css
 
- -- Alf Gaida <agaida@siduction.org>  Thu, 01 Dec 2011 16:22:02 +0100
+ -- Alf Gaida <agaida@siduction.org>  Fri, 02 Dec 2011 08:26:48 +0100
 
 sidu-installer (0.8-4+nmu1) unstable; urgency=low
 
