@@ -1,9 +1,16 @@
+sidu-installer (0.9.3) unstable; urgency=low
+
+  * Fix: Title on all html pages.
+  * Fix: End of form added
+  * New: Portuguese
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Fri, 02 Dec 2011 23:52:35 +0100
+
 sidu-installer (0.9.2) unstable; urgency=low
 
   * Fieldlength of "mountpoint" reduced. Improves the design in iceweasel.
   * Docu improved
-  * Fix: Title on all html pages.
-  * Fix: End of form added
+  * fixes in css by se7en
 
  -- J. Hamatoma <hamatoma@gmx.de>  Fri, 02 Dec 2011 22:08:32 +0100
 
@@ -57,7 +64,7 @@ sidu-installer (0.8-2.2) unstable; urgency=low
   * Non-maintainer upload.
   * a few fixes by hendrikL
 
- -- Alf Gaida <agaida@ramme>  Sat, 26 Nov 2011 10:16:38 +0100
+ -- Alf Gaida <agaida@siduction.org>  Sat, 26 Nov 2011 10:16:38 +0100
 
 sidu-installer (0.8-2.1) unstable; urgency=low
 
@@ -215,7 +222,7 @@ sidu-installer (0.1-5) unstable; urgency=low
   * Session.forceReload(): general solution for page reloading.
   * Fix: Deletes user data only if it exists.
   * Fix: Preloading can have 2 or 3 arguments.
-  * Message when we wait for the partition info.
+			   * Message when we wait for the partition info.
   * Partition info will be cleared if no info is available.
 
  -- J. Hamatoma <hamatoma@gmx.de>  Sat, 12 Nov 2011 11:04:06 +0100
