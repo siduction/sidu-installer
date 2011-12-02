@@ -1,11 +1,9 @@
-body {
- font-size: 12px
-}
+body { font-size: 12px; background: white; }
 h1,h2,h3,h4 {
- border-top: 1px orange solid;
+ border-top: 1px #162d50 solid;
  font-size: 2em;
 }
-h1 { font-size: 1.5em; background: orange; }
+h1 { font-size: 1.5em; background: #162d50; color: #ff6600; }
 h2 { font-size: 1.3em; }
 h3 { font-size: 1.2em; }
 h4 { font-size: 1.1em; }

@@ -108,6 +108,7 @@ class TocMaker:
         @param chapterName:    the name of the chapter (link anchor)
         @param title:          the title of the chapter 
         '''
+        title = title.lstrip()
         line = '<li> <a href="#' + chapterName + '">' + chapterNum + ' ' + title + "</a></li>\n"
         self._toc += line
         
@@ -116,7 +117,7 @@ class TocMaker:
         @param chapterNum:     the enumeration
         @param chapterName:    the chapter name (anchor for the link)
         '''
-        rc = '<a name="' + chapterName + '">' + chapterNum + "</a> "
+        rc = '<a name="' + chapterName + '">' + chapterNum + "</a>"
         return rc
         
     def handleHeadline(self, line, matcher):
@@ -154,6 +155,8 @@ class TocMaker:
         self.addToToc(chapterNum, chapterName, title)
         tag = hTag + self.buildAnchor(chapterNum, chapterName)
         line = line.replace(fullTag, tag)
+        line = line.replace('    ', ' ');
+        line = line.replace('  ', ' ');
         return line
         
     def parse(self):

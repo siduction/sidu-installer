@@ -1,3 +1,10 @@
+sidu-installer (0.8-5) unstable; urgency=low
+
+  * Fieldlength of "mountpoint" reduced. Improves the design in iceweasel.
+  * Docu improved
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Fri, 02 Dec 2011 22:08:32 +0100
+
 sidu-installer (0.8-4+nmu1) unstable; urgency=low
 
   * fix sidu-installer.svg
