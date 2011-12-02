@@ -1,4 +1,10 @@
 @CHARSET "UTF-8";
+
+#link
+a:link { color: blue; }
+a:active { color: red; }
+a:visited { color: purple; }
+a:hover { color: green; }
 body {
   background: #fffff0;
   font-size: 12px;
