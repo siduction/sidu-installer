@@ -4,7 +4,7 @@
 <html><head>
 <style type="text/css">
 body {background-color: #ffffff; color: #000000;}
-body, td, th, h1, h2 {font-family: "DroidSans";}
+body, td, th, h1, h2 {font-family: "Droid Sans";}
 pre {margin: 0px; font-family: monospace;}
 a:link {color: #000099; text-decoration: none; background-color: #ffffff;}
 a:hover {text-decoration: underline;}
