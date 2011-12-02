@@ -56,10 +56,10 @@ body {
 .navigation{
 }
 .next_button{
-	text-align: right;
+	float: right;
 }
 .prev_button{
-	text-align: left;
+	float: left;
 }
 .logo{
 }
