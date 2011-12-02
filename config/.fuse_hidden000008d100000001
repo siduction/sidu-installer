@@ -5,7 +5,7 @@
 <meta http-equiv="Content-Type" content="text/html" />
 ###META_DYNAMIC###
 <link href="###URL_STATIC###config/sidu-installer.css" rel="stylesheet" type="text/css" />
-<title>###siduction installer###</title>
+<title>###txt_title###</title>
 </head>
 <body>
 <div id="main_area">

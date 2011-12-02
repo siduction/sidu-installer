@@ -13,9 +13,9 @@
 <div class="textblock">
 ###txt_help###
 <ul>
-<li>###txt_chat###: <a href="http://irc.oftc.net"> irc.oftc.net ###txt_channel### #siduction</a></li>
-<li>###txt_forum###: <a href="http://forum.siduction.org"> http://forum.siduction.org</a></li>
-<li>###txt_wiki###: <a href="http://wiki.siduction.org"> http://wiki.siduction.org</a></li>
+<li>###txt_chat###: <a href="http://irc.oftc.net" irc.oftc.net target="_blank"> ###txt_channel### #siduction</a></li>
+<li>###txt_forum###: <a href="http://forum.siduction.org" target="_blank"> http://forum.siduction.org</a></li>
+<li>###txt_wiki###: <a href="http://wiki.siduction.org" target="_blank"> http://wiki.siduction.org</a></li>
 </ul>
 </div>
 <div class="textblock">
