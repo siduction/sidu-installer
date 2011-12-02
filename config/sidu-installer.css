@@ -1,7 +1,14 @@
 @CHARSET "UTF-8";
+
+#link
+a:link { color: #cccccc; }
+a:active { color: red; }
+a:visited { color: purple; }
+a:hover { color: #ff6600; }
 body {
   background: #fffff0;
-  font-size: 12px;
+  font-size: 14px;
+  font-family: "Droid Sans";
   margin: 1.5ex 1em;
   background: #162d50;
 }
@@ -17,7 +24,7 @@ body {
 	background: #cccccc;
 	padding: 1em;
 	text-align: center;
-	border: 1px #000000 solid
+	border: 2px #000000 solid
 }
 #content{
 	background: #ffffff;
@@ -50,10 +57,10 @@ body {
 .navigation{
 }
 .next_button{
-	text-align: right;
+	float: right;
 }
 .prev_button{
-	text-align: left;
+	float: left;
 }
 .logo{
 }

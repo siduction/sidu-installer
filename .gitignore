@@ -12,3 +12,4 @@ debian/sidu-installer.debhelper.log
 debian/sidu-installer
 base/*
 base
+.fuse*
