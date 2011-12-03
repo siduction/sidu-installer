@@ -1,3 +1,9 @@
+sidu-installer (0.9.4) unstable; urgency=low
+
+  * Page mountpoints: Exchange of combo boxes "device" and "label" / "mountpoint" and free text. (Closes: #347)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sat, 03 Dec 2011 18:01:34 +0100
+
 sidu-installer (0.9.3) unstable; urgency=low
 
   * Fix: Title on all html pages.

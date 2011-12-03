@@ -28,6 +28,9 @@ class MountpointPage extends Page{
 	 */
 	function build(){
 		$this->readContentTemplate();
+		$this->readHtmlTemplates();
+		$this->setButtonSelectedPart('DEV_SELECTOR', 'DEVICE', 'LABEL');
+		$this->setButtonSelectedPart('POINT_SELECTOR', 'POINT_COMBO', 'POINT_TEXT');
 		$this->fillOptions('disk2', true);
 		$this->fillOptions('add_dev', true);
 		$this->fillOptions('add_label', true);
@@ -53,15 +56,15 @@ class MountpointPage extends Page{
 	 */
 	function addMount(){
 		$ok = true;
-		$dev = $this->session->getField('add_dev');
-		$label = $this->session->getField('add_label');
-		if (strcmp($dev, '-') == 0 && strcmp($label, '-') == 0
-			|| strcmp($dev, '-') != 0 && strcmp($label, '-') != 0)
-			$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_NO_DEVICE');
-		else if (strcmp($dev, '-') == 0)
-			$dev = $this->diskInfo->getPartitionName($label);
-		else
+		$devSelector = $this->getUserData('DEV_SELECTOR');
+		if (strcmp($devSelector, 'DEVICE') == 0)
+		{
+			$dev = $this->session->getField('add_dev');
 			$label = $this->diskInfo->getPartitionLabel($dev);
+		} else {
+			$label = $this->session->getField('add_label');
+			$dev = $this->diskInfo->getPartitionName($label);
+		}
 			
 		$val1 = $this->session->getField('add_mount');
 		$val2 = $this->session->getField('add_mount2');
@@ -72,6 +75,8 @@ class MountpointPage extends Page{
 				$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_NO_MOUNT');
 		} elseif (strncmp($val2, '/', 1) != 0)
 			$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_WRONG_MOUNT');
+		elseif (strcmp($val2, '/') == 0)
+			$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_IS_ROOT');
 		else 
 			$mount = $val2;
 		if ($ok){
@@ -97,6 +102,10 @@ class MountpointPage extends Page{
 			$this->diskInfo->buildInfoTable();
 		} elseif (strcmp($button, 'button_add') == 0){
 			$this->addMount();
+		} elseif (strcmp($button, 'button_DEV_SELECTOR') == 0){
+			$this->switchPartbyButton('DEV_SELECTOR', 'DEVICE', 'LABEL');
+		} elseif (strcmp($button, 'button_POINT_SELECTOR') == 0){
+			$this->switchPartbyButton('POINT_SELECTOR', 'POINT_COMBO', 'POINT_TEXT');
 		} elseif (strcmp($button, "button_next") == 0){
 			$redraw = $this->navigation(false);
 		} elseif (strcmp($button, "button_prev") == 0){

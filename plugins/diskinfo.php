@@ -159,8 +159,8 @@ class DiskInfo {
 				$this->session->userData->setValue('rootfs', 'opt_root', $devs);
 			} else {
 				$this->session->userData->setValue('mountpoint', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
-				$this->session->userData->setValue('mountpoint', 'opt_add_label', $labels);
+				$this->session->userData->setValue('mountpoint', 'opt_add_dev', substr($devs, 2));
+				$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
 			}
 		}
 	}	
