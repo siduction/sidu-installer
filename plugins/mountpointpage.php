@@ -103,9 +103,9 @@ class MountpointPage extends Page{
 		} elseif (strcmp($button, 'button_add') == 0){
 			$this->addMount();
 		} elseif (strcmp($button, 'button_DEV_SELECTOR') == 0){
-			$this->switchPartbyButton('DEV_SELECTOR', 'DEVICE', 'LABEL');
+			$this->switchPartByButton('DEV_SELECTOR', 'DEVICE', 'LABEL');
 		} elseif (strcmp($button, 'button_POINT_SELECTOR') == 0){
-			$this->switchPartbyButton('POINT_SELECTOR', 'POINT_COMBO', 'POINT_TEXT');
+			$this->switchPartByButton('POINT_SELECTOR', 'POINT_COMBO', 'POINT_TEXT');
 		} elseif (strcmp($button, "button_next") == 0){
 			$redraw = $this->navigation(false);
 		} elseif (strcmp($button, "button_prev") == 0){
