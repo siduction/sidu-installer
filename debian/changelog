@@ -1,14 +1,13 @@
-sidu-installer (0.9.4) unstable; urgency=low
+sidu-installer (0.9.5) unstable; urgency=low
 
-<<<<<<< HEAD
   * Page mountpoints: Exchange of combo boxes "device" and "label" / "mountpoint" and free text. (Closes: #347)
 
  -- J. Hamatoma <hamatoma@gmx.de>  Sat, 03 Dec 2011 18:01:34 +0100
-=======
+
+sidu-installer (0.9.4) unstable; urgency=low
   * merge se7ens css manual to changelog, probally my fault 
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 03 Dec 2011 01:08:47 +0100
->>>>>>> 8a72a726f20ea73445ad366445ad797eb8f14a49
 
 sidu-installer (0.9.3) unstable; urgency=low
 
