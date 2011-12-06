@@ -1,3 +1,10 @@
+sidu-installer (0.9.6) unstable; urgency=low
+
+  * Fix: progressbar does its work. (Closes: #353)
+  * Removed: leading backslashes in install
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Tue, 06 Dec 2011 23:58:23 +0100
+
 sidu-installer (0.9.5) unstable; urgency=low
 
   * Page mountpoints: Exchange of combo boxes "device" and "label" / "mountpoint" and free text. (Closes: #347)
