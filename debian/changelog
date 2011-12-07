@@ -1,3 +1,10 @@
+sidu-installer (0.9.7) unstable; urgency=low
+
+  * Fix: /mapper/* excluded from hd list
+  * Fix: HTML template: charset UTF-8
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Wed, 07 Dec 2011 03:03:01 +0100
+
 sidu-installer (0.9.6) unstable; urgency=low
 
   * Fix: progressbar does its work. (Closes: #353)
