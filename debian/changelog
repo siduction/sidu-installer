@@ -1,3 +1,11 @@
+sidu-installer (0.9.9) unstable; urgency=low
+
+  * Fix: Handling of disks without partitions
+  * Fix: Exclude of the live cd from disk/partition list
+  * 
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Fri, 09 Dec 2011 23:32:42 +0100
+
 sidu-installer (0.9.8) unstable; urgency=low
 
   * Fix: HTML template: charset UTF-8

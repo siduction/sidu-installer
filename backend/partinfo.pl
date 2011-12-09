@@ -4,7 +4,7 @@ my $fdisk = shift;
 $fdisk = "fdisk -l |" unless $fdisk;
 my $blkid = shift;
 $blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
-
+my %disks;
 my $verbose = 0;
 my $mountpoint = "/tmp/partinfo-mount";
 my %months = ( 
@@ -40,6 +40,10 @@ while(<CMD>){
 		if ($ptype != 5){
 			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 		}
+	} elsif (/^Disk\s+([^:]+):.*\s(\d+)\s+bytes/){
+		my ($dev, $bytes) = ($1, $2);
+		my $mb = length($bytes) <= 6 ? 1 : substr($bytes, 0, length($bytes) - 6);
+		$disks{$1} = $mb;
 	}
 }
 close CMD;
@@ -99,6 +103,9 @@ foreach $dev (keys %blkids){
 foreach $key (sort keys %sorted){
 	$dev = $sorted{$key};
 	print $dev, "\t", $blkids{$dev}, "\n";
+}
+foreach $key (sort keys %disks){
+	print $key, "\t", $disks{$key}, "\n";
 }
 # searches for extended info of a partition
 sub detective{

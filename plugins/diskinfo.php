@@ -10,6 +10,8 @@ class DiskInfo {
 	var $page;
 	/// the session info
 	var $session;
+	// the disk array: name => size in kbyte
+	var $disks;
 	/// an array of PartitionInfo.
 	var $partitions;
 	/// the file created by the shellserver
@@ -28,6 +30,7 @@ class DiskInfo {
 		$this->page = $page;
 		$this->name = $page->name;
 		$this->partitions = NULL;
+		$this->disks = array();
 		$this->filePartInfo = $session->configuration->getValue(
 			'diskinfo.file.demo.partinfo');
 		if (! file_exists($this->filePartInfo))
@@ -78,6 +81,11 @@ class DiskInfo {
 			$dev = str_replace('/dev/', '', $cols[0]);
 			if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
 				continue;
+			if (count($cols) == 2){
+				// Disks
+				$this->disks[$dev] = $cols[1];
+				continue;
+			}
 			$infos = array();
 			foreach($cols as $key => $value){
 				$vals = explode(':', $value);
@@ -152,6 +160,9 @@ class DiskInfo {
 			$disklist = '';
 			foreach ($disks as $key => $val)
 				$disklist .= ';' . $key;
+			foreach ($this->disks as $key => $val)
+				if (! isset($disks[$key]))
+					$disklist .= ';' . $key;
 				
 			if ($isRootFs){
 				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist);
