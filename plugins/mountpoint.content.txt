@@ -5,28 +5,24 @@
 <table class="table_col5">
 	<tr>
 		<th>###txt_device###</th>
-		<th>###txt_label###</th>
+		<th>###txt_switch1###</th>
 		<th>###txt_mount###</th>
-		<th>###txt_mount###</th>
+		<th>###txt_switch2###</th>
 		<th>###txt_action###</th>
 	</tr>
 	<tr>
 		<td>
-		<select name="add_dev" size="1">
-		###OPT_ADD_DEV###
-		</select>
+###PART_DEV_SELECTOR###
 		</td>
 		<td>
-		<select name="add_label" size="1">
-		###OPT_ADD_LABEL###
-		</select>
+		<input type="submit" name="button_DEV_SELECTOR" value="###txt_button_DEV_SELECTOR###" /> 
 		</td>
 		<td>
-		<select name="add_mount" size="1">
-		###OPT_ADD_MOUNT###
-		</select>
+###PART_POINT_SELECTOR###
 		</td>
-		<td><input type="text" name="add_mount2" value="###VAL_ADD_MOUNT2###" size="10" /></td>
+		<td>
+		<input type="submit" name="button_POINT_SELECTOR" value="###txt_button_POINT_SELECTOR###" /> 
+		</td>
 		<td><input type="submit" name="button_add" value="###txt_add###" /></td>
 	</tr>
 </table>

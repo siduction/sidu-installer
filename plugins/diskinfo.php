@@ -10,6 +10,8 @@ class DiskInfo {
 	var $page;
 	/// the session info
 	var $session;
+	// the disk array: name => size in kbyte
+	var $disks;
 	/// an array of PartitionInfo.
 	var $partitions;
 	/// the file created by the shellserver
@@ -28,6 +30,7 @@ class DiskInfo {
 		$this->page = $page;
 		$this->name = $page->name;
 		$this->partitions = NULL;
+		$this->disks = array();
 		$this->filePartInfo = $session->configuration->getValue(
 			'diskinfo.file.demo.partinfo');
 		if (! file_exists($this->filePartInfo))
@@ -78,6 +81,11 @@ class DiskInfo {
 			$dev = str_replace('/dev/', '', $cols[0]);
 			if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
 				continue;
+			if (count($cols) == 2){
+				// Disks
+				$this->disks[$dev] = $cols[1];
+				continue;
+			}
 			$infos = array();
 			foreach($cols as $key => $value){
 				$vals = explode(':', $value);
@@ -127,7 +135,12 @@ class DiskInfo {
 		$minSize = (int) $this->session->configuration->getValue('diskinfo.root.minsize.mb');
 		
 		$this->partitions = array();
-		if (!empty($info)){
+		$disklist = '';
+		$diskOnlyList = '';
+		if (empty($info)){
+			foreach ($this->disks as $key => $val)
+				$diskOnlyList .= ';' . $key;				
+		}else{
 			$parts = explode(SEPARATOR_PARTITION, $info);
 			foreach($parts as $key => $info){
 				$item = new PartitionInfo($info);
@@ -149,18 +162,22 @@ class DiskInfo {
 					$labels .= ';' . $item->label;
 				}
 			}
-			$disklist = '';
 			foreach ($disks as $key => $val)
 				$disklist .= ';' . $key;
-				
+			foreach ($this->disks as $key => $val)
+				if (! isset($disks[$key]))
+					$disklist .= ';' . $key;				
+		}
+		if (! empty($disklist) || ! empty($diskOnlyList))
+		{
 			if ($isRootFs){
-				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist);
+				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
 				$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
 				$this->session->userData->setValue('rootfs', 'opt_root', $devs);
 			} else {
 				$this->session->userData->setValue('mountpoint', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
-				$this->session->userData->setValue('mountpoint', 'opt_add_label', $labels);
+				$this->session->userData->setValue('mountpoint', 'opt_add_dev', substr($devs, 2));
+				$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
 			}
 		}
 	}	
@@ -248,7 +265,34 @@ class DiskInfo {
 		}
 		return $rc;
 	}
-	
+	/** Adapts the partition/label lists respecting the mountpoints.
+	 * 
+	 * The partitions belonging yet to a mountpoint will not appear in the selection lists.
+	 */
+	function respectMountPoints(){
+		$page = $this->page;
+		$count = $page->getRowCount('mounts');
+		$value = $this->session->userData->getValue('mountpoint', 'opt_add_label');
+		$labels = explode(';', $value);
+		$value = $this->session->userData->getValue('mountpoint', 'opt_add_dev');
+		$devices = explode(';', $value);
+		for ($ix = 0; $ix < $count; $ix++){
+			$line = $page->getRow('mounts', $ix);
+			$cols = explode('|', $line);
+			$dev = $cols[0];
+			$label = $this->getPartitionLabel($dev);
+			$ix2 = $this->session->findIndex($labels, $label);
+			if ($ix2 >= 0)
+				unset($labels[$ix2]);
+			$ix2 = $this->session->findIndex($devices, $dev);
+			if ($ix2 >= 0)
+				unset($devices[$ix2]);
+		}
+		$value = implode(';', $labels);
+		$this->session->userData->setValue('mountpoint', 'opt_add_label', $value);
+		$value = implode(';', $devices);
+		$this->session->userData->setValue('mountpoint', 'opt_add_dev', $value);
+	}
 }
 /**
  * Implements a storage for a partition info.

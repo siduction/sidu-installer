@@ -15,6 +15,8 @@ PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
 CONFIGFILE=$(echo ${LINES[4]} | sed -e 's/\n//; s/configfile=//i;')
 rm -f $PARAMFILE
 test -n "$VERBOSE" && echo "Config: $CONFIGFILE"
+# fll-installer:progress.pm needs a non empty DISPLAY
+test -n "$DISPLAY" || export DISPLAY=:0
 
 function simulation(){
 	echo "Progress: '$PROGRESSFILE'"

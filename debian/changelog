@@ -1,5 +1,40 @@
-sidu-installer (0.9.4) unstable; urgency=low
+sidu-installer (0.9.9) unstable; urgency=low
 
+  * Fix: Handling of disks without partitions
+  * Fix: Exclude of the live cd from disk/partition list (closes #370)
+  * The rootfs will be shown in the mountpoint table (closes #378) 
+  * The rootfs will be excluded from the mountpoint devices (closes #380)
+  * CSS: 5-col-tables: width 100%
+  * Button text: "add the partition" -> "add"
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Fri, 09 Dec 2011 23:32:42 +0100
+
+sidu-installer (0.9.8) unstable; urgency=low
+
+  * Fix: HTML template: charset UTF-8
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Wed, 07 Dec 2011 03:14:05 +0100
+
+sidu-installer (0.9.7) unstable; urgency=low
+
+  * Fix: /mapper/* excluded from hd list
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Wed, 07 Dec 2011 02:54:37 +0100
+
+sidu-installer (0.9.6) unstable; urgency=low
+
+  * Fix: progressbar does its work. (Closes: #353)
+  * Removed: leading backslashes in install
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Tue, 06 Dec 2011 23:58:23 +0100
+
+sidu-installer (0.9.5) unstable; urgency=low
+
+  * Page mountpoints: Exchange of combo boxes "device" and "label" / "mountpoint" and free text. (Closes: #347)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sat, 03 Dec 2011 18:01:34 +0100
+
+sidu-installer (0.9.4) unstable; urgency=low
   * merge se7ens css manual to changelog, probally my fault 
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 03 Dec 2011 01:08:47 +0100

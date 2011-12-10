@@ -1,0 +1,14 @@
+DEVICE:
+		<select name="add_dev" size="1">
+		###OPT_ADD_DEV###
+		</select>
+LABEL:
+		<select name="add_label" size="1">
+		###OPT_ADD_LABEL###
+		</select>
+POINT_COMBO:
+		<select name="add_mount" size="1">
+		###OPT_ADD_MOUNT###
+		</select>
+POINT_TEXT:
+		<input type="text" name="add_mount2" value="###VAL_ADD_MOUNT2###" size="10" />
