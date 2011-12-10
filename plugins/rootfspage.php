@@ -96,6 +96,7 @@ class RootfsPage extends Page{
 				$this->session->trace(TRACE_RARE, 'onButton(): redraw: ' . strval($redraw));
 			}
 		} elseif (strcmp($button, 'button_next') == 0){
+			$this->session->userData->setValue('mountpoint', 'mounts.rowcount', 0);
 			$value = $this->session->getField('root');
 			if (strcmp($value, '-') == 0)
 				$redraw = ! $this->setFieldError('root', 

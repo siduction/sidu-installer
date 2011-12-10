@@ -16,6 +16,19 @@ class MountpointPage extends Page{
 	function __construct(&$session){
 		parent::__construct($session, 'mountpoint');
 		$this->diskInfo = new DiskInfo($session, $this, false);
+		$ix = $this->getRowCount('mounts');
+		$dev = $this->session->userData->getValue('rootfs', 'root');
+		if ($ix == 0 && ! empty($dev)){
+			$dev = $this->session->userData->getValue('rootfs', 'root');
+			$label = $this->diskInfo->getPartitionLabel($dev);
+			$fs = $this->session->userData->getValue('rootfs', 'filesys');
+			$ix2 = $this->indexOfList('rootfs', 'filesys', NULL, 'opt_filesys');
+			if ($ix2 <= 0) 
+				$fs = $this->diskInfo->getPartitionFs($dev);
+			$row = "$dev|$label|$fs|/|";
+			$this->setRow('mounts', $row);
+		}
+		$this->diskInfo->respectMountPoints();
 		$this->setDefaultOption('add_dev', 0, false);
 		$this->setDefaultOption('add_label', 0, false);
 		$this->setDefaultOption('add_mount', 0, false);
@@ -41,7 +54,6 @@ class MountpointPage extends Page{
 		$text = $this->diskInfo->getWaitForPartitionMessage();
 		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text, 
 			$this->content);
-		
 	}
 	/** Returns an array containing the input field names.
 	 * 
@@ -89,6 +101,7 @@ class MountpointPage extends Page{
 		$this->setUserData('add_label', '');
 		$this->setUserData('add_mount', '');
 		$this->setUserData('add_mount2', '');
+		$this->diskInfo->respectMountPoints();
 		return $ok;
 	}
 	/** Will be called on a button click.
@@ -113,6 +126,7 @@ class MountpointPage extends Page{
 		} elseif (strncmp($button, 'button_del_', 11) == 0){
 			$ix = (int) substr($button, 11);
 			$this->delRow('mounts', $ix);
+			$this->diskInfo->respectMountPoints();
 		} else {
 			$this->session->log("unknown button: $button");
 		}
