@@ -10,10 +10,15 @@ fi
 
 # Create the links from the toolkit:
 pushd /usr/share/sidu-installer >/dev/null
-SRC=../siguibui/
+SRC=../siguibui
 function MkLink(){
 	if [ ! -L $1 ] ; then
 		ln -s $2/$1 $1
+	fi
+}
+function MkLink2(){
+	if [ ! -L $2 ] ; then
+		ln -s $1 $2
 	fi
 }
 MkLink index.php $SRC
@@ -26,6 +31,10 @@ MkLink install.sh $SRC
 MkLink partinfo.pl $SRC
 MkLink partinfo.sh $SRC
 MkLink timezoneinfo.sh $SRC
+MkLink firmware.sh $SRC
+MkLink firmware.pl $SRC
+MkLink2 /var/cache/siguibui/public /usr/share/sidu-installer
+
 popd >/dev/null
 exit 0
  

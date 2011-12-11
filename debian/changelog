@@ -1,3 +1,9 @@
+sidu-installer (0.9.10) unstable; urgency=low
+
+  * Installation of unfree firmware (closes: #384)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 11 Dec 2011 22:38:41 +0100
+
 sidu-installer (0.9.9) unstable; urgency=low
 
   * Fix: Handling of disks without partitions

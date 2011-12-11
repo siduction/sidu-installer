@@ -13,3 +13,4 @@ debian/sidu-installer
 base/*
 base
 .fuse*
+public

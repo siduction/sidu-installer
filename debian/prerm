@@ -15,6 +15,7 @@ function RmLink(){
 pushd /usr/share/sidu-installer >/dev/null
 RmLink index.php
 RmLink base
+RmLink public
 
 # Remove the links to the shellserver:
 cd /usr/share/siguibui/backend
@@ -22,5 +23,8 @@ RmLink install.sh
 RmLink partinfo.pl
 RmLink partinfo.sh
 RmLink timezoneinfo.sh
+RmLink firmware.sh
+RmLink firmware.pl
+
 popd >/dev/null
 exit 0
