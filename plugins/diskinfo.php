@@ -144,10 +144,11 @@ class DiskInfo {
 			$parts = explode(SEPARATOR_PARTITION, $info);
 			foreach($parts as $key => $info){
 				$item = new PartitionInfo($info);
+				$isSwap = strcmp($item->partType, '82') == 0 || strcmp($item->partType, '8200') == 0
+					|| strcmp($item->filesystem, 'swap') == 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
-					# swap:
-					|| strcmp($item->partType, '82') == 0
-					|| $isRootFs && $item->megabytes < $minSize;
+					|| $isSwap
+					|| $isRootFs && $item->megabytes < $minSize && $item->megabytes > 0;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
 				if (empty($disk))
 					continue;

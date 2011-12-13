@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 use strict;
-my $fdisk = shift;
-$fdisk = "fdisk -l |" unless $fdisk;
+my $gdisk = shift;
+$gdisk = "gdisk -l DISK|" unless $gdisk;
 my $blkid = shift;
 $blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
 my %disks;
@@ -25,73 +25,20 @@ if (! -d $mountpoint){
 	mkdir $mountpoint;
 	print STDERR $mountpoint, " created\n" if $verbose;
 }
-# get the info from fdisk:
-my %devs;
-open(CMD, $fdisk) || die "$fdisk failed: $!";
-my ($dev, $size, $ptype, $info);
-while(<CMD>){
-	s/\*/ /;
-	if (/^(\S+)\s+\d+\s+\d+\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)/){
-		$dev = $1;
-		$size = $2;
-		$ptype = $3;
-		$info = $4;
-		# forget extended:
-		if ($ptype != 5){
-			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
-		}
-	} elsif (/^Disk\s+([^:]+):.*\s(\d+)\s+bytes/){
-		my ($dev, $bytes) = ($1, $2);
-		my $mb = length($bytes) <= 6 ? 1 : substr($bytes, 0, length($bytes) - 6);
-		$disks{$1} = $mb;
-	}
+my @diskDevs = &getDiskDev;
+#&getFdiskInfo;
+foreach(@diskDevs){
+	&getGdiskInfo($_, $gdisk);
 }
-close CMD;
+# get the info from gdisk:
+my %devs;
 
 # get the info from blkid
 
-open(CMD, $blkid) || die "$blkid failed: $!";
-my %blkids;
-my ($label, $uuid, $fs, $info2);
-while(<CMD>){
-	if (/^(\S+):/){
-		$dev = $1;
-		$info = '';
-		$label = $uuid = $fs = $size = $info = "";
-		if (/LABEL="([^"]+)"/){
-			$label = "\tlabel:$1";
-		}
-		if (/TYPE="([^"]+)"/){
-			$fs = "\tfs:$1";
-		}
-		if (/UUID="([^"]+)"/){
-			$uuid = "\tuuid:$1";
-		}
-		if ($devs{$dev} ne ""){
-			$info=$devs{$info}
-		}
-		$info .= &detective($dev, $fs);
-		$blkids{$dev} = "$label$fs$uuid$info";
-	}
-}
-close CMD;
+my %blkids = &getBlockId;
+&mergeDevs;
 
-# merge the two fields:
-foreach $dev (keys %devs){
-	$info = $blkids{$dev};
-	my $val = $devs{$dev};
-	if ($info eq ""){
-		$blkids{$dev} = $val;
-	} else {
-		$size = $ptype = $info2 = "";
-		$size = "\t$1" if $val =~ /(size:\d+)/;
-		$ptype = "\t$1" if $val =~ /(id:\w+)/;
-		$info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
-		$blkids{$dev} = "$info$size$ptype$info2"; 
-	}
-}
-
-my (%sorted, $key);
+my (%sorted, $key, $dev);
 foreach $dev (keys %blkids){
 	if ($dev =~ /(\D+)(\d+)/){
 		$key = $1 . sprintf ("%03d", $2);
@@ -112,20 +59,26 @@ sub detective{
 	my $dev = shift;
 	my $fs = shift;
 	my $info = "";
-	system ("mount -o ro $dev $mountpoint");
+	my $dirMount = &getMountPoint($dev);
+	if ($dirMount eq ""){
+		system ("mount -o ro $dev $mountpoint");
+		$dirMount = $mountpoint;
+	}
 	if ($fs eq "ntfs" || $fs =~ /^vfat|fat\d/){
-		if (-d "$mountpoint/windows/system32"){
+		if (-d "$dirMount/windows/system32"){
 			$info .= "\tos:windows";
 		}
 	}
-	if (-d "$mountpoint/etc"){
-		$info .= &firstLineOf("$mountpoint/etc/debian_version", "distro");
-		$info .= &firstLineOf("$mountpoint/etc/aptosid-version", "subdistro");
-		$info .= &firstLineOf("$mountpoint/etc/sidux-version", "subdistro");
-		$info .= &firstLineOf("$mountpoint/etc/siduction-version", "subdistro");
-		$info .= "\tos:unix" if $info eq "" && -d "$mountpoint/etc/passwd";		
+	if (-d "$dirMount/etc"){
+		$info .= &firstLineOf("$dirMount/etc/debian_version", "distro");
+		$info .= &firstLineOf("$dirMount/etc/aptosid-version", "subdistro");
+		$info .= &firstLineOf("$dirMount/etc/sidux-version", "subdistro");
+		$info .= &firstLineOf("$dirMount/etc/siduction-version", "subdistro");
+		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";		
 	}
-	system ("umount $mountpoint");
+	if ($dirMount eq $mountpoint){
+		system ("umount $mountpoint");
+	}
 	
 	if ($fs =~ /fs:ext\d/){
 		open(TUNE, "tune2fs -l $dev|");
@@ -146,7 +99,22 @@ sub detective{
 	}
 	return $info;
 }
-
+my %s_mounts;
+my $s_mounts;
+sub getMountPoint{
+	my $dev = shift;
+	if ($s_mounts eq ""){
+		open(INP, "mount|");
+		while(<INP>){
+			if (/^(\S+)\s+on\s+(\S+)/){
+				$s_mounts{$1} = $2;
+			}
+		}
+		close INP;
+		$s_mounts = 1;
+	}
+	return $s_mounts{$dev};
+}
 sub firstLineOf{
 	my $file = shift;
 	my $prefix = shift;
@@ -158,4 +126,125 @@ sub firstLineOf{
 		close INP;
 	}
 	return $rc;
+}
+sub getDiskDev{
+	opendir(DIR, "/sys/block");
+	my @files = readdir(DIR);
+	my @rc;
+	closedir DIR;
+	foreach (@files){
+		# find all names without a digit:
+		push @rc, $_ unless /\d/ || /^\.{1,2}$/;
+	}
+	return @rc;
+}
+
+sub getFdiskInfo{
+	my $fdisk = "fdisk -l |";
+	open(CMD, $fdisk) || die "$fdisk failed: $!";
+	my ($dev, $size, $ptype, $info);
+	while(<CMD>){
+		s/\*/ /;
+		if (/^(\S+)\s+\d+\s+\d+\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)/){
+			$dev = $1;
+			$size = $2;
+			$ptype = $3;
+			$info = $4;
+			# forget extended:
+			if ($ptype != 5){
+				$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
+			}
+		} elsif (/^Disk\s+([^:]+):.*\s(\d+)\s+bytes/){
+			my ($dev, $bytes) = ($1, $2);
+			my $mb = length($bytes) <= 6 ? 1 : substr($bytes, 0, length($bytes) - 6);
+			$disks{$1} = $mb;
+		}
+	}
+	close CMD;
+}
+
+sub getGdiskInfo{
+	my $disk = shift;
+	my $cmd = shift;
+	$cmd =~ s!DISK!/dev/$disk! if $cmd =~ /\|/; 
+	open(CMD, $cmd) || die "$gdisk failed: $!";
+	my $sector = 512;
+	while(<CMD>){
+		s/\*/ /;
+#   5        96392048        98799749   1.1 GiB     8200  Linux swap
+#   6        98801798       176714999   37.2 GiB    8300  Linux filesystem
+		if (/^\s+(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+B\s+([0-9A-Fa-f]+)\s+(.*)/){
+			my ($partno, $min, $max, $ptype, $info) = ($1, $2, $3, $4, $5);
+			my $dev = "/dev/$disk$partno";
+			my $size = int(($max - $min + 1) * 1.0 * $sector / 1024);
+			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
+		} elsif (/sector size:\s+(\d+)/){
+			$sector = $1;
+		}
+	}
+	close CMD;
+}
+sub getBlockId{
+	my ($label, $uuid, $fs, $info2);
+	my ($dev, $info);
+	my %blkids;
+	open(CMD, $blkid) || die "$blkid failed: $!";
+	while(<CMD>){
+		if (/^(\S+):/){
+			my $dev = $1;
+			my ($info, $label, $uuid, $fs, $size, $info);
+			if (/LABEL="([^"]+)"/){
+				$label = "\tlabel:$1";
+			}
+			if (/TYPE="([^"]+)"/){
+				$fs = "\tfs:$1";
+			}
+			if (/UUID="([^"]+)"/){
+				$uuid = "\tuuid:$1";
+			}
+			if ($devs{$dev} ne ""){
+				$info=$devs{$info}
+			}
+			if (/mapper/){
+				$size = getSizeOfLvmPartition($dev);
+				$size = $size == 0 ? "" : "\tsize:$size";
+			}
+			$info .= &detective($dev, $fs);
+			$blkids{$dev} = "$label$fs$uuid$info$size";
+		}
+	}
+	close CMD;
+	return %blkids;
+}
+
+sub mergeDevs{
+	# merge the two fields:
+	foreach $dev (keys %devs){
+		my $info = $blkids{$dev};
+		my $val = $devs{$dev};
+		if ($info eq ""){
+			$blkids{$dev} = $val;
+		} else {
+			my $size = "\t$1" if $val =~ /(size:\d+)/;
+			my $ptype = "\t$1" if $val =~ /(id:\w+)/;
+			my $info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
+			$blkids{$dev} = "$info$size$ptype$info2"; 
+		}
+	}
+}
+
+sub getSizeOfLvmPartition{
+	my $dev = shift;
+	my ($sectors, $size);
+	open (INP, "gdisk -l $dev|") || die "gdisk: $!";
+	while(<INP>){
+		if (/(\d+)\s+sectors/){
+			$sectors = $1;
+		} elsif (/sector\s+size:\s+(\d+)/){
+			$size = int($1 * 1.0 * $sectors / 1024);
+			last;
+		}
+	}
+	close INP;
+	return $size;
 }

@@ -1,3 +1,11 @@
+sidu-installer (0.9.11) unstable; urgency=low
+
+  * Swap partitions cannot be selected as rootfs or mountpoint (closes #393)
+  * Using gdisk instead of fdisk should work on EFI (closes #390)
+  * LVM partitions can be used as rootfs or mountpoints (closes #391)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Wed, 14 Dec 2011 00:49:01 +0100
+
 sidu-installer (0.9.10) unstable; urgency=low
 
   * Installation of unfree firmware (closes: #384)
