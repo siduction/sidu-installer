@@ -14,6 +14,7 @@ class RunPage extends Page{
 		parent::__construct($session, 'run');
 		$this->setDefaultOption('force', 0, true);
 		$value = $this->getUserData('running');
+		$this->session->trace(TRACE_RARE, "construct(): running: $value");
 		if (empty($value))
 			$text = $this->getConfiguration('button');
 		else{
@@ -21,7 +22,7 @@ class RunPage extends Page{
 			if (empty($duration)){
 				$duration = time() - (int) $value;
 				if ($duration > 3600)
-					$duration = sprintf("%d:%02d:%02d", $duration / 3600, $duration % 3600 / 60, $duration % 60);
+					$duration = sprintf("%d:%02d:%02d (%d)", $duration / 3600, $duration % 3600 / 60, $duration % 60, $duration);
 				else					
 					$duration = sprintf("%02d:%02d", $duration % 3600 / 60, $duration % 60);
 			}
@@ -55,7 +56,8 @@ class RunPage extends Page{
 	 */
 	function startInstallation(){
 		$answer = $this->session->getAnswerFileName('inst', '.ready');
-		$shellConfig = $this->session->getAnswerFileName('inst', '.conf');
+		$this->session->trace(TRACE_RARE, "startInstallation: answer: $answer");
+				$shellConfig = $this->session->getAnswerFileName('inst', '.conf');
 		$lines = array();
 		# This must be the first entry, because of changing with NAME_NAME:
 		$lines[] = "REGISTERED=' SYSTEM_MODULE HD_MODULE HD_FORMAT HD_FSTYPE HD_CHOICE HD_MAP HD_IGNORECHECK SWAP_MODULE SWAP_AUTODETECT SWAP_CHOICES NAME_MODULE USER_MODULE USER_NAME USERPASS_MODULE USERPASS_CRYPT ROOTPASS_MODULE ROOTPASS_CRYPT HOST_MODULE HOST_NAME SERVICES_MODULE SERVICES_START BOOT_MODULE BOOT_LOADER BOOT_DISK BOOT_WHERE AUTOLOGIN_MODULE INSTALL_READY HD_AUTO'";
@@ -204,18 +206,19 @@ class RunPage extends Page{
 
 
 		$configFile = fopen($shellConfig, "w");
+		$count = 0;
 		foreach ($lines as $key => $val) {
+			$count++;
 			$val .= "\n";
 			fputs($configFile, $val);
 		}
 		fclose($configFile);
-		
+		$this->session->trace(TRACE_RARE, "StartInstallation: $count lines written");
 		$options = 'background requestfile';
 		$command = 'install';
-		$text = $this->getConfiguration('wait.intro');
 		$this->session->exec($answer, $options, $command, $params, 0);
+		$text = $this->getConfiguration('wait.intro');
 		$redraw = $this->startWait($answer, $text, $description, $progress);
-
 	}	
 	/** Will be called on a button click.
 	 * 
@@ -225,6 +228,7 @@ class RunPage extends Page{
 	function onButtonClick($button){
 		$rc = true;
 		if (strcmp($button, 'button_install') == 0){
+			$this->session->trace(TRACE_RARE, 'onButtonClick(): setting running');
 			$this->setUserData('running', strval(time()));
 			$this->startInstallation();
 		}
