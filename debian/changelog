@@ -1,3 +1,11 @@
+sidu-installer (0.9.12) unstable; urgency=low
+
+  * Fix: start of fdisk/gparted is possible again
+  * Fix: typo in config file. (Closes: #406)
+  * Fix: run: removed hidden field
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Fri, 16 Dec 2011 21:13:30 +0100
+
 sidu-installer (0.9.11) unstable; urgency=low
 
   * Swap partitions cannot be selected as rootfs or mountpoint (closes #393)
