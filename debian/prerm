@@ -27,4 +27,9 @@ RmLink firmware.sh
 RmLink firmware.pl
 
 popd >/dev/null
+
+# Debhelpertoken added, review needed
+
+#DEBHELPER#
+
 exit 0
