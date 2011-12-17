@@ -63,7 +63,7 @@ h1, h2, h3 {
 }
 
 #text_area{
-	min-height: 500px;
+	min-height: 75%;
 }
 .error_message{
 	color: red;
