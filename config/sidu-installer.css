@@ -41,20 +41,20 @@ h1, h2, h3 {
 #main_area{
     	margin-left: auto;
 	margin-right: auto;
-	width: 960px;
+	width: 700px;
 }
 #header {
-    height: 102px;
-    width:960px;
+    height: 72px;
+    width:700px;
     background: url(../images/header.png) center;
 }
 #content{
       	margin-left: auto;
 	margin-right: auto;
-	width: 882px;
+	width: 633px;
 	background: #ffffff;
 	padding: 1em;
-	border: 1px #000000 solid
+	border: 3px #535d6c solid;
 }
 #content h1{
 	text-align: center;
