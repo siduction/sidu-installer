@@ -49,16 +49,15 @@ h1, h2, h3 {
 #header {
 	margin-left: auto;
 	margin-right: auto;
-    width:100%;
-    /*background: url(../images/header.png) center;*/
-    background-repeat:no-repeat;
+  width:100%;
+  background-repeat:no-repeat;
 }
 #content{
+	margin-top:-1%;
 	margin-left: auto;
 	margin-right: auto;
 	background: #ffffff;
 	border: 1px #000000 solid;
-	/*max-width: 907px;*/
 	max-width:94.5%;
 }
 #content h1{
