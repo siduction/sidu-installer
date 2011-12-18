@@ -130,7 +130,7 @@ class NetworkPage extends Page{
 	function onButtonClick($button){
 		$redraw = true;
 		if (strcmp($button, 'button_next') == 0){
-			$ok = $this->isValidContent('host', 'a-z', 'a-z0-9_', true);
+			$ok = $this->isValidContent('host', 'A-Za-z', 'A-Za-z0-9_', true);
 			if ($ok)
 				$redraw = $this->navigation(false);
 		} elseif (strcmp($button, 'button_prev') == 0){

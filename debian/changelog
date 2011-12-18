@@ -1,3 +1,10 @@
+sidu-installer (0.9.13) unstable; urgency=low
+
+  * New page "partition" which takes some parts of the page "rootfs".
+  * Fix: Uppercase letters are allowed for the hostname. 
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 18 Dec 2011 13:47:34 +0100
+
 sidu-installer (0.9.12) unstable; urgency=low
 
   * Fix: start of fdisk/gparted is possible again
