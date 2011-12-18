@@ -1,6 +1,9 @@
 <?php
 define ('SEPARATOR_PARTITION', '|');
 define ('SEPARATOR_INFO', "\t");
+define ('PAGE_PARTITION', 0);
+define ('PAGE_ROOTFS', 1);
+define ('PAGE_MOUNTPOINT', 2);
 /**
  * Administrates the disk and partition infos.
  * 
@@ -18,6 +21,8 @@ class DiskInfo {
 	var $filePartInfo;
 	/// True: the partition info is avaliable.
 	var $hasInfo;
+	/// One of PAGE_PARTITION .. PAGE_MOUNTPOINT
+	var $pageIndex;
 	/** Constructor.
 	 * 
 	 * @param $session		the session info
@@ -29,6 +34,13 @@ class DiskInfo {
 		$this->hasInfo = false;
 		$this->page = $page;
 		$this->name = $page->name;
+		if (strcmp($this->name, "partition") == 0)
+			$this->pageIndex = PAGE_PARTITION;
+		elseif (strcmp($this->name, "rootfs") == 0)
+			$this->pageIndex = PAGE_ROOTFS;
+		else
+			$this->pageIndex = PAGE_MOUNTPOINT;
+			
 		$this->partitions = NULL;
 		$this->disks = array();
 		$this->filePartInfo = $session->configuration->getValue(
@@ -54,13 +66,20 @@ class DiskInfo {
 		else
 			$this->clearPartitionInfo();
 	}
+	/** Forces the reload of the partition info.
+	 */
+	function forceReload(){
+		if (file_exists($this->filePartInfo))
+			unlink($this->filePartInfo);
+	}
 	/** Sets all gui info related with partition info to undefined.
 	 */
 	function clearPartitionInfo(){
-		$this->session->userData->setValue('rootfs', 'opt_disk', '-');
+		$this->session->userData->setValue('partition', 'opt_disk', '-');
+		$this->session->userData->setValue('partition', 'opt_disk2', '-');
+		$this->session->userData->setValue('rootfs', 'opt_root', '-');
 		$this->session->userData->setValue('rootfs', 'opt_disk2', '-');
 		$this->session->userData->setValue('mountpoint', 'opt_disk2', '-');
-		$this->session->userData->setValue('rootfs', 'opt_root', '-');
 		$this->session->userData->setValue('mountpoint', 'opt_add_dev', '-');
 		$this->session->userData->setValue('mountpoint', 'opt_add_label', '-');
 		$this->page->setRowCount('partinfo', 0);
@@ -123,10 +142,19 @@ class DiskInfo {
 	 */
 	function readPartitionInfo(){
 		$this->session->trace(TRACE_RARE, 'DiskInfo.readPartitionInfo()');
-		$isRootFs = strcmp($this->name, 'rootfs') == 0; 
 		if ($this->hasInfo)
 			$this->importPartitionInfo();
-		$excludedPartition = $isRootFs ? "" : $this->session->userData->getValue('rootfs', 'root');
+		switch($this->pageIndex)
+		{
+			case PAGE_MOUNTPOINT:
+				$excludedPartition = $this->session->userData->getValue('rootfs', 'root');
+				break;
+			case PAGE_PARTITION:
+			case PAGE_ROOTFS:
+			default:
+				$excludedPartition = "";
+				break;
+		}
 		$value = $this->session->userData->getValue('', 'partinfo');
 		$disks = array();
 		$devs = '-';
@@ -148,7 +176,7 @@ class DiskInfo {
 					|| strcmp($item->filesystem, 'swap') == 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
 					|| $isSwap
-					|| $isRootFs && $item->megabytes < $minSize && $item->megabytes > 0;
+					|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
 				if (empty($disk))
 					continue;
@@ -171,14 +199,24 @@ class DiskInfo {
 		}
 		if (! empty($disklist) || ! empty($diskOnlyList))
 		{
-			if ($isRootFs){
-				$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
-				$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('rootfs', 'opt_root', $devs);
-			} else {
-				$this->session->userData->setValue('mountpoint', 'opt_disk2', substr($disklist, 1));
-				$this->session->userData->setValue('mountpoint', 'opt_add_dev', substr($devs, 2));
-				$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
+			switch($this->pageIndex)
+			{
+				case PAGE_PARTITION:
+					$this->session->userData->setValue('partition', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
+					$this->session->userData->setValue('partition', 'opt_disk2', $disklist);
+					break;
+				case PAGE_ROOTFS:
+					$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
+					$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
+					$this->session->userData->setValue('rootfs', 'opt_root', $devs);
+					break;
+				case PAGE_MOUNTPOINT:
+					$this->session->userData->setValue('mountpoint', 'opt_disk2', $disklist);
+					$this->session->userData->setValue('mountpoint', 'opt_add_dev', substr($devs, 2));
+					$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
+					break;
+				default:
+					break;
 			}
 		}
 	}	
@@ -237,7 +275,10 @@ class DiskInfo {
 	 */
 	function buildInfoTable(){
 		$disk = $this->session->getField('disk2');
-		if ($this->hasInfo && ! empty($disk)){
+		$disk = trim($disk);
+		if (! ($this->hasInfo && ! empty($disk)))
+			$this->page->setRowCount('partinfo', 0);
+		else {
 			$partitions = $this->getPartitionsOfDisk($disk);
 			$this->page->setRowCount('partinfo', 0);
 			foreach ($partitions as $dev => $item){

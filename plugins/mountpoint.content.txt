@@ -2,6 +2,9 @@
 <h1>###txt_partition###</h1>
 ###WAIT_FOR_PARTINFO###
 <div class="textblock">
+<p>###txt_intro###</p>
+<p>###txt_intro2###</p>
+<p>###txt_intro3###</p>
 <table class="table_col5">
 	<tr>
 		<th>###txt_device###</th>
