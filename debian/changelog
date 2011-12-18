@@ -1,5 +1,9 @@
 sidu-installer (0.9.14) unstable; urgency=low
 
+  [ Torsten Wohlfarth]
+  * fixed the typo in sidu-installer_de.conf
+
+  [ J. Hamatoma ]
   * The partition info table will be hidden if no disk is selected.
   * Update: refs: #437
 
