@@ -1,3 +1,10 @@
+sidu-installer (0.9.14) unstable; urgency=low
+
+  * The partition info table will be hidden if no disk is selected.
+  * Update: refs: #437
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 18 Dec 2011 15:17:42 +0100
+
 sidu-installer (0.9.13) unstable; urgency=low
 
   * New page "partition" which takes some parts of the page "rootfs".

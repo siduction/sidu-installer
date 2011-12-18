@@ -207,7 +207,7 @@ class DiskInfo {
 					break;
 				case PAGE_ROOTFS:
 					$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
-					$this->session->userData->setValue('rootfs', 'opt_disk2', substr($disklist, 1));
+					$this->session->userData->setValue('rootfs', 'opt_disk2', $disklist);
 					$this->session->userData->setValue('rootfs', 'opt_root', $devs);
 					break;
 				case PAGE_MOUNTPOINT:

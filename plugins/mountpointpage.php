@@ -42,6 +42,10 @@ class MountpointPage extends Page{
 	function build(){
 		$this->readContentTemplate();
 		$this->readHtmlTemplates();
+		if ($this->getRowCount('partinfo') > 0)
+			$this->replacePartWithTemplate('INFO_TABLE', 'INFO_TABLE');
+		else
+			$this->clearPart('INFO_TABLE');
 		$this->setButtonSelectedPart('DEV_SELECTOR', 'DEVICE', 'LABEL');
 		$this->setButtonSelectedPart('POINT_SELECTOR', 'POINT_COMBO', 'POINT_TEXT');
 		$this->fillOptions('disk2', true);

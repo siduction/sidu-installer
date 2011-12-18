@@ -36,8 +36,11 @@ class RootfsPage extends Page{
 	function build(){
 		$this->session->trace(TRACE_RARE, 'RootfsPage.build()');
 		$this->readContentTemplate();
-		$this->fillOptions('disk', true);
-		$this->fillOptions('partman');
+		$this->readHtmlTemplates();
+		if ($this->getRowCount('partinfo') > 0)
+			$this->replacePartWithTemplate('INFO_TABLE', 'INFO_TABLE');
+		else
+			$this->clearPart('INFO_TABLE');
 		$this->fillOptions('filesys');
 		$this->fillOptions('root', true);
 		$this->fillOptions('disk2', true);

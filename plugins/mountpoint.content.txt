@@ -5,12 +5,10 @@
 <p>###txt_intro###</p>
 <p>###txt_intro2###</p>
 <p>###txt_intro3###</p>
-<table class="table_col5">
+<table width="100%">
 	<tr>
 		<th>###txt_device###</th>
-		<th>###txt_switch1###</th>
 		<th>###txt_mount###</th>
-		<th>###txt_switch2###</th>
 		<th>###txt_action###</th>
 	</tr>
 	<tr>
@@ -18,18 +16,27 @@
 ###PART_DEV_SELECTOR###
 		</td>
 		<td>
-		<input type="submit" name="button_DEV_SELECTOR" value="###txt_button_DEV_SELECTOR###" /> 
-		</td>
-		<td>
 ###PART_POINT_SELECTOR###
+		</td>
+		<td><input type="submit" name="button_add" value="###txt_add###" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"><div class="center">###txt_switch###</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<input type="submit" name="button_DEV_SELECTOR" value="###txt_button_DEV_SELECTOR###" /> 
 		</td>
 		<td>
 		<input type="submit" name="button_POINT_SELECTOR" value="###txt_button_POINT_SELECTOR###" /> 
 		</td>
-		<td><input type="submit" name="button_add" value="###txt_add###" /></td>
+		<td>&nbsp;</td>
 	</tr>
 </table>
 ###ERROR_ADD_MOUNT2###
+
 <div class="horicontal_line"></div>
 <table id="table_partition_mount" class="table_col5">
 	<tr>
@@ -73,18 +80,7 @@
 		<td></td>
 	</tr>
 </table>
-<div class="horicontal_line"></div>
-<table id="rootfs_part_info">
-	<tr>
-		<th>###txt_device###</th>
-		<th>###txt_label###</th>
-		<th>###txt_size###</th>
-		<th>###txt_parttype###</th>
-		<th>###txt_fs###</th>
-		<th>###txt_info###</th>
-	</tr>
-	###ROWS_PARTINFO###
-</table>
+###PART_INFO_TABLE###
 </div>
 
 </div> <!-- text_area-->

@@ -41,18 +41,7 @@
 		<td></td>
 	</tr>
 </table>
-<div class="horicontal_line"></div>
-<table id="rootfs_part_info">
-	<tr>
-		<th>###txt_device###</th>
-		<th>###txt_label###</th>
-		<th>###txt_size###</th>
-		<th>###txt_parttype###</th>
-		<th>###txt_fs###</th>
-		<th>###txt_info###</th>
-	</tr>
-	###ROWS_PARTINFO###
-</table>
+###PART_INFO_TABLE###
 </div>
 </div> <!-- text_area-->
 
