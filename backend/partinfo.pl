@@ -54,6 +54,8 @@ foreach $key (sort keys %sorted){
 foreach $key (sort keys %disks){
 	print $key, "\t", $disks{$key}, "\n";
 }
+exit 0;
+
 # searches for extended info of a partition
 sub detective{
 	my $dev = shift;
@@ -169,6 +171,7 @@ sub getGdiskInfo{
 	$cmd =~ s!DISK!/dev/$disk! if $cmd =~ /\|/; 
 	open(CMD, $cmd) || die "$gdisk failed: $!";
 	my $sector = 512;
+	my $sectors = 0;
 	while(<CMD>){
 		s/\*/ /;
 #   5        96392048        98799749   1.1 GiB     8200  Linux swap
@@ -180,8 +183,12 @@ sub getGdiskInfo{
 			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 		} elsif (/sector size:\s+(\d+)/){
 			$sector = $1;
+#Disk /dev/sda: 3907029168 sectors, 1.8 TiB
+		} elsif (/^Disk\s+\S+:\s+(\d+)/){
+			$sectors = $1;
 		}
 	}
+	$disks{$disk} = int($sectors * 1.0 * $sector / 1024); 
 	close CMD;
 }
 sub getBlockId{
