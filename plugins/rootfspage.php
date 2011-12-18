@@ -67,38 +67,6 @@ class RootfsPage extends Page{
 		$redraw = true;
 		if (strcmp($button, 'button_refresh') == 0){
 			$this->diskInfo->buildInfoTable();
-		} elseif (strcmp($button, "button_exec") == 0){
-			$answer = $this->session->getAnswerFileName('part', '.ready');
-			$description = $this->getConfiguration('description_wait'); 
-			$program = $this->session->getField('partman');
-			$disk = $this->session->getField('disk');
-			$progress = null;
-			$value = $this->getConfiguration('cmd_' . $program);
-			list($allDisksAllowed, $options, $command, $params) = explode(CONFIG_SEPARATOR, $value);
-			// All disks?
-			$ix = $this->indexOfList('rootfs', 'disk', 'opt_disk', null);
-			if ($ix == 0)
-				$disk = '';
-			if (strcmp($allDisksAllowed, 'y') != 0 && empty($disk))
-				$redraw = ! $this->setFieldErrorByKey('disk', 'ERR_ALL_NOT_ALLOWED');
-			else{
-				$params = str_replace('###DISK###', empty($disk) ? '' : "/dev/$disk", $params);
-				$user = posix_getlogin();
-				if (empty($user)){
-					// use standard user (uid=1000)
-					$user = posix_getpwuid (1000);
-					if ($user)
-						$user = $user['name'];
-				}
-				$params = str_replace('###USER###', $user ? $user : 'root', $params);
-				
-				$params = explode('|', $params);
-				$this->session->exec($answer, $options, $command, $params, 0);
-				// Partition info is potentially changed. Reload necessary:
-				$this->setUserData('reload.partinfo', 'T');
-				$redraw = $this->startWait($answer, $program, $description, $progress);
-				$this->session->trace(TRACE_RARE, 'onButton(): redraw: ' . strval($redraw));
-			}
 		} elseif (strcmp($button, 'button_next') == 0){
 			$this->session->userData->setValue('mountpoint', 'mounts.rowcount', 0);
 			$value = $this->session->getField('root');

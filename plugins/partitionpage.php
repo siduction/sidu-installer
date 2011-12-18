@@ -77,12 +77,13 @@ class PartitionPage extends Page{
 			$value = $this->getConfiguration('cmd_' . $program);
 			list($allDisksAllowed, $options, $command, $params) = explode(CONFIG_SEPARATOR, $value);
 			// All disks?
-			if (strpos($disk, '/') === FALSE)
+			$ix = $this->indexOfList('partition', 'disk', 'opt_disk', null);
+			if ($ix == 0)
 				$disk = '';
 			if (strcmp($allDisksAllowed, 'y') != 0 && empty($disk))
 				$redraw = ! $this->setFieldErrorByKey('disk', 'ERR_ALL_NOT_ALLOWED');
 			else{
-				$params = str_replace('###DISK###', empty($disk) ? '' : $disk, $params);
+				$params = str_replace('###DISK###', empty($disk) ? '' : "/dev/$disk", $params);
 				$user = posix_getlogin();
 				if (empty($user)){
 					// use standard user (uid=1000)
