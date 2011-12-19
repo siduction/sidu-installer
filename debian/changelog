@@ -1,3 +1,10 @@
+sidu-installer (0.9.16+nmu1) unstable; urgency=low
+
+  * Non-maintainer upload.
+  * refs #443
+
+ -- Torsten Wohlfarth <towo@siduction.org>  Mon, 19 Dec 2011 12:23:16 +0100
+
 sidu-installer (0.9.16) unstable; urgency=low
 
   * Removing unnecessary code in rootfs (now in partition)
