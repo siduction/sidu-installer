@@ -38,6 +38,12 @@ class ReadyPage extends Page{
 		$answer = $this->session->userData->getValue('wait', 'file.answer');
 		$text = ! file_exists($answer) ? '' : $this->session->readFile($answer);
 		$this->content = str_replace('###DETAILS###', $text, $this->content);
+		if (strpos($text, 'ended abnormally') > 0){
+			$text = $this->getConfiguration('txt_failed');
+			$this->replaceMarker('txt_intro', $text);
+			// Enable the page "run":
+			$this->session->userData->setValue('run', 'running', '');
+		}
 		return $this->content;
 	}	
 	/** Will be called on a button click.
