@@ -1,3 +1,9 @@
+sidu-installer (0.9.19) unstable; urgency=low
+
+  * Fix: Clean repetition when installation has failed
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Tue, 20 Dec 2011 23:49:26 +0100
+
 sidu-installer (0.9.18) unstable; urgency=low
 
   * Fix: Indicates always an error (forgotten testcode).
