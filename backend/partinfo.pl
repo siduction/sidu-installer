@@ -1,7 +1,9 @@
 #! /usr/bin/perl
 use strict;
 my $gdisk = shift;
-$gdisk = "gdisk -l DISK|" unless $gdisk;
+# If there is a GPT and a MBR gdisk asks which partition table should be used.
+# 1: GPT 2: MBR 3: clean GPT
+$gdisk = "echo 1 | gdisk -l DISK|" unless $gdisk;
 my $blkid = shift;
 $blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
 my %disks;

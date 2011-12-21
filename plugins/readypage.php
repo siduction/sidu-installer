@@ -44,7 +44,7 @@ class ReadyPage extends Page{
 			// Enable the page "run":
 			$this->session->userData->setValue('run', 'running', '');
 			$this->session->userData->setValue('run', 'duration', '');
-			$session->userData->setValue('wait', 'blocked', '');
+			$this->session->userData->setValue('wait', 'blocked', '');
 		}
 		return $this->content;
 	}	

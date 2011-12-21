@@ -1,3 +1,11 @@
+sidu-installer (0.9.20) unstable; urgency=low
+
+  * Fix: GPT and MBR exists: gdisk asks a question and the script hangs.
+  * Fix: Mounted partitons must have a filesystem. Other partitions will be ignored.
+  * Fix: Crash, when installation has failed.
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Thu, 22 Dec 2011 00:25:28 +0100
+
 sidu-installer (0.9.19) unstable; urgency=low
 
   * Fix: Clean repetition when installation has failed

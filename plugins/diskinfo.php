@@ -174,9 +174,11 @@ class DiskInfo {
 				$item = new PartitionInfo($info);
 				$isSwap = strcmp($item->partType, '82') == 0 || strcmp($item->partType, '8200') == 0
 					|| strcmp($item->filesystem, 'swap') == 0;
+				$hasFileSys = ! empty($item->filesystem) && strcmp($item->filesystem, "LVM2_member") != 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
 					|| $isSwap
-					|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0;
+					|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0
+					|| $this->pageIndex == PAGE_MOUNTPOINT && ! $hasFileSys;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
 				if (empty($disk))
 					continue;
