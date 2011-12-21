@@ -43,8 +43,7 @@ h1, h2, h3 {
 #main_area{
 		margin-left: auto;
 		margin-right: auto;
-		max-width: 700px;
-		min-height:80%;
+		max-width: 670px;
 }
 #header {
 		margin-left: auto;
@@ -58,7 +57,9 @@ h1, h2, h3 {
 		margin-right: auto;
 		background: #ffffff;
 		border: 2px #535d6c solid;
-		max-width:94.0%;
+		border-bottom-right-radius:5px;
+		border-bottom-left-radius:5px;
+		max-width:94.2%;
 }
 #content h1{
 		text-align: center;
@@ -85,7 +86,7 @@ h1, h2, h3 {
 		display: block;
 }
 .navigation{
-		padding-bottom: 5%;
+		padding-bottom:3%;
 		padding-left:5%;
 		padding-right:5%;
 }
@@ -102,10 +103,11 @@ h1, h2, h3 {
 		text-align: right;
 }
 .textblock{
-		padding: 0.9em;
+		padding: 0.7em;
 		margin: 0.5em;
 		border: 1px #ff6600 solid;
-		float: none;	
+		float: none;
+		border-radius:3px;	
 }
 .warning{
 		font-weight: bold;
@@ -130,7 +132,6 @@ td { vertical-align: top; }
 		float: left; 
 }
 .home_img_usb {
-		margin-top: 1%;
 		margin-right: 1%;
 }
 .home_button_usb {
