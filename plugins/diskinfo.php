@@ -172,11 +172,19 @@ class DiskInfo {
 			$parts = explode(SEPARATOR_PARTITION, $info);
 			foreach($parts as $key => $info){
 				$item = new PartitionInfo($info);
-				$isSwap = strcmp($item->partType, '82') == 0 || strcmp($item->partType, '8200') == 0
-					|| strcmp($item->filesystem, 'swap') == 0;
-				$hasFileSys = ! empty($item->filesystem) && strcmp($item->filesystem, "LVM2_member") != 0;
+				$type = strtolower($item->partType);
+				$isProtected = strcmp($type, '8200') == 0
+					|| strcmp($item->filesystem, 'swap') == 0
+					|| strcmp($type, '8e00') == 0 // LVM
+					|| strcmp($type, 'fd00') == 0 // Linux-RAID
+					|| strcmp($type, 'a906') == 0 // Netbsd-RAID
+					|| strcmp($type, 'ab00') == 0 // Apple boot
+					|| strncmp($type, 'af', 2) == 0 // Apple (HFS, RAID ...
+					;
+				$hasFileSys = ! empty($item->filesystem) 
+					&& strcmp($item->filesystem, "LVM2_member") != 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
-					|| $isSwap
+					|| $isProtected
 					|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0
 					|| $this->pageIndex == PAGE_MOUNTPOINT && ! $hasFileSys;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
