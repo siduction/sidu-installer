@@ -15,15 +15,28 @@ info)
 	;;
 install)
 	CONFIG=/etc/apt/sources.list.d/debian.list
+	UPDATE=0
 	if ! grep "^deb.*non-free" $CONFIG >/dev/null ; then
 		sed -i -e 's/main/main non-free/;' $CONFIG
+		UPDATE=1
+	fi 	
+	if ! grep "^deb.*contrib" $CONFIG >/dev/null ; then
+		sed -i -e 's/main/main contrib/;' $CONFIG
+		UPDATE=1
 	fi 	
 	date "+%Y.%m.%d-%H:%M:%S Installing firmware..." >$TEMP1
+	if [ $UPDATE ] ; then
+		echo "apt-get update" >>$TEMP1
+		apt-get update | tail -n 5 >>$TEMP1
+	fi
 	while [ -n "$ARG" ] ; do
 		ITEM=${ARG%%;*}
 		ARG=${ARG#*;}
 		test "$ARG" = "$ITEM" && ARG=
-		test -n "$ITEM" && $RUN fw-detect -i $ITEM >>$TEMP1 2>&1
+		if [ -n "$ITEM" ] ; then
+			echo "fw-detect -i $ITEM" >>$TEMP1 
+			$RUN fw-detect -i $ITEM >>$TEMP1 2>&1
+		fi
 	done
 	if [ -f $TEMP1 ] ; then
 		mv $TEMP1 $ANSWER

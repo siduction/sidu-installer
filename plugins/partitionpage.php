@@ -68,6 +68,7 @@ class PartitionPage extends Page{
 			$this->diskInfo->buildInfoTable();
 		} elseif (strcmp($button, 'button_reload') == 0){
 			$this->diskInfo->forceReload();
+			$this->setUserData('reload.partinfo', 'T');
 		} elseif (strcmp($button, 'button_exec') == 0){
 			$answer = $this->session->getAnswerFileName('part', '.ready');
 			$description = $this->getConfiguration('description_wait'); 

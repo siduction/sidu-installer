@@ -155,8 +155,13 @@ class NetworkPage extends Page{
 			$params = array();
 			$params[] = 'install';
 			$params[] = $modules; 
+			$program = 'firmware';
+			$progress = null;
 			$this->session->exec($answer, SVOPT_DEFAULT,
-				'firmware', $params, 0);
+				$program, $params, 0);
+			$description = "";
+			$redraw = $this->startWait($answer, $program, $description, $progress);
+			
 		} else {
 			$this->session->log("unknown button: $button");
 		}

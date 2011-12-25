@@ -1,3 +1,10 @@
+sidu-installer (0.9.23) unstable; urgency=low
+
+  * Firmware installation: calling apt-get update
+  * Firmware installation: wait page
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 25 Dec 2011 12:15:16 +0100
+
 sidu-installer (0.9.22) unstable; urgency=low
 
   * Portuguese translations (bequimao) (Closes: #472)
