@@ -15,7 +15,7 @@ info)
 	;;
 install)
 	CONFIG=/etc/apt/sources.list.d/debian.list
-	if ! grep ^deb.*non-free/ $CONFIG ; then
+	if ! grep "^deb.*non-free" $CONFIG >/dev/null ; then
 		sed -i -e 's/main/main non-free/;' $CONFIG
 	fi 	
 	date "+%Y.%m.%d-%H:%M:%S Installing firmware..." >$TEMP1
