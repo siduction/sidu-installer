@@ -1,3 +1,14 @@
+sidu-installer (0.9.22) unstable; urgency=low
+
+  * Portuguese translations (bequimao) (Closes: #472)
+  * Excluding partitions with special types (RAID, LVM ...)
+  * Deinstalling the installer at the first boot.
+  * Fix: one (not more) non-free in debian.list. (Closes: #475)
+  * Recognizing SDHC disks (mmcblk0)
+  * Fix: Restarting sidu-shellserver enables start of partition managers. (Closes: #469)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Sun, 25 Dec 2011 01:51:49 +0100
+
 sidu-installer (0.9.21) unstable; urgency=low
 
   * Portuguese translations (bequimao)
