@@ -13,11 +13,12 @@ PATH=$PATH:/bin:/sbin:/usr/sbin
 
 case "$1" in
 start)
-	if grep "/dev/mapper/siduction-live on /bin" /dev/mounts; then
+	if ! grep "/dev/mapper/siduction-live on /bin" /dev/mounts >/dev/null 2>&1 ; then
 		echo Removing installer...
 		dpkg --purge sidu-installer >>/tmp/sidu-deinstall.log 2>>/tmp/sidu-deinstall.err.log
 	fi
-status|stop|restart|reload)
+	;;
+status|stop|restart|reload|force-reload)
 	echo "Unsupported command: $1"
     ;;
 *)
