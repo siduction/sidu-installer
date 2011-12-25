@@ -138,7 +138,7 @@ sub getDiskDev{
 	closedir DIR;
 	foreach (@files){
 		# find all names without a digit:
-		push @rc, $_ unless /\d/ || /^\.{1,2}$/;
+		push @rc, $_ unless /\d/ && ! /mmcblk\d/ || /^\.{1,2}$/;
 	}
 	return @rc;
 }
