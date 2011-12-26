@@ -22,7 +22,7 @@
 <table>
 	<tr>
 		<td class="col_label">###txt_real_name###:</td>
-		<td><input type="text" name="real_name" value="###VAL_REAL_NAME###" size="20" maxlength="20" />###ERROR_REAL_NAME###
+		<td><input type="text" name="real_name" value="###VAL_REAL_NAME###" size="20" maxlength="64" />###ERROR_REAL_NAME###
 		</td>
 		<td>###txt_optional###
 		</td>
