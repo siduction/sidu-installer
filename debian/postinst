@@ -37,10 +37,7 @@ MkLink2 /var/cache/siguibui/public /usr/share/sidu-installer
 
 popd >/dev/null
 
-# Debhelpertoken added, review needed
-
 #DEBHELPER#
-
 
 exit 0
  

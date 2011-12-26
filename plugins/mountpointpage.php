@@ -43,7 +43,7 @@ class MountpointPage extends Page{
 		$this->readContentTemplate();
 		$this->readHtmlTemplates();
 		if ($this->getRowCount('partinfo') > 0)
-			$this->replacePartWithTemplate('INFO_TABLE', 'INFO_TABLE');
+			$this->replacePartWithTemplate('INFO_TABLE');
 		else
 			$this->clearPart('INFO_TABLE');
 		$this->setButtonSelectedPart('DEV_SELECTOR', 'DEVICE', 'LABEL');

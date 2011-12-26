@@ -74,27 +74,27 @@ class NetworkPage extends Page{
 			$this->clearPart('FOUND_FIRMWARE');
 		else{
 			$this->readHtmlTemplates();
-			$this->replacePartWithTemplate('FOUND_FIRMWARE', 'FOUND_FIRMWARE');
+			$this->replacePartWithTemplate('FOUND_FIRMWARE');
 			if ($this->installedModules == null){
 				$this->clearPart('INSTALLED_FW');
 			} else {
-				$this->replacePartWithTemplate('INSTALLED_FW', 'INSTALLED_FW');
+				$this->replacePartWithTemplate('INSTALLED_FW');
 				$this->replaceInContent('txt_found_firmware');
 				$this->replaceMarker('INSTALLED_MODULES', $this->installedModules);
 			}
 			if ($this->missingModules == null || $this->installedModules == null)
 				$this->clearPart('FW_SEPARATOR');
 			else
-				$this->replacePartWithTemplate('FW_SEPARATOR', 'FW_SEPARATOR');
+				$this->replacePartWithTemplate('FW_SEPARATOR');
 			
 			if ($this->missingModules == null){
 				$this->clearPart('MISSING_FW');
 			} else {
-				$this->replacePartWithTemplate('MISSING_FW', 'MISSING_FW');
+				$this->replacePartWithTemplate('MISSING_FW');
 				if (count($this->missingModules) <= 1)
 					$this->clearPart('BUTTON_ALL');
 				else
-					$this->replacePartWithTemplate('BUTTON_ALL', 'BUTTON_ALL');
+					$this->replacePartWithTemplate('BUTTON_ALL');
 				$this->setRowCount('fw_modules', 0);
 				foreach ($this->missingModules as $ix => $line){
 					$pos = strpos($line, '|');
@@ -109,7 +109,7 @@ class NetworkPage extends Page{
 			if (! file_exists($this->session->publicDir . $this->nodeLog))
 				$this->clearPart('LOG_FIRMWARE');
 			else{
-				$this->replacePartWithTemplate('LOG_FIRMWARE', 'LOG_FIRMWARE');
+				$this->replacePartWithTemplate('LOG_FIRMWARE');
 				$this->replaceMarker('URL_LOG', $this->session->urlPublicDir . $this->nodeLog);
 			}
 		}

@@ -34,6 +34,8 @@ body {
 		color: #222222;
 		background-color: #e7e7e7;
 }
+input { font-size: 13px; }
+select, option { font-size: 13px; font-weight: normal; }
 h1, h2, h3 {
 		font-size: 20px;
 		font-family: 'DroidSansBold', sans-serif;
@@ -93,6 +95,7 @@ h1, h2, h3 {
 .next_button{
 		float: right;
 }
+.navigation input { background: #ff6600; font-weight: bold; }
 .prev_button{
 		float: left;
 }

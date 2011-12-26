@@ -13,8 +13,8 @@ INSTALLED_FW:
 </p>
 
 MISSING_FW:
-<p>###txt_firmware_intro###
-</p>
+<p>###txt_firmware_intro###</p>
+<p>###txt_firmware_intro2###</p>
 ###PART_BUTTON_ALL###
 <table>
 <tr>

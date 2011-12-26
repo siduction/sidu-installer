@@ -1,3 +1,14 @@
+sidu-installer (0.9.24) unstable; urgency=low
+
+  * Redesign: wait page moved to base
+  * Refactoring: default parameter $nameTemplate in replacePartWithTemplate()
+  * Layout: buttons/comboboxes have the common font size.
+  * back and next button with colored background
+  * Description text while waiting for partion program reactivated
+  * More text for firmware installation (Closes: #486)
+
+ -- J. Hamatoma <hamatoma@gmx.de>  Mon, 26 Dec 2011 22:34:56 +0100
+
 sidu-installer (0.9.23) unstable; urgency=low
 
   * Firmware installation: calling apt-get update
