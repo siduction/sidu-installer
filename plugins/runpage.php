@@ -66,7 +66,6 @@ class RunPage extends Page{
 		$lines[] = "HD_MODULE='configured'";
 		$lines[] = '';
 		
-		$description = $this->getConfiguration('description_wait'); 
 		$program = 'installation';
 		$progress = $this->session->getAnswerFileName('progress', '.dat');
 		$params = array();
@@ -217,8 +216,10 @@ class RunPage extends Page{
 		$options = 'background requestfile';
 		$command = 'install';
 		$this->session->exec($answer, $options, $command, $params, 0);
-		$text = $this->getConfiguration('wait.intro');
-		$redraw = $this->startWait($answer, $text, $description, $progress);
+		$program = $this->getConfiguration('wait.intro');
+		$description = $this->getConfiguration('description_wait'); 
+		$translations = 'run.backend';
+		$redraw = $this->startWait($answer, $program, $description, $progress, $translations);
 	}	
 	/** Will be called on a button click.
 	 * 
