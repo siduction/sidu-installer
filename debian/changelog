@@ -1,28 +1,34 @@
+sidu-installer (1.0.0) unstable; urgency=low
+
+  * email adress changed 
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 23:32:40 +0100
+
 sidu-installer (0.9.28) unstable; urgency=low
 
   * Removed: unneeded deinstallation (will be done in the backend)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 30 Dec 2011 00:16:04 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 00:16:04 +0100
 
 sidu-installer (0.9.27) unstable; urgency=low
 
   * wait: Correct texts in intro and description. (Closes: #506)
   * translating progress messages
 
- -- J. Hamatoma <hamatoma@gmx.de>  Thu, 29 Dec 2011 23:44:04 +0100
+ -- J. Hamatoma <hama@siduction.net>  Thu, 29 Dec 2011 23:44:04 +0100
 
 sidu-installer (0.9.26) unstable; urgency=low
 
   * maxlength of real name: 64. (Closes: #494)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Mon, 26 Dec 2011 23:30:05 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 26 Dec 2011 23:30:05 +0100
 
 sidu-installer (0.9.25) unstable; urgency=low
 
   * Fix: no deinstalling in live mode
   * maxlength of real name: 64. (Closes: #494)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Mon, 26 Dec 2011 23:15:37 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 26 Dec 2011 23:15:37 +0100
 
 sidu-installer (0.9.24) unstable; urgency=low
 
@@ -33,14 +39,14 @@ sidu-installer (0.9.24) unstable; urgency=low
   * Description text while waiting for partion program reactivated
   * More text for firmware installation (Closes: #486)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Mon, 26 Dec 2011 22:34:56 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 26 Dec 2011 22:34:56 +0100
 
 sidu-installer (0.9.23) unstable; urgency=low
 
   * Firmware installation: calling apt-get update
   * Firmware installation: wait page
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 25 Dec 2011 12:15:16 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 25 Dec 2011 12:15:16 +0100
 
 sidu-installer (0.9.22) unstable; urgency=low
 
@@ -51,13 +57,13 @@ sidu-installer (0.9.22) unstable; urgency=low
   * Recognizing SDHC disks (mmcblk0)
   * Fix: Restarting sidu-shellserver enables start of partition managers. (Closes: #469)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 25 Dec 2011 01:51:49 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 25 Dec 2011 01:51:49 +0100
 
 sidu-installer (0.9.21) unstable; urgency=low
 
   * Portuguese translations (bequimao)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 24 Dec 2011 09:43:41 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 24 Dec 2011 09:43:41 +0100
 
 sidu-installer (0.9.20) unstable; urgency=low
 
@@ -65,7 +71,7 @@ sidu-installer (0.9.20) unstable; urgency=low
   * Fix: Mounted partitons must have a filesystem. Other partitions will be ignored.
   * Fix: Crash, when installation has failed.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Thu, 22 Dec 2011 00:31:32 +0100
+ -- J. Hamatoma <hama@siduction.net>  Thu, 22 Dec 2011 00:31:32 +0100
 
 sidu-installer (0.9.19+nmu1) unstable; urgency=low
 
@@ -78,20 +84,20 @@ sidu-installer (0.9.19) unstable; urgency=low
 
   * Fix: Clean repetition when installation has failed
 
- -- J. Hamatoma <hamatoma@gmx.de>  Tue, 20 Dec 2011 23:49:26 +0100
+ -- J. Hamatoma <hama@siduction.net>  Tue, 20 Dec 2011 23:49:26 +0100
 
 sidu-installer (0.9.18) unstable; urgency=low
 
   * Fix: Indicates always an error (forgotten testcode).
 
- -- J. Hamatoma <hamatoma@gmx.de>  Tue, 20 Dec 2011 22:58:32 +0100
+ -- J. Hamatoma <hama@siduction.net>  Tue, 20 Dec 2011 22:58:32 +0100
 
 sidu-installer (0.9.17) unstable; urgency=low
 
   * Fix: If installation fails message is issued and restart is possible. (Closes: #446)
   * Text corrections (from se7en). (Closes: #442)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Mon, 19 Dec 2011 23:55:10 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 19 Dec 2011 23:55:10 +0100
 
 sidu-installer (0.9.16+nmu1) unstable; urgency=low
 
@@ -107,14 +113,14 @@ sidu-installer (0.9.16) unstable; urgency=low
   * Fix: Wrong error message when starting gdisk/fdisk...
   * Update: refs: #440
 
- -- J. Hamatoma <hamatoma@gmx.de>  Mon, 19 Dec 2011 00:04:43 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 19 Dec 2011 00:04:43 +0100
 
 sidu-installer (0.9.15) unstable; urgency=low
 
   * Fix: Finding disks without partitions.
 
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 18 Dec 2011 23:57:59 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 18 Dec 2011 23:57:59 +0100
 
 sidu-installer (0.9.14) unstable; urgency=low
 
@@ -125,14 +131,14 @@ sidu-installer (0.9.14) unstable; urgency=low
   * The partition info table will be hidden if no disk is selected.
   * Update: refs: #437
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 18 Dec 2011 15:17:42 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 18 Dec 2011 15:17:42 +0100
 
 sidu-installer (0.9.13) unstable; urgency=low
 
   * New page "partition" which takes some parts of the page "rootfs".
   * Fix: Uppercase letters are allowed for the hostname. 
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 18 Dec 2011 13:47:34 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 18 Dec 2011 13:47:34 +0100
 
 sidu-installer (0.9.12) unstable; urgency=low
 
@@ -140,7 +146,7 @@ sidu-installer (0.9.12) unstable; urgency=low
   * Fix: typo in config file. (Closes: #406)
   * Fix: run: removed hidden field
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 16 Dec 2011 21:13:30 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 16 Dec 2011 21:13:30 +0100
 
 sidu-installer (0.9.11) unstable; urgency=low
 
@@ -158,7 +164,7 @@ sidu-installer (0.9.10) unstable; urgency=low
 
   * Installation of unfree firmware (closes: #384)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 11 Dec 2011 22:38:41 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 11 Dec 2011 22:38:41 +0100
 
 sidu-installer (0.9.9) unstable; urgency=low
 
@@ -169,32 +175,32 @@ sidu-installer (0.9.9) unstable; urgency=low
   * CSS: 5-col-tables: width 100%
   * Button text: "add the partition" -> "add"
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 09 Dec 2011 23:32:42 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 09 Dec 2011 23:32:42 +0100
 
 sidu-installer (0.9.8) unstable; urgency=low
 
   * Fix: HTML template: charset UTF-8
 
- -- J. Hamatoma <hamatoma@gmx.de>  Wed, 07 Dec 2011 03:14:05 +0100
+ -- J. Hamatoma <hama@siduction.net>  Wed, 07 Dec 2011 03:14:05 +0100
 
 sidu-installer (0.9.7) unstable; urgency=low
 
   * Fix: /mapper/* excluded from hd list
 
- -- J. Hamatoma <hamatoma@gmx.de>  Wed, 07 Dec 2011 02:54:37 +0100
+ -- J. Hamatoma <hama@siduction.net>  Wed, 07 Dec 2011 02:54:37 +0100
 
 sidu-installer (0.9.6) unstable; urgency=low
 
   * Fix: progressbar does its work. (Closes: #353)
   * Removed: leading backslashes in install
 
- -- J. Hamatoma <hamatoma@gmx.de>  Tue, 06 Dec 2011 23:58:23 +0100
+ -- J. Hamatoma <hama@siduction.net>  Tue, 06 Dec 2011 23:58:23 +0100
 
 sidu-installer (0.9.5) unstable; urgency=low
 
   * Page mountpoints: Exchange of combo boxes "device" and "label" / "mountpoint" and free text. (Closes: #347)
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 03 Dec 2011 18:01:34 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 03 Dec 2011 18:01:34 +0100
 
 sidu-installer (0.9.4) unstable; urgency=low
   * merge se7ens css manual to changelog, probally my fault 
@@ -207,7 +213,7 @@ sidu-installer (0.9.3) unstable; urgency=low
   * Fix: End of form added
   * New: Portuguese
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 02 Dec 2011 23:52:35 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 02 Dec 2011 23:52:35 +0100
 
 sidu-installer (0.9.2) unstable; urgency=low
 
@@ -215,7 +221,7 @@ sidu-installer (0.9.2) unstable; urgency=low
   * Docu improved
   * fixes in css by se7en
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 02 Dec 2011 22:08:32 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 02 Dec 2011 22:08:32 +0100
 
 sidu-installer (0.9.1) unstable; urgency=low
 
@@ -253,7 +259,7 @@ sidu-installer (0.8-3) unstable; urgency=low
   * Adding virtual host by restarting pywwetha
   * Needless messages removed from install scripts
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 26 Nov 2011 18:09:34 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 26 Nov 2011 18:09:34 +0100
 
 sidu-installer (0.8-2.3) unstable; urgency=low
 
@@ -281,27 +287,27 @@ sidu-installer (0.8-2) unstable; urgency=low
 
   * The prefix /dev/ will not be shown. That improves the design in iceweasel (shorter comboboxes).
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 26 Nov 2011 09:20:14 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 26 Nov 2011 09:20:14 +0100
 
 sidu-installer (0.8-1) unstable; urgency=low
 
   * sidu-installer adds the virtual host if necessary
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 25 Nov 2011 22:05:14 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 25 Nov 2011 22:05:14 +0100
 
 sidu-installer (0.7-3) unstable; urgency=low
 
   * Fix: Dependency sudo removed.
   * Fix: sudoers.d and init.d not necessary
 
- -- J. Hamatoma <hamatoma@gmx.de>  Thu, 24 Nov 2011 22:52:17 +0100
+ -- J. Hamatoma <hama@siduction.net>  Thu, 24 Nov 2011 22:52:17 +0100
 
 sidu-installer (0.7-2) unstable; urgency=low
 
   * Improvements in postinst
   * Dependency bash removed
 
- -- J. Hamatoma <hamatoma@gmx.de>  Thu, 24 Nov 2011 21:30:09 +0100
+ -- J. Hamatoma <hama@siduction.net>  Thu, 24 Nov 2011 21:30:09 +0100
 
 sidu-installer (0.7-1.2) unstable; urgency=low
 
@@ -325,7 +331,7 @@ sidu-installer (0.7-1) unstable; urgency=low
   * Separation of the packet siguibui: some files are moved
   * Reduces linian errors and warnings
 
- -- J. Hamatoma <hamatoma@gmx.de>  Tue, 22 Nov 2011 22:37:03 +0100
+ -- J. Hamatoma <hama@siduction.net>  Tue, 22 Nov 2011 22:37:03 +0100
 
 sidu-installer (0.6-1) unstable; urgency=low
 
@@ -338,32 +344,32 @@ sidu-installer (0.6-1) unstable; urgency=low
   * Code review: readPartitionInfo() will be called one time only.
   * CSS: Reduced height.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 23:51:25 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 23:51:25 +0100
 
 sidu-installer (0.5-2) unstable; urgency=low
 
   * Workaround for Midori: blocking page wait after reaching page ready.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 18:57:37 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 18:57:37 +0100
 
 sidu-installer (0.5-1) unstable; urgency=low
 
   * The output of the fll-installer is appended to the ready page
   * Debugging: trace can be controlled by the webserver
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 17:23:57 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 17:23:57 +0100
 
 sidu-installer (0.4-3) unstable; urgency=low
 
   * Customized text while fll-installer is running.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 12:58:40 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 12:58:40 +0100
 
 sidu-installer (0.4-2) unstable; urgency=low
 
   * No "back" button in ready page
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 12:13:37 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 12:13:37 +0100
 
 sidu-installer (0.4-1) unstable; urgency=low
 
@@ -371,7 +377,7 @@ sidu-installer (0.4-1) unstable; urgency=low
   * New backend plugin: reboot.sh
   * New positions of the buttons "back" and "next" 
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 11:28:56 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 11:28:56 +0100
 
 sidu-installer (0.3-1.1) unstable; urgency=low
 
@@ -386,14 +392,14 @@ sidu-installer (0.3-1) unstable; urgency=low
   * Fix: index access on default values, if none is defined.
   * No default root partition (too dangerous). Error message if not choosen.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 13 Nov 2011 00:50:36 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 00:50:36 +0100
 
 sidu-installer (0.2-2) unstable; urgency=low
 
   * Fix: partition devices without digits corrupt the output
   * Debug code in partinfo.pl
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 12 Nov 2011 22:31:26 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 12 Nov 2011 22:31:26 +0100
 
 sidu-installer (0.2-1.1) unstable; urgency=low
 
@@ -406,7 +412,7 @@ sidu-installer (0.2-1) unstable; urgency=low
 
   * Sets the timezone.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 12 Nov 2011 19:07:03 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 12 Nov 2011 19:07:03 +0100
 
 sidu-installer (0.1-5.1) unstable; urgency=low
 
@@ -428,13 +434,13 @@ sidu-installer (0.1-5) unstable; urgency=low
 			   * Message when we wait for the partition info.
   * Partition info will be cleared if no info is available.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sat, 12 Nov 2011 11:04:06 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 12 Nov 2011 11:04:06 +0100
 
 sidu-installer (0.1-4) unstable; urgency=low
 
   * Fix: Syntax error in install.sh
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 11 Nov 2011 21:26:40 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 11 Nov 2011 21:26:40 +0100
 
 sidu-installer (0.1-3) unstable; urgency=low
 
@@ -444,7 +450,7 @@ sidu-installer (0.1-3) unstable; urgency=low
   * Fix: $ in password hash must be quoted.
   * Fix: Syntax error in install.sh
 
- -- J. Hamatoma <hamatoma@gmx.de>  Fri, 11 Nov 2011 00:20:42 +0100
+ -- J. Hamatoma <hama@siduction.net>  Fri, 11 Nov 2011 00:20:42 +0100
 
 sidu-installer (0.1-2) unstable; urgency=low
 
@@ -455,10 +461,10 @@ sidu-installer (0.1-2) unstable; urgency=low
   * Minimum length of a password is configurable.
   * Replacing the button when the installation has been finished.
 
- -- J. Hamatoma <hamatoma@gmx.de>  Wed, 09 Nov 2011 23:24:04 +0100
+ -- J. Hamatoma <hama@siduction.net>  Wed, 09 Nov 2011 23:24:04 +0100
 
 sidu-installer (0.1-1) unstable; urgency=low
 
   * Initial release
 
- -- J. Hamatoma <hamatoma@gmx.de>  Sun, 23 Oct 2011 10:25:37 +0200
+ -- J. Hamatoma <hama@siduction.net>  Sun, 23 Oct 2011 10:25:37 +0200

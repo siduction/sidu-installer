@@ -1,7 +1,7 @@
 Source: sidu-installer
 Section: admin
 Priority: optional
-Maintainer: J. Hamatoma <hamatoma@gmx.de>
+Maintainer: J. Hamatoma <hama@siduction.net>
 Uploaders: Ferdinand Thommes <devil@siduction.org>,
            Alf Gaida <agaida@siduction.org>
 Build-Depends: debhelper (>= 8)
