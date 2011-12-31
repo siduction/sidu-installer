@@ -2,13 +2,21 @@ sidu-installer (1.0.0) unstable; urgency=low
 
   * email adress changed 
 
- -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 23:32:40 +0100
+ -- J. Hamatoma <hama@siduction.net>  Sat, 31 Dec 2011 00:25:31 +0100
 
-sidu-installer (0.9.28) unstable; urgency=low
+sidu-installer (0.9.28.1) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * Removed: unneeded deinstallation (will be done in the backend)
 
  -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 00:16:04 +0100
+  
+sidu-installer (0.9.28) unstable; urgency=low
+
+  [ Alf Gaida ]
+  * rebuild fixes #523 und #526 
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 30 Dec 2011 00:51:36 +0100
 
 sidu-installer (0.9.27) unstable; urgency=low
 
