@@ -1,0 +1,63 @@
+print "+$ok" if $ok;
+print join("\n", @missing) if $#missing >= 0;
+
+Looking for common drivers that need firmware...
+
+Driver: iwl3945
+Firmware dir found: /lib/firmware
+Firmware NOT found: /lib/firmware/iwlwifi-3945-1.ucode
+Detected driver that requires firmware to operate
+-------------------------------------------------
+
+# 
+# Follow these instructions to obtain the correct firmware
+# and activate the iwl3945 driver:
+
+apt-get update
+apt-get install firmware-iwlwifi
+modprobe -r iwl3945
+modprobe iwl3945
+
+You must first configure apt to install this non-free software,
+refer to the offline manual that came with this distribution.
+
+Driver: tg3
+Firmware dir NOT found: /lib/firmware/tigon
+Detected driver that requires firmware to operate
+-------------------------------------------------
+
+# 
+# Follow these instructions to obtain the correct firmware
+# and activate the tg3 driver:
+
+apt-get update
+apt-get install firmware-linux-nonfree
+modprobe -r tg3
+modprobe tg3
+
+You must first configure apt to install this non-free software,
+Driver: r8169
+Firmware dir found: /lib/firmware/rtl_nic
+Firmware found: /lib/firmware/rtl_nic/rtl8168d-1.fw
+Firmware found: /lib/firmware/rtl_nic/rtl8168d-2.fw
+Firmware is okay
+Driver: radeon
+Firmware is okay
+Driver: rt73usb
+Firmware dir found: /lib/firmware
+Firmware NOT found: /lib/firmware/rt73
+Detected driver that requires firmware to operate
+-------------------------------------------------
+
+# 
+# Follow these instructions to obtain the correct firmware
+# and activate the rt73usb driver:
+
+apt-get update
+apt-get install firmware-ralink
+modprobe -r rt73usb
+modprobe rt73usb
+
+You must first configure apt to install this non-free software,
+refer to the offline manual that came with this distribution.
+
