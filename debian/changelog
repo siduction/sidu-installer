@@ -1,3 +1,10 @@
+sidu-installer (1.0.1) unstable; urgency=low
+
+  * '.' and '-' are now allowed characters in a hostname. (Closes: #564)
+  * Update: refs: #630
+
+ -- J. Hamatoma <hama@siduction.net>  Tue, 20 Mar 2012 22:36:10 +0100
+
 sidu-installer (1.0.0) unstable; urgency=low
 
   * email adress changed 
