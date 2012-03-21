@@ -1,3 +1,11 @@
+sidu-installer (1.0.2) unstable; urgency=low
+
+  * bump standards to 3.9.3
+  * bump compat to 9
+  * .gitignore modified 
+
+ -- Alf Gaida <agaida@siduction.org>  Wed, 21 Mar 2012 13:54:53 +0100
+
 sidu-installer (1.0.1) unstable; urgency=low
 
   * '.' and '-' are now allowed characters in a hostname. (Closes: #564)
@@ -11,14 +19,10 @@ sidu-installer (1.0.0) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Sat, 31 Dec 2011 00:25:31 +0100
 
-sidu-installer (0.9.28.1) unstable; urgency=low
+sidu-installer (0.9.28) unstable; urgency=low
 
   [ J. Hamatoma ]
   * Removed: unneeded deinstallation (will be done in the backend)
-
- -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 00:16:04 +0100
-  
-sidu-installer (0.9.28) unstable; urgency=low
 
   [ Alf Gaida ]
   * rebuild fixes #523 und #526 
