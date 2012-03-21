@@ -4,7 +4,7 @@ sidu-installer (1.0.2) unstable; urgency=low
   * bump compat to 9
   * .gitignore modified 
 
- -- Alf Gaida <agaida@siduction.org>  Wed, 21 Mar 2012 13:54:53 +0100
+ -- Alf Gaida <agaida@siduction.org>  Wed, 21 Mar 2012 14:07:11 +0100
 
 sidu-installer (1.0.1) unstable; urgency=low
 
