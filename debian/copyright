@@ -3,28 +3,30 @@ Upstream-Name: sidu-installer
 Source: http://siduction.org
 
 Files: *
-Copyright: 2011 J. Hamatoma <hama@siduction.net>
+Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2011 J. Hamatoma <hama@siduction.net>
+Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
+           2011-2012 Alf Gaida <agaida@siduction.org>
 License: GPL-3.0+
 
 Files: config/sidu-installer.css
 Copyright: 2011 J. Hamatoma <hama@siduction.net>
-				2011, Sven Strohmeier <se7enelven@gmail.com>
-				2011, Hendrik Lehmbruch <hlehmbruch@gmx.net>
+           2011 Sven Strohmeier <se7enelven@gmail.com>
+           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
 License: GPL-3.0+
 
 Files: config/sidu-installer.html
 Copyright: 2011 J. Hamatoma <hama@siduction.net>
-				2011, Hendrik Lehmbruch <hlehmbruch@gmx.net>
+           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
 License: GPL-3.0+
 
-Files:images/*
-Copyright: 2011, Sven Strohmeier <se7enelven@gmail.com>
-				2011, Hendrik Lehmbruch <hlehmbruch@gmx.net>
-Licence:CC-BY-SA + GPL-3.0+
+Files: images/*
+Copyright: 2011 Sven Strohmeier <se7enelven@gmail.com>
+           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
+License: CC-BY-SA, 
+         GPL-3.0+
 
 Files:images/index.html
 Copyright: 2011 J. Hamatoma <hama@siduction.net>

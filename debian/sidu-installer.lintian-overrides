@@ -1,0 +1,3 @@
+# i thing we will never ever write a manpage for this
+sidu-installer: binary-without-manpage usr/bin/sidu-installer
+
