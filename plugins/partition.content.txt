@@ -6,6 +6,7 @@
 <p>###txt_intro2###</p>
 <p>###txt_intro3###</p>
 <p>###txt_intro4###</p>
+<p>###txt_intro5###</p>
 </p>
 <table id="table_partition_partman" class="table_col5">
 	<tr>

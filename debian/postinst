@@ -4,8 +4,12 @@ set -e
 if ! grep -q "sidu-installer" /etc/hosts ; then
 	# if the last newline is missing:
 	echo "" >>/etc/hosts
-	echo "127.0.0.86 sidu-installer" >>/etc/hosts
-	echo "virtual host installed: sidu-installer"
+	ADDR=86
+	while grep -q "127.0.0.$ADDR" /etc/hosts ; do
+		PORT=$(expr $ADDR + 1)
+	done
+	echo "127.0.0.$ADDR sidu-installer" >>/etc/hosts
+	echo "virtual host installed: sidu-installer ($ADDR)"
 fi
 
 # Create the links from the toolkit:

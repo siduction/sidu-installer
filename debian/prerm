@@ -1,9 +1,9 @@
 #! /bin/bash
 set -e
-
-if grep -q sidu-installer /etc/hosts ; then
-	sed -i -e '/127\.0\.0\.[0-9 \t]*sidu-installer/d' /etc/hosts
-	echo "virtual host removed: sidu-installer"
+PROJ=sidu-installer
+if grep -q $PROJ /etc/hosts ; then
+	sed -i -e "/127\.0\.0\.[0-9]*[ \t]*$PROJ/d" /etc/hosts
+	echo "virtual host removed: $PROJ"
 fi
 
 # delete the links from the toolkit:
@@ -12,7 +12,7 @@ function RmLink(){
 		rm -f $1
 	fi
 }
-pushd /usr/share/sidu-installer >/dev/null
+pushd /usr/share/$PROJ >/dev/null
 RmLink index.php
 RmLink base
 RmLink public

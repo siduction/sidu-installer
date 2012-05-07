@@ -1,3 +1,12 @@
+sidu-installer (1.0.2) unstable; urgency=low
+
+  * btrfs selectable
+  * Link to sidu-disk-center
+  * postinst: automatic selection of ip addr in /etc/hosts
+  * grub installation target can be a partition
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 06 May 2012 22:30:50 +0200
+
 sidu-installer (1.0.1) unstable; urgency=low
 
   * '.' and '-' are now allowed characters in a hostname. (Closes: #564)
