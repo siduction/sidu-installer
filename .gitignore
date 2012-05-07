@@ -15,3 +15,8 @@ base
 .fuse*
 public
 index.php
+.idea/
+debian/files
+debian/sidu-installer.postinst.debhelper
+debian/sidu-installer.postrm.debhelper
+debian/sidu-installer.substvars

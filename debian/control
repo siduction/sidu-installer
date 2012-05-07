@@ -4,8 +4,8 @@ Priority: optional
 Maintainer: J. Hamatoma <hama@siduction.net>
 Uploaders: Ferdinand Thommes <devil@siduction.org>,
            Alf Gaida <agaida@siduction.org>
-Build-Depends: debhelper (>= 8)
-Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+Standards-Version: 3.9.3
 Homepage: http://siduction.org
 Vcs-git: git://git.siduction.org:packages/siduction-repository/sidu-installer
 Vcs-Browser: http://git.siduction.org/?p=packages/siduction-repository/sidu-installer.git

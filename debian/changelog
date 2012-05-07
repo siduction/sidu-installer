@@ -1,4 +1,4 @@
-sidu-installer (1.0.2) unstable; urgency=low
+sidu-installer (1.0.4) unstable; urgency=low
 
   * btrfs selectable
   * Link to sidu-disk-center
@@ -6,6 +6,24 @@ sidu-installer (1.0.2) unstable; urgency=low
   * grub installation target can be a partition
 
  -- J. Hamatoma <hama@siduction.net>  Sun, 06 May 2012 22:30:50 +0200
+
+sidu-installer (1.0.3) unstable; urgency=low
+
+  * some Typos in Copyright
+  * more then one license per line is not good
+  * add a sidu-installer override to prevent lintian complaining about
+    a missed manpage for sidu-installer
+  * fixes #630
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 23 Mar 2012 10:22:14 +0100
+
+sidu-installer (1.0.2) unstable; urgency=low
+
+  * bump standards to 3.9.3
+  * bump compat to 9
+  * .gitignore modified 
+
+ -- Alf Gaida <agaida@siduction.org>  Wed, 21 Mar 2012 14:07:11 +0100
 
 sidu-installer (1.0.1) unstable; urgency=low
 
@@ -20,14 +38,10 @@ sidu-installer (1.0.0) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Sat, 31 Dec 2011 00:25:31 +0100
 
-sidu-installer (0.9.28.1) unstable; urgency=low
+sidu-installer (0.9.28) unstable; urgency=low
 
   [ J. Hamatoma ]
   * Removed: unneeded deinstallation (will be done in the backend)
-
- -- J. Hamatoma <hama@siduction.net>  Fri, 30 Dec 2011 00:16:04 +0100
-  
-sidu-installer (0.9.28) unstable; urgency=low
 
   [ Alf Gaida ]
   * rebuild fixes #523 und #526 
