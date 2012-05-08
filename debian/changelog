@@ -1,3 +1,10 @@
+sidu-installer (1.1.0) unstable; urgency=low
+
+  * dependency: btrfs-tools, siguibui >= 1.1
+  * disks in combobx of the grub installation target
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 07 May 2012 21:27:04 +0200
+
 sidu-installer (1.0.4) unstable; urgency=low
 
   * btrfs selectable

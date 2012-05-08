@@ -2,7 +2,7 @@
 /**
  * Builds the core content of the bootloader/timezone page.
  * Implements a plugin.
- * 
+ *
  * @author hm
  */
 class BootPage extends Page{
@@ -11,7 +11,7 @@ class BootPage extends Page{
 	/// The answer file from the shell server.
 	var $fileTimeZone;
 	/** Constructor.
-	 * 
+	 *
 	 * @param $session
 	 */
 	function __construct(&$session){
@@ -27,7 +27,7 @@ class BootPage extends Page{
 		if (! file_exists($filename))
 			$filename = $this->getConfiguration('file.timezoneinfo');
 		$this->fileTimeZone = $filename;
-			
+
 		$this->checkTimeZoneFiles();
 	}
 	/** Tests whether the time zone files must be created/read.
@@ -36,7 +36,7 @@ class BootPage extends Page{
 		$regions = $this->getUserData('opt_region');
 		if (strpos($regions, OPT_SEPARATOR) <= 0){
 			if (! file_exists($this->fileCurrentZone)){
-				$this->session->exec($this->fileCurrentZone, SVOPT_DEFAULT, 
+				$this->session->exec($this->fileCurrentZone, SVOPT_DEFAULT,
 					"timezoneinfo",  "current", 0);
 			}
 			if (! file_exists($this->fileTimeZone)){
@@ -47,7 +47,7 @@ class BootPage extends Page{
 		}
 	}
 	/** Reads the timezone file from the shell server and build the internal data structures.
-	 */ 
+	 */
 	function prepareTimezone(){
 		if (! file_exists($this->fileCurrentZone)){
 			$currentRegion = "Europe";
@@ -81,31 +81,31 @@ class BootPage extends Page{
 			}
 			// remove first separator:
 			$regions = substr($regions, 1);
-			
+
 			foreach ($regionlist as $region => $value){
 				$this->setUserData('region_' . $region, $value);
 			}
 		}
-		$cities = $this->getUserData('region_' . $currentRegion); 
+		$cities = $this->getUserData('region_' . $currentRegion);
 		$this->setUserData('opt_region', $regions);
 		$this->setUserData('opt_city', $cities);
 		$this->setUserData('region', $currentRegion);
 		$this->setUserData('city', $currentCity);
 	}
 	/** Builds the core content of the page.
-	 * 
+	 *
 	 * Overwrites the method in the baseclass.
 	 */
 	function build(){
 		$this->readContentTemplate();
 		$this->fillOptions('loader');
-		$this->fillOptions('target');
+		$this->fillOptions('target', true);
 		$this->checkTimeZoneFiles();
 		$this->fillOptions('region', true);
 		$this->fillOptions('city', true);
-	}		
+	}
 	/** Returns an array containing the input field names.
-	 * 
+	 *
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
@@ -122,7 +122,7 @@ class BootPage extends Page{
 			$this->setUserData('opt_city', $cities);
 	}
 	/** Will be called on a button click.
-	 * 
+	 *
 	 * @param $button	the name of the button
 	 * @return false: a redirection will be done. true: the current page will be redrawn
 	 */
@@ -138,13 +138,13 @@ class BootPage extends Page{
 			$redraw = $this->navigation(true);
 		} elseif (strcmp($button, 'button_next') == 0){
 			$timezone = $this->session->getField('region') . '/' . $this->session->getField('city');
-			$this->session->exec(NULL, SVOPT_DEFAULT, 
+			$this->session->exec(NULL, SVOPT_DEFAULT,
 					'timezoneinfo', array('set',  $timezone), 0);
 			$redraw = $this->navigation(false);
 		} else {
 			$this->session->log("unknown button: $button");
 		}
 		return $redraw;
-	} 
+	}
 }
 ?>

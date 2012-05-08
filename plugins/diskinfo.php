@@ -6,7 +6,7 @@ define ('PAGE_ROOTFS', 1);
 define ('PAGE_MOUNTPOINT', 2);
 /**
  * Administrates the disk and partition infos.
- * 
+ *
  */
 class DiskInfo {
 	/// the current plugin
@@ -24,7 +24,7 @@ class DiskInfo {
 	/// One of PAGE_PARTITION .. PAGE_MOUNTPOINT
 	var $pageIndex;
 	/** Constructor.
-	 * 
+	 *
 	 * @param $session		the session info
 	 * @param $page			the current plugin. Type: Derivation of Page
 	 * @param $forceRebuild	Deletes the partition info file to force rebuilding
@@ -40,7 +40,7 @@ class DiskInfo {
 			$this->pageIndex = PAGE_ROOTFS;
 		else
 			$this->pageIndex = PAGE_MOUNTPOINT;
-			
+
 		$this->partitions = NULL;
 		$this->disks = array();
 		$this->filePartInfo = $session->configuration->getValue(
@@ -48,15 +48,15 @@ class DiskInfo {
 		if (! file_exists($this->filePartInfo))
 			$this->filePartInfo = $session->configuration->getValue(
 				'diskinfo.file.partinfo');
-			
+
 		if ($forceRebuild && file_exists($this->filePartInfo)){
 			$this->session->userData->setValue('', 'partinfo', '');
 			unlink($this->filePartInfo);
 		}
-		
+
 		$wait = (int) $session->configuration->getValue('diskinfo.wait.partinfo');
 		$maxWait = (int) $session->configuration->getValue('diskinfo.wait.partinfo.creation');
-		if ($session->testFile($this->filePartInfo, 
+		if ($session->testFile($this->filePartInfo,
 				'partinfo.created', $wait, $maxWait))
 			$session->exec($this->filePartInfo, SVOPT_DEFAULT,
 				'partinfo', NULL, 0);
@@ -83,7 +83,7 @@ class DiskInfo {
 		$this->session->userData->setValue('mountpoint', 'opt_add_dev', '-');
 		$this->session->userData->setValue('mountpoint', 'opt_add_label', '-');
 		$this->page->setRowCount('partinfo', 0);
-	}	
+	}
 	/** Gets the data of the partition info and put it into into the user data.
 	 */
 	function importPartitionInfo(){
@@ -93,7 +93,7 @@ class DiskInfo {
 		$excludes = $this->session->configuration->getValue('diskinfo.excluded.dev');
 		if (strlen($excludes) > 0)
 			$excludes = '/' . str_replace('/', '\/', $excludes) . '/';
-		
+		$diskList = '';
 		while( (list($no, $line) = each($file))){
 			$line = chop($line);
 			$cols = explode("\t", $line);
@@ -103,6 +103,7 @@ class DiskInfo {
 			if (count($cols) == 2){
 				// Disks
 				$this->disks[$dev] = $cols[1];
+				$diskList .= ';/dev/' . $dev;
 				continue;
 			}
 			$infos = array();
@@ -126,7 +127,7 @@ class DiskInfo {
 				$date = ' ' . $this->session->i18n('rootfs', 'CREATED', 'created') . ': ' . $infos['created'];
 			if (isset($infos['modified']))
 				$date .= ' ' . $this->session->i18n('rootfs', 'MODIFIED', 'modified') . ': ' . $infos['modified'];
-						
+
 			$info = empty($subdistro) ? $distro : $subdistro;
 			if (empty($info))
 				$info = $os;
@@ -137,6 +138,8 @@ class DiskInfo {
 		// strip the first separator:
 		$partitions = substr($partitions, 1);
 		$this->session->userData->setValue('', 'partinfo', $partitions);
+		$this->session->extendList('boot.opt_target', 'boot', 'opt_target',
+				substr($diskList, 1));
 	}
 	/** Reads the partition infos from the user data.
 	 */
@@ -161,13 +164,13 @@ class DiskInfo {
 		$labels = '-';
 		$info = $this->session->userData->getValue('', 'partinfo');
 		$minSize = (int) $this->session->configuration->getValue('diskinfo.root.minsize.mb');
-		
+
 		$this->partitions = array();
 		$disklist = '';
 		$diskOnlyList = '';
 		if (empty($info)){
 			foreach ($this->disks as $key => $val)
-				$diskOnlyList .= ';' . $key;				
+				$diskOnlyList .= ';' . $key;
 		}else{
 			$parts = explode(SEPARATOR_PARTITION, $info);
 			foreach($parts as $key => $info){
@@ -181,7 +184,7 @@ class DiskInfo {
 					|| strcmp($type, 'ab00') == 0 // Apple boot
 					|| strncmp($type, 'af', 2) == 0 // Apple (HFS, RAID ...
 					;
-				$hasFileSys = ! empty($item->filesystem) 
+				$hasFileSys = ! empty($item->filesystem)
 					&& strcmp($item->filesystem, "LVM2_member") != 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
 					|| $isProtected
@@ -205,7 +208,7 @@ class DiskInfo {
 				$disklist .= ';' . $key;
 			foreach ($this->disks as $key => $val)
 				if (! isset($disks[$key]))
-					$disklist .= ';' . $key;				
+					$disklist .= ';' . $key;
 		}
 		if (! empty($disklist) || ! empty($diskOnlyList))
 		{
@@ -229,9 +232,9 @@ class DiskInfo {
 					break;
 			}
 		}
-	}	
+	}
 	/** Gets the label of a device.
-	 * 
+	 *
 	 * @param $device	the name of the device, e.g. sda1
 	 * @return '': no label available. Otherwise: the label of the device
 	 */
@@ -242,7 +245,7 @@ class DiskInfo {
 		return $rc;
 	}
 	/** Gets the filesystem of a device.
-	 * 
+	 *
 	 * @param $device	the name of the device, e.g. sda1
 	 * @return '': no filesystem available. Otherwise: the filesystem of the device
 	 */
@@ -253,8 +256,8 @@ class DiskInfo {
 		return $rc;
 	}
 	/** Gets the device name of a device given by its label.
-	 * 
-	 * @param $label	the label of the wanted device 
+	 *
+	 * @param $label	the label of the wanted device
 	 * @return '': no label available. Otherwise: the label of the device
 	 */
 	function getPartitionName($label){
@@ -268,7 +271,7 @@ class DiskInfo {
 		return $rc;
 	}
 	/** Returns the partitions of a given disk.
-	 * 
+	 *
 	 * @param $disk	the name of the disk, e.g. sda
 	 * @return an array with the partitions (type PartitionInfo)
 	 */
@@ -304,7 +307,7 @@ class DiskInfo {
 		}
 	}
 	/** Returns a message that we must wait for the partition info.
-	 * 
+	 *
 	 * @return '': Partition info is available. Otherwise: the info message
 	 */
 	function getWaitForPartitionMessage(){
@@ -318,7 +321,7 @@ class DiskInfo {
 		return $rc;
 	}
 	/** Adapts the partition/label lists respecting the mountpoints.
-	 * 
+	 *
 	 * The partitions belonging yet to a mountpoint will not appear in the selection lists.
 	 */
 	function respectMountPoints(){
@@ -366,16 +369,16 @@ class PartitionInfo{
 	/// size in MByte
 	var $megabytes;
 	/** Constructor.
-	 * 
+	 *
 	 * @param $info		the partition info, separated by "\t"
 	 */
 	function __construct($info){
-		list($this->device, 
-				$this->label, 
+		list($this->device,
+				$this->label,
 				$size,
-				$this->partType, 
-				$this->filesystem, 
-				$this->info) 
+				$this->partType,
+				$this->filesystem,
+				$this->info)
 			= explode(SEPARATOR_INFO, $info);
 		$size = (int) $size;
 		$this->megabytes = $size / 1000;

@@ -17,9 +17,10 @@ Depends: ${misc:Depends},
 	perl (>= 5.0),
 	php5-cgi (>= 5.0),
 	pywwetha (>= 0.2),
-	siguibui (>= 0.7.11),
+	siguibui (>= 1.1),
 	tzdata (>=1989),
-	whois (>=1.0)
+	whois (>=1.0),
+	btrfs-tools
 Suggests: gparted
 Description: GUI for the siduction installer
  sidu-installer provides a graphical user interface for the siduction installer.
