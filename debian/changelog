@@ -1,3 +1,9 @@
+sidu-installer (1.1.2) unstable; urgency=low
+
+  * Fix: never ending loop in postins
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 May 2012 00:47:15 +0200
+
 sidu-installer (1.1.1) unstable; urgency=low
 
   * partinfo.pl: search for GPT disks
