@@ -11,4 +11,15 @@ INFO_TABLE:
 	</tr>
 	###ROWS_PARTINFO###
 </table>
+
+WARNING:
+<div class="textblock">
+ <p>###txt_btrfs_warning###</p>
+ <p class="center">
+  <select name="confirmation" size="2">
+   ###OPT_CONFIRMATION###
+  </select>
+ </div>
+</div>
+
 END:

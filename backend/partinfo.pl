@@ -23,6 +23,8 @@ my %months = (
 	"Nov" => "11",
 	"Dec" => "12"
 );
+my $gptDisks;
+
 if (! -d $mountpoint){
 	mkdir $mountpoint;
 	print STDERR $mountpoint, " created\n" if $verbose;
@@ -56,6 +58,7 @@ foreach $key (sort keys %sorted){
 foreach $key (sort keys %disks){
 	print $key, "\t", $disks{$key}, "\n";
 }
+print "!GPT=$gptDisks;\n";
 exit 0;
 
 # searches for extended info of a partition
@@ -174,6 +177,7 @@ sub getGdiskInfo{
 	open(CMD, $cmd) || die "$gdisk failed: $!";
 	my $sector = 512;
 	my $sectors = 0;
+	my $isGpt = 0;
 	while(<CMD>){
 		s/\*/ /;
 #   5        96392048        98799749   1.1 GiB     8200  Linux swap
@@ -188,6 +192,10 @@ sub getGdiskInfo{
 #Disk /dev/sda: 3907029168 sectors, 1.8 TiB
 		} elsif (/^Disk\s+\S+:\s+(\d+)/){
 			$sectors = $1;
+			$gptDisks .= ';' . $disk if $isGpt; 
+#   GPT: present
+		} elsif (/^\s*GPT: present/){
+			$isGpt = 1; 
 		}
 	}
 	$disks{$disk} = int($sectors * 1.0 * $sector / 1024); 

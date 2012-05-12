@@ -2,8 +2,8 @@
 <h1>###txt_title###</h1>
 ###WAIT_FOR_PARTINFO###
 <div class="textblock">
-<p>###txt_intro###
-</p>
+<p>###txt_intro###</p>
+<p>###txt_intro2###</p>
 <table id="table_partition_root" class="table_col5">
 	<tr>
 		<td>###txt_root###:</td>
@@ -43,6 +43,7 @@
 </table>
 ###PART_INFO_TABLE###
 </div>
+###PART_WARNING###
 </div> <!-- text_area-->
 
 

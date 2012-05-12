@@ -3,7 +3,7 @@ include "plugins/diskinfo.php";
 /**
  * Builds the core content of the root file system page.
  * Implements a plugin.
- * 
+ *
  * @author hm
  */
 class RootfsPage extends Page{
@@ -11,8 +11,10 @@ class RootfsPage extends Page{
 	var $diskInfo;
 	/// name of the file containing the partition info
 	var $filePartInfo;
+	var $btrfsWarning;
+
 	/** Constructor.
-	 * 
+	 *
 	 * @param $session
 	 */
 	function __construct(&$session){
@@ -22,15 +24,19 @@ class RootfsPage extends Page{
 		if ($forceRebuild)
 			$this->setUserData('reload.partinfo', '');
 		$this->diskInfo = new DiskInfo($session, $this, $forceRebuild);
-			
-		$this->setDefaultOption('filesys', 1, true);
+
 		$this->setDefaultOption('disk', 0, true);
 		$this->setDefaultOption('disk2', 0, true);
 		$this->setDefaultOption('partman', 0, true);
-		$this->setDefaultOption('filesys', 0, true);
+		$this->setDefaultOption('filesys', 1, true);
+		$this->setDefaultOption('confirmation', 0, true);
+		$fs = $this->getUserData('filesys');
+		$root = $this->getField('root');
+		$this->session->trace(TRACE_RARE, "fs: .$fs. root: .$root.");
+		$this->btrfsWarning = strcmp($fs, "btrfs") == 0 && $this->diskInfo->hasGPT($root);
 	}
 	/** Builds the core content of the page.
-	 * 
+	 *
 	 * Overwrites the method in the baseclass.
 	 */
 	function build(){
@@ -47,19 +53,25 @@ class RootfsPage extends Page{
 		$this->fillRows('partinfo');
 		$this->diskInfo->buildInfoTable();
 		$text = $this->diskInfo->getWaitForPartitionMessage();
-		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text, 
+		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text,
 			$this->content);
+		if (! $this->btrfsWarning)
+			$this->clearPart('WARNING');
+		else {
+			$this->replacePartWithTemplate('WARNING');
+		}
+		$this->fillOptions('confirmation');
 	}
 	/** Returns an array containing the input field names.
-	 * 
+	 *
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
-		$rc = array('disk', 'partman', 'root', 'filesys', 'disk2');
+		$rc = array('disk', 'partman', 'root', 'filesys', 'disk2', 'confirmation');
 		return $rc;
 	}
 	/** Will be called on a button click.
-	 * 
+	 *
 	 * @param $button	the name of the button
 	 * @return false: a redirection will be done. true: the current page will be redrawn
 	 */
@@ -68,12 +80,15 @@ class RootfsPage extends Page{
 		if (strcmp($button, 'button_refresh') == 0){
 			$this->diskInfo->buildInfoTable();
 		} elseif (strcmp($button, 'button_next') == 0){
+			$ix = $this->indexOfSelectionField('rootfs', 'confirmation', null, 'opt_confirmation');
 			$this->session->userData->setValue('mountpoint', 'mounts.rowcount', 0);
 			$value = $this->session->getField('root');
 			if (strcmp($value, '-') == 0)
-				$redraw = ! $this->setFieldError('root', 
+				$redraw = ! $this->setFieldError('root',
 					$this->i18n('ERR_EMPTY_ROOT', 'No root partition chosen!'));
-			else
+			elseif ($this->btrfsWarning && $ix != 1){
+				// Nothing to do
+			} else
 				$redraw = $this->navigation(false);
 		} elseif (strcmp($button, 'button_prev') == 0){
 			$redraw = $this->navigation(true);
@@ -84,6 +99,6 @@ class RootfsPage extends Page{
 			$this->session->log("unknown button: $button");
 		}
 		return $redraw;
-	} 
+	}
 }
 ?>

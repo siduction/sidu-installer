@@ -23,6 +23,8 @@ class DiskInfo {
 	var $hasInfo;
 	/// One of PAGE_PARTITION .. PAGE_MOUNTPOINT
 	var $pageIndex;
+	/// Disks with GPT, e.g. ;sda;sde;
+	var $gptDisks;
 	/** Constructor.
 	 *
 	 * @param $session		the session info
@@ -34,6 +36,7 @@ class DiskInfo {
 		$this->hasInfo = false;
 		$this->page = $page;
 		$this->name = $page->name;
+		$this->gptDisks = '';
 		if (strcmp($this->name, "partition") == 0)
 			$this->pageIndex = PAGE_PARTITION;
 		elseif (strcmp($this->name, "rootfs") == 0)
@@ -96,44 +99,49 @@ class DiskInfo {
 		$diskList = '';
 		while( (list($no, $line) = each($file))){
 			$line = chop($line);
-			$cols = explode("\t", $line);
-			$dev = str_replace('/dev/', '', $cols[0]);
-			if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
-				continue;
-			if (count($cols) == 2){
-				// Disks
-				$this->disks[$dev] = $cols[1];
-				$diskList .= ';/dev/' . $dev;
-				continue;
-			}
-			$infos = array();
-			foreach($cols as $key => $value){
-				$vals = explode(':', $value);
-				if (count($vals) > 1){
-					$infos[$vals[0]] = $vals[1];
+			if (strncmp("!GPT=", $line, 5) == 0){
+					// Store the preceeding ':': This allowes the simple usage of strpos().
+				$this->gptDisks = substr($line, 4);
+			} else {
+				$cols = explode("\t", $line);
+				$dev = str_replace('/dev/', '', $cols[0]);
+				if (strlen($excludes) != 0 && preg_match($excludes, $dev) > 0)
+					continue;
+				if (count($cols) == 2){
+					// Disks
+					$this->disks[$dev] = $cols[1];
+					$diskList .= ';/dev/' . $dev;
+					continue;
 				}
-			}
-			$size = isset($infos['size']) ? (int)$infos['size'] : 0;
-			$label = isset($infos['label']) ? $infos['label'] : '';
-			$ptype = isset($infos['ptype']) ? $infos['ptype'] : '';
-			$fs = isset($infos['fs']) ? $infos['fs'] : '';
-			$pinfo = isset($infos['pinfo']) ? $infos['pinfo'] : '';
-			$debian = isset($infos['debian']) ? $infos['debian'] : '';
-			$os = isset($infos['os']) ? $infos['os'] : '';
-			$distro = isset($infos['distro']) ? $infos['distro'] : '';
-			$subdistro = isset($infos['subdistro']) ? $infos['subdistro'] : '';
-			$date = '';
-			if (isset($infos['created']))
-				$date = ' ' . $this->session->i18n('rootfs', 'CREATED', 'created') . ': ' . $infos['created'];
-			if (isset($infos['modified']))
-				$date .= ' ' . $this->session->i18n('rootfs', 'MODIFIED', 'modified') . ': ' . $infos['modified'];
+				$infos = array();
+				foreach($cols as $key => $value){
+					$vals = explode(':', $value);
+					if (count($vals) > 1){
+						$infos[$vals[0]] = $vals[1];
+					}
+				}
+				$size = isset($infos['size']) ? (int)$infos['size'] : 0;
+				$label = isset($infos['label']) ? $infos['label'] : '';
+				$ptype = isset($infos['ptype']) ? $infos['ptype'] : '';
+				$fs = isset($infos['fs']) ? $infos['fs'] : '';
+				$pinfo = isset($infos['pinfo']) ? $infos['pinfo'] : '';
+				$debian = isset($infos['debian']) ? $infos['debian'] : '';
+				$os = isset($infos['os']) ? $infos['os'] : '';
+				$distro = isset($infos['distro']) ? $infos['distro'] : '';
+				$subdistro = isset($infos['subdistro']) ? $infos['subdistro'] : '';
+				$date = '';
+				if (isset($infos['created']))
+					$date = ' ' . $this->session->i18n('rootfs', 'CREATED', 'created') . ': ' . $infos['created'];
+				if (isset($infos['modified']))
+					$date .= ' ' . $this->session->i18n('rootfs', 'MODIFIED', 'modified') . ': ' . $infos['modified'];
 
-			$info = empty($subdistro) ? $distro : $subdistro;
-			if (empty($info))
-				$info = $os;
-			if (! empty($date))
-				$info .= $date;
-			$partitions .= "|$dev\t$label\t$size\t$ptype\t$fs\t$info";
+				$info = empty($subdistro) ? $distro : $subdistro;
+				if (empty($info))
+					$info = $os;
+				if (! empty($date))
+					$info .= $date;
+				$partitions .= "|$dev\t$label\t$size\t$ptype\t$fs\t$info";
+			}
 		}
 		// strip the first separator:
 		$partitions = substr($partitions, 1);
@@ -284,6 +292,17 @@ class DiskInfo {
 		}
 		return $rc;
 	}
+	/** Returns whether a given disk has a GPT (instead of a MBR).
+	 *
+	 * @param $dev disk to test
+	 * @return true: $dev has a GPT. false: otherwise
+	 */
+	function hasGPT($dev){
+		$dev = ';' . preg_replace('/\d+/', "", $dev) . ';';
+		$this->session->trace(TRACE_RARE, "hasGPT: dev: $dev");
+		$ix = strpos($this->gptDisks, $dev);
+		return $ix > 0;
+	}
 	/** Builds dynamic part of the partition info table.
 	 */
 	function buildInfoTable(){
@@ -314,9 +333,7 @@ class DiskInfo {
 		if ($this->hasInfo)
 			$rc = '';
 		else{
-			$rc = $this->session->readFileFromPlugin('waitforpartinfo.txt', false);
-			$text = $this->session->configuration->getValue('diskinfo.txt_wait_for_partinfo');
-			$rc = str_replace('###txt_wait_for_partinfo###', $text, $rc);
+			$rc = $this->session->configuration->getValue('diskinfo.txt_wait_for_partinfo');
 		}
 		return $rc;
 	}

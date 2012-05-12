@@ -17,11 +17,7 @@ class PartitionPage extends Page{
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'partition');
-		$value = $this->getUserData('reload.partinfo');
-		$forceRebuild = ! empty($value);
-		if ($forceRebuild)
-			$this->setUserData('reload.partinfo', '');
-		$this->diskInfo = new DiskInfo($session, $this, $forceRebuild);
+		$this->diskInfo = new DiskInfo($session, $this, false);
 
 		$this->setDefaultOption('disk', 0, true);
 		$this->setDefaultOption('disk2', 0, true);
@@ -35,6 +31,15 @@ class PartitionPage extends Page{
 		$this->session->trace(TRACE_RARE, 'Overview.build()');
 		$this->readContentTemplate();
 		$this->readHtmlTemplates();
+
+		$text = $this->diskInfo->getWaitForPartitionMessage();
+		if (empty($text)){
+			$this->replacePartWithTemplate('PARTITION_INFO');
+		} else {
+			$this->replacePartWithTemplate('PARTITION_INFO', 'WAIT_FOR_PARTINFO');
+			$this->content = str_replace('###txt_no_info###', $text, $this->content);
+		}
+
 		if ($this->getRowCount('partinfo') > 0)
 			$this->replacePartWithTemplate('INFO_TABLE');
 		else
@@ -45,9 +50,6 @@ class PartitionPage extends Page{
 		$this->fillOptions('disk2', true);
 		$this->fillRows('partinfo');
 		$this->diskInfo->buildInfoTable();
-		$text = $this->diskInfo->getWaitForPartitionMessage();
-		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text,
-			$this->content);
 	}
 	/** Returns an array containing the input field names.
 	 *
@@ -65,10 +67,10 @@ class PartitionPage extends Page{
 	function onButtonClick($button){
 		$redraw = true;
 		if (strcmp($button, 'button_refresh') == 0){
-			$this->diskInfo->buildInfoTable();
+			// Do nothing
 		} elseif (strcmp($button, 'button_reload') == 0){
 			$this->diskInfo->forceReload();
-			$this->setUserData('reload.partinfo', 'T');
+			$this->session->gotoPage('partition', 'partition.onButtonClick');
 		} elseif (strcmp($button, 'button_exec') == 0){
 			$answer = $this->session->getAnswerFileName('part', '.ready');
 			$description = $this->getConfiguration('description_wait');
