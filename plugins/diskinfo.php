@@ -25,6 +25,11 @@ class DiskInfo {
 	var $pageIndex;
 	/// Disks with GPT, e.g. ;sda;sde;
 	var $gptDisks;
+	/// LVM volume groups, e.g. vbox;bigdisk
+	var $lvmVGs;
+	/// LVM logical volumes, e.g. vbox/home;bigdisk/swap;bigdisk/home
+	var $lvmLVs;
+	
 	/** Constructor.
 	 *
 	 * @param $session		the session info
@@ -40,17 +45,17 @@ class DiskInfo {
 		if (strcmp($this->name, "partition") == 0)
 			$this->pageIndex = PAGE_PARTITION;
 		elseif (strcmp($this->name, "rootfs") == 0)
-			$this->pageIndex = PAGE_ROOTFS;
+		$this->pageIndex = PAGE_ROOTFS;
 		else
 			$this->pageIndex = PAGE_MOUNTPOINT;
 
 		$this->partitions = NULL;
 		$this->disks = array();
 		$this->filePartInfo = $session->configuration->getValue(
-			'diskinfo.file.demo.partinfo');
+				'diskinfo.file.demo.partinfo');
 		if (! file_exists($this->filePartInfo))
 			$this->filePartInfo = $session->configuration->getValue(
-				'diskinfo.file.partinfo');
+					'diskinfo.file.partinfo');
 
 		if ($forceRebuild && file_exists($this->filePartInfo)){
 			$this->session->userData->setValue('', 'partinfo', '');
@@ -62,7 +67,7 @@ class DiskInfo {
 		if ($session->testFile($this->filePartInfo,
 				'partinfo.created', $wait, $maxWait))
 			$session->exec($this->filePartInfo, SVOPT_DEFAULT,
-				'partinfo', NULL, 0);
+					'partinfo', NULL, 0);
 		$this->hasInfo = file_exists($this->filePartInfo);
 		if ($this->hasInfo)
 			$this->readPartitionInfo();
@@ -100,8 +105,12 @@ class DiskInfo {
 		while( (list($no, $line) = each($file))){
 			$line = chop($line);
 			if (strncmp("!GPT=", $line, 5) == 0){
-					// Store the preceeding ':': This allowes the simple usage of strpos().
+				// Store the preceeding ':': This allowes the simple usage of strpos().
 				$this->gptDisks = substr($line, 4);
+			} elseif (strncmp("!VG=", $line, 4) == 0){
+				$this->lvmVGs = substr($line, 4);
+			} elseif (strncmp("!LV=", $line, 4) == 0){
+				$this->lvmLVs = substr($line, 4);
 			} else {
 				$cols = explode("\t", $line);
 				$dev = str_replace('/dev/', '', $cols[0]);
@@ -185,19 +194,19 @@ class DiskInfo {
 				$item = new PartitionInfo($info);
 				$type = strtolower($item->partType);
 				$isProtected = strcmp($type, '8200') == 0
-					|| strcmp($item->filesystem, 'swap') == 0
-					|| strcmp($type, '8e00') == 0 // LVM
-					|| strcmp($type, 'fd00') == 0 // Linux-RAID
-					|| strcmp($type, 'a906') == 0 // Netbsd-RAID
-					|| strcmp($type, 'ab00') == 0 // Apple boot
-					|| strncmp($type, 'af', 2) == 0 // Apple (HFS, RAID ...
-					;
+				|| strcmp($item->filesystem, 'swap') == 0
+				|| strcmp($type, '8e00') == 0 // LVM
+				|| strcmp($type, 'fd00') == 0 // Linux-RAID
+				|| strcmp($type, 'a906') == 0 // Netbsd-RAID
+				|| strcmp($type, 'ab00') == 0 // Apple boot
+				|| strncmp($type, 'af', 2) == 0 // Apple (HFS, RAID ...
+				;
 				$hasFileSys = ! empty($item->filesystem)
-					&& strcmp($item->filesystem, "LVM2_member") != 0;
+				&& strcmp($item->filesystem, "LVM2_member") != 0;
 				$ignored = strcmp($item->device, $excludedPartition) == 0
-					|| $isProtected
-					|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0
-					|| $this->pageIndex == PAGE_MOUNTPOINT && ! $hasFileSys;
+				|| $isProtected
+				|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0
+				|| $this->pageIndex == PAGE_MOUNTPOINT && ! $hasFileSys;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
 				if (empty($disk))
 					continue;
@@ -216,7 +225,7 @@ class DiskInfo {
 				$disklist .= ';' . $key;
 			foreach ($this->disks as $key => $val)
 				if (! isset($disks[$key]))
-					$disklist .= ';' . $key;
+				$disklist .= ';' . $key;
 		}
 		if (! empty($disklist) || ! empty($diskOnlyList))
 		{
@@ -229,11 +238,16 @@ class DiskInfo {
 				case PAGE_ROOTFS:
 					$this->session->userData->setValue('rootfs', 'opt_disk', $this->page->getConfiguration('txt_all') . $disklist . $diskOnlyList);
 					$this->session->userData->setValue('rootfs', 'opt_disk2', $disklist);
+					if ($this->lvmLVs)
+							$devs .= ';' . $this->lvmLVs;
 					$this->session->userData->setValue('rootfs', 'opt_root', $devs);
 					break;
 				case PAGE_MOUNTPOINT:
 					$this->session->userData->setValue('mountpoint', 'opt_disk2', $disklist);
-					$this->session->userData->setValue('mountpoint', 'opt_add_dev', substr($devs, 2));
+					$devs = substr($devs, 2);
+					if ($this->lvmLVs)
+						$devs .= ';' . $this->lvmLVs;
+					$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
 					$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
 					break;
 				default:
@@ -396,15 +410,15 @@ class PartitionInfo{
 				$this->partType,
 				$this->filesystem,
 				$this->info)
-			= explode(SEPARATOR_INFO, $info);
+				= explode(SEPARATOR_INFO, $info);
 		$size = (int) $size;
 		$this->megabytes = $size / 1000;
 		if ($size < 10*1000)
 			$size = sprintf('%dMB', $size);
 		elseif ($size < 10*1000*1000)
-			$size = sprintf('%dMB', $size / 1000);
+		$size = sprintf('%dMB', $size / 1000);
 		elseif ($size < 10*1000*1000*1000)
-			$size = sprintf('%dGB', $size / 1000 / 1000);
+		$size = sprintf('%dGB', $size / 1000 / 1000);
 		else
 			$size = sprintf('%dTB', $size / 1000 / 1000 / 1000);
 		$this->size = $size;

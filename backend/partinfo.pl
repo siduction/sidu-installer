@@ -24,6 +24,8 @@ my %months = (
 	"Dec" => "12"
 );
 my $gptDisks;
+my @s_vg;
+my @s_lv;
 
 if (! -d $mountpoint){
 	mkdir $mountpoint;
@@ -37,10 +39,12 @@ foreach(@diskDevs){
 # get the info from gdisk:
 my %devs;
 
+&getVG;
 # get the info from blkid
 
 my %blkids = &getBlockId;
 &mergeDevs;
+
 
 my (%sorted, $key, $dev);
 foreach $dev (keys %blkids){
@@ -59,6 +63,8 @@ foreach $key (sort keys %disks){
 	print $key, "\t", $disks{$key}, "\n";
 }
 print "!GPT=$gptDisks;\n";
+print '!VG=', join(';', @s_vg), "\n";
+print '!LV=', join(';', @s_lv), "\n";
 exit 0;
 
 # searches for extended info of a partition
@@ -134,6 +140,29 @@ sub firstLineOf{
 	}
 	return $rc;
 }
+sub getVG{
+	open(VG, "vgdisplay|");
+	my $vgs = "";
+	while(<VG>){
+		if (/VG Name\s+(\S+)/){
+			push(@s_vg, $1);
+		}
+	}
+	close VG;
+	
+	my $vg;
+	my $lvs;
+	foreach $vg (@s_vg){
+		open(LS, "ls -1 /dev/$vg/*|");
+		while(<LS>){
+			chomp;
+			next unless m!/dev/$vg/(\S+)!;
+			push(@s_lv, "$vg/$1");
+		}
+		close LS;
+	}
+}
+
 sub getDiskDev{
 	opendir(DIR, "/sys/block");
 	my @files = readdir(DIR);
