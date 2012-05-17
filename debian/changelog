@@ -7,9 +7,13 @@ sidu-installer (1.1.3) unstable; urgency=low
 
 sidu-installer (1.1.2) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * Fix: never ending loop in postins
 
- -- J. Hamatoma <hama@siduction.net>  Sun, 13 May 2012 00:47:15 +0200
+  [ Alf Gaida ]
+  * Rebuild closes #697
+
+ -- Alf Gaida <agaida@siduction.org>  Sun, 13 May 2012 01:12:04 +0200
 
 sidu-installer (1.1.1) unstable; urgency=low
 
