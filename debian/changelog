@@ -1,3 +1,12 @@
+sidu-installer (1.1.4) unstable; urgency=low
+
+  * LV will not be added to the possible mount devices:
+  ** If a LV has no filesystem mounting is not meaningful. 
+  ** If there is a filesystem the partition is listed by blkid and therefore it arrives in the mount devices
+  * Closes #711
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 18 May 2012 23:46:59 +0200
+
 sidu-installer (1.1.3) unstable; urgency=low
 
   * Puts LVM logical volumes to the combobox of root partition and mount points

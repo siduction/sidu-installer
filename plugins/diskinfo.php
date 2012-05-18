@@ -29,7 +29,7 @@ class DiskInfo {
 	var $lvmVGs;
 	/// LVM logical volumes, e.g. vbox/home;bigdisk/swap;bigdisk/home
 	var $lvmLVs;
-	
+
 	/** Constructor.
 	 *
 	 * @param $session		the session info
@@ -245,8 +245,6 @@ class DiskInfo {
 				case PAGE_MOUNTPOINT:
 					$this->session->userData->setValue('mountpoint', 'opt_disk2', $disklist);
 					$devs = substr($devs, 2);
-					if ($this->lvmLVs)
-						$devs .= ';' . $this->lvmLVs;
 					$this->session->userData->setValue('mountpoint', 'opt_add_dev', $devs);
 					$this->session->userData->setValue('mountpoint', 'opt_add_label', substr($labels, 2));
 					break;
