@@ -3,19 +3,21 @@ include "plugins/diskinfo.php";
 /**
  * Builds the core content mountpoint definitions.
  * Implements a plugin.
- * 
+ *
  * @author hm
  */
 class MountpointPage extends Page{
 	/// instance of DiskInfo
 	var $diskInfo;
 	/** Constructor.
-	 * 
+	 *
 	 * @param $session
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'mountpoint');
 		$this->diskInfo = new DiskInfo($session, $this, false);
+		$this->initializeButtonSwitchedParts('DEV_SELECTOR', 'DEVICE');
+		$this->initializeButtonSwitchedParts('POINT_SELECTOR', 'POINT_COMBO');
 		$ix = $this->getRowCount('mounts');
 		$dev = $this->session->userData->getValue('rootfs', 'root');
 		if ($ix == 0 && ! empty($dev)){
@@ -23,20 +25,18 @@ class MountpointPage extends Page{
 			$label = $this->diskInfo->getPartitionLabel($dev);
 			$fs = $this->session->userData->getValue('rootfs', 'filesys');
 			$ix2 = $this->indexOfList('rootfs', 'filesys', NULL, 'opt_filesys');
-			if ($ix2 <= 0) 
+			if ($ix2 <= 0)
 				$fs = $this->diskInfo->getPartitionFs($dev);
 			$row = "$dev|$label|$fs|/|";
 			$this->setRow('mounts', $row);
 		}
 		$this->diskInfo->respectMountPoints();
-		$this->setDefaultOption('add_dev', 0, false);
 		$this->setDefaultOption('add_label', 0, false);
-		$this->setDefaultOption('add_mount', 0, false);
 		$this->setField('add_mount2', '');
 		$this->setDefaultOption('mountonboot', 1, true);
 	}
 	/** Builds the core content of the page.
-	 * 
+	 *
 	 * Overwrites the method in the baseclass.
 	 */
 	function build(){
@@ -53,18 +53,18 @@ class MountpointPage extends Page{
 		$this->fillOptions('add_label', true);
 		$this->fillOptions('add_mount');
 		$this->fillOptions('mountonboot');
-		$this->fillRows('mounts');		
+		$this->fillRows('mounts');
 		$this->fillRows('partinfo');
 		$text = $this->diskInfo->getWaitForPartitionMessage();
-		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text, 
+		$this->content = str_replace('###WAIT_FOR_PARTINFO###', $text,
 			$this->content);
 	}
 	/** Returns an array containing the input field names.
-	 * 
+	 *
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
-		$rc = array('add_dev', 'add_label', 'add_mount', 
+		$rc = array('add_dev', 'add_label', 'add_mount',
 			'add_mount2', 'disk2', 'mountonboot');
 		return $rc;
 	}
@@ -81,9 +81,10 @@ class MountpointPage extends Page{
 			$label = $this->session->getField('add_label');
 			$dev = $this->diskInfo->getPartitionName($label);
 		}
-			
+
 		$val1 = $this->session->getField('add_mount');
 		$val2 = $this->session->getField('add_mount2');
+		$this->session->trace(TRACE_RARE, "addMount: $devSelector / $val1 / $val2");
 		if (strncmp($val1, '/', 1) == 0){
 			if (empty($val2))
 				$mount = $val1;
@@ -93,7 +94,7 @@ class MountpointPage extends Page{
 			$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_WRONG_MOUNT');
 		elseif (strcmp($val2, '/') == 0)
 			$ok = $this->setFieldErrorByKey('add_mount2', 'ERR_IS_ROOT');
-		else 
+		else
 			$mount = $val2;
 		if ($ok){
 			$ix = $this->getRowCount('mounts');
@@ -109,7 +110,7 @@ class MountpointPage extends Page{
 		return $ok;
 	}
 	/** Will be called on a button click.
-	 * 
+	 *
 	 * @param $button	the name of the button
 	 * @return false: a redirection will be done. true: the current page will be redrawn
 	 */
@@ -135,6 +136,6 @@ class MountpointPage extends Page{
 			$this->session->log("unknown button: $button");
 		}
 		return $redraw;
-	} 
+	}
 }
 ?>
