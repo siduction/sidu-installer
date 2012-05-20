@@ -7,14 +7,17 @@ sidu-installer (1.2.1) unstable; urgency=low
 
 sidu-installer (1.2) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * Excluded: /dev/sr0
   * Better texts for "mountpoint definition"
   * Closes: #709
   * Fix: No wrong change of device/mountpoint selectors
   * Dependency: siguibui 1.2
-  * refs #714
 
- -- J. Hamatoma <hama@siduction.net>  Sat, 19 May 2012 00:40:30 +0200
+  [ Alf Gaida ]
+  * rebuild closes  #714
+
+ -- Alf Gaida <agaida@siduction.org>  Sat, 19 May 2012 13:08:46 +0200
 
 sidu-installer (1.1.4) unstable; urgency=low
 
