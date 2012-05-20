@@ -1,3 +1,10 @@
+sidu-installer (1.2.1) unstable; urgency=low
+
+  * Portuguese text improvements
+  * Closes: #723
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 20 May 2012 18:05:54 +0200
+
 sidu-installer (1.2) unstable; urgency=low
 
   * Excluded: /dev/sr0
