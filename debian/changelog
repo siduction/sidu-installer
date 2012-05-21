@@ -1,9 +1,13 @@
 sidu-installer (1.2.1) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * Portuguese text improvements
   * Closes: #723
+  
+  [ Alf Gaida ]
+  * rebuild closes #728
 
- -- J. Hamatoma <hama@siduction.net>  Sun, 20 May 2012 18:05:54 +0200
+ -- Alf Gaida <agaida@siduction.org>  Mon, 21 May 2012 02:29:08 +0200
 
 sidu-installer (1.2) unstable; urgency=low
 
