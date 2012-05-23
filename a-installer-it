@@ -1,0 +1,217 @@
+   1 # Sequence of the pages separated by a comma.
+   2 # The name of the page is the name of the plugin.
+   3 # The series define the effect of the back and next button.
+   4 
+   5 # global definitions:
+   6 
+   7 .gui.pages=home;partizione;root-fs;mountpoint;avvio;utente;rete;esegui
+   8 .gui.button.prev%=<input type="invia" name="button_prev" value="Indietro" />
+   9 .gui.button.next%=<input type="invia" name="button_next" value="Avanti" />
+  10 .tempdir=/var/cache/siguibui/
+  11 .taskdir=${tempdir}shellserver-tasks/
+  12 
+  13 .EMPTY_FIELD%=Riempire il campo!
+  14 .WRONG_CHARS%=Caratteri non validi. Sono permessi:
+  15 .WRONG_FIRST%=Primo carattere non valido:
+  16 .WRONG_NEXT%=Caratter(e|i) non valid(o|i):
+  17 .BLANK%=<blank>
+  18 .ALLOWED%=Permesso:
+  19 .TOO_SHORT%=Troppo breve!
+  20 .TOO_LONG%=Troppo lungo!
+  21 .NOT_EQUAL%=Password non uguali!
+  22 .NOT_MINUS%=- non permesso all'inizio!
+  23 .TXT_TITLE%=Installer di Siduction
+  24 
+  25 #Plugin specific:
+  26 
+  27 home.txt_welcome%=Benvenuto!
+  28 home.txt_introduction%=Questa applicazione installerà siduction nel disco rigido.
+  29 home.txt_intro2%=Formattare una partizione può condurre a perdita di dati!
+  30 home.txt_warning%=siduction non è responsabile della perdita di dati o di danni all'hardware.
+  31 home.txt_warning2%=Per favore, attenzione.
+  32 home.txt_help%=Se avete bisogno di aiuto per l'installazione, visitate il supporto di siduction.
+  33 home.txt_chat%=Chat
+  34 home.txt_channel%=Channel
+  35 home.txt_forum%=Forum
+  36 home.txt_wiki%=Wiki
+  37 home.txt_usb_installer%=Live Installer su scheda-USB
+  38 home.txt_alt_usb%=Scheda-USB
+  39 home.txt_alt_warning%=Scheda-USB
+  40 home.txt_clear_config%=Cancella la Configurazione
+  41 home.preload.count=4
+  42 home.preload.0=${tempdir}timezoneinfo.txt;timezoneinfo;current
+  43 home.preload.1=${tempdir}timezoneinfo.txt;timezoneinfo;all
+  44 home.preload.2=${tempdir}partinfo.txt;partinfo;
+  45 home.preload.3=${tempdir}fwdetect.txt;firmware;info
+  46 
+  47 # for demo mode only:
+  48 diskinfo.file.demo.partinfo=/etc/inosid/partinfo.txt
+  49 diskinfo.file.partinfo=${tempdir}partinfo.txt
+  50 diskinfo.wait.partinfo=5
+  51 diskinfo.wait.partinfo.creation=30
+  52 diskinfo.excluded.dev=loop\d|siduction-live
+  53 diskinfo.txt_wait_for_partinfo%=Verrà ricercata informazione sulle partizioni. Per favore, abbiate pazienza...
+  54 diskinfo.root.minsize.mb=1000
+  55 
+  56 partition.txt_title%=Cambiare lo Schema delle Partizioni
+  57 partition.txt_intro%=In questa pagina potrete creare/cambiare/cancellare le partizioni de(l|i) disc(o|hi) rigid(o|i). Se non è necessario, premete "avanti" (in basso a destra). 
+  58 partition.txt_intro2%=Per far ciò dovete utilizzare un programma esterno che potete scegliere in "Part.Manager".
+  59 partition.txt_intro3%=Alcuni programmi necessitano di un disco rigido di riferimento. In questo caso dovete selezionarlo in "Disco Rigido".
+  60 partition.txt_intro4%=Premete "Esegui" per avviare il programma.
+  61 partition.txt_intro5%=<xml>Altre possibilità sono prospettate in <a href="http://sidu-disk-center:8086" target="_blank">sidu-disk-center</a>.
+  62 partition.txt_disk%=Disco rigido
+  63 partition.txt_partman%=Part.manager
+  64 partition.opt_partman=gparted;gdisk;fdisk;cfdisk
+  65 partition.cmd_gparted=s;background;startgui;gparted|###DISK###|root|std
+  66 partition.cmd_gdisk=n;background;startgui;gdisk|###DISK###|root|console
+  67 partition.cmd_fdisk=n;background;startgui;fdisk|###DISK###|root|console
+  68 partition.cmd_cfdisk=n;background;startgui;cfdisk|###DISK###|root|console
+  69 partition.ERR_ALL_NOT_ALLOWED%=scegliere un disco. "tutti" non è consentito da questo programma.
+  70 partition.txt_exec%=Esegui
+  71 partition.txt_intro_info%=In questo paragrafo potete prendere visione delle partizioni esistenti.
+  72 partition.txt_refresh%=Aggiorna
+  73 partition.txt_device%=Dispositivo
+  74 partition.txt_label%=Etichetta
+  75 partition.txt_info%=Info Addizionale
+  76 partition.txt_fs%=FSys
+  77 partition.txt_size%=Dimensione
+  78 partition.txt_parttype%=Tipo di partizione
+  79 partition.txt_reload%=Scansiona i dischi
+  80 partition.txt_all%=tutti
+  81 partition.description_wait%=Modificate le partizioni e chiudete il programma esterno.
+  82 
+  83 
+  84 rootfs.file.demo.partinfo=/etc/inosid/partinfo.txt
+  85 rootfs.file.partinfo=${tempdir}partinfo.txt
+  86 rootfs.txt_title%=Il Filesystem di Root
+  87 rootfs.opt_filesys%=Nessuna modifica;ext4;ext3;reiserfs;xfs;btrfs
+  88 rootfs.txt_intro%=<xml><b>Scegliere la partizione</b> dove verrà creato il filesystem root di siduction.
+  89 rootfs.txt_intro2%=<xml><b>Nota</b>:<br/><b>btrfs</b> è un filesystem <b>relativamente giovane</b>. Lo abbiamo inserito perché inseriamo software "all'ultimo grido". Poiché un filesystem <b>può distruggere tutti i vostri dati</b>, per favore <b>fate sempre il backup</b> se volete provare btrfs. <b>Siete avvertiti</b>: potrebbe mangiare i vostri micini!
+  90 rootfs.txt_root%=Partizione
+  91 rootfs.txt_filesys%=Filesystem
+  92 rootfs.txt_intro_info%=Info sulle Partizioni:
+  93 rootfs.txt_refresh%=Aggiorna
+  94 rootfs.txt_disk%=Disco rigido
+  95 rootfs.txt_device%=Dispositivo
+  96 rootfs.txt_label%=Etichetta
+  97 rootfs.txt_info%=Info Addizionale
+  98 rootfs.txt_fs%=FSys
+  99 rootfs.txt_size%=Dimensione
+ 100 rootfs.txt_parttype%=Tipo di Partizione
+ 101 rootfs.CREATED%=Creato
+ 102 rootfs.MODIFIED%=Modificato
+ 103 rootfs.ERR_EMPTY_ROOT%=Scegliere una partizione per l'installazione.
+ 104 rootfs.txt_btrfs_warning%=<xml>Il filesystem di root è btrfs ed è situato in un disco GPT.<br/> Secondo la nostra esperienza <b>Grub non può avviarsi</b> in questa situazione. Create, quindi, una piccola <b>partizione d'avvio</b> (200 MB) e formattatela con ext2..ext4.
+ 105 rootfs.opt_confirmation%=Alt! Cambio le impostazioni.;Continuare! Questa è la mia decisione!
+ 106 
+ 107 mountpoint.txt_partition%=Scelta dei Mountpoint
+ 108 mountpoint.txt_intro%=È prudente separare i dati utente dai dati di sistema. Ciò può esser fatto aggiungendo altre partizioni nel filesystem principale.
+ 109 mountpoint.txt_intro2%=I mountpoint sono directory che costituiscono la porta d'accesso a queste partizioni esterne.
+ 110 mountpoint.txt_intro3%=Consigliamo di usare una partizione separata almeno per /home.
+ 111 mountpoint.txt_disk%=Disco rigido
+ 112 mountpoint.txt_device%=Dispositivo
+ 113 mountpoint.txt_label%=Etichetta
+ 114 mountpoint.txt_mount%=Mountpoint
+ 115 mountpoint.txt_filesys%=Filesystem
+ 116 mountpoint.txt_add%=Aggiungere
+ 117 mountpoint.txt_switch%=I criteri di selezione possono essere modificati:
+ 118 mountpoint.txt_action%=Azione
+ 119 mountpoint.opt_add_mount=/home;/boot;/opt;/usr;/work;/var/tmp
+ 120 mountpoint.txt_button_del%=Cancella
+ 121 mountpoint.ERR_IS_ROOT%=Non è possibile scegliere la directory root (vedi pagina precedente)!
+ 122 mountpoint.ERR_WRONG_MOUNT%=Mountpoint fornito non valido: Deve iniziare con '/'.
+ 123 mountpoint.txt_intro_info%=Queste sono le attuali partizioni:
+ 124 mountpoint.txt_refresh%=Aggiorna
+ 125 mountpoint.txt_device%=Dispositivo
+ 126 mountpoint.txt_fs%=FSys
+ 127 mountpoint.txt_label%=Etichetta
+ 128 mountpoint.txt_info%=Info Addizionale
+ 129 mountpoint.txt_size%=Dimensione
+ 130 mountpoint.txt_parttype%=Tipo di partizione
+ 131 mountpoint.opt_mountonboot%=no;sì
+ 132 mountpoint.txt_mount_on_boot%=Montare all'avvio?
+ 133 mountpoint.txt_desc_mount_on_boot%= 
+ 134 mountpoint.txt_button_DEVICE%=Dispositivi
+ 135 mountpoint.txt_button_LABEL%=Etichette
+ 136 mountpoint.txt_button_POINT_COMBO%=Proposte
+ 137 mountpoint.txt_button_POINT_TEXT%=Scelta libera
+ 138 
+ 139 boot.txt_bootloader%=Bootloader e Fuso Orario
+ 140 boot.txt_description%=Un bootmanager consente di scegliere il sistema operativo da avviare all'inizio.
+ 141 boot.txt_manager%=Bootmanager
+ 142 boot.txt_target%=Sede di Installazione
+ 143 boot.opt_loader%=Nessuno;GRUB
+ 144 boot.opt_target%=Settore-Masterboot;Partizione
+ 145 boot.txt_region%=Regione
+ 146 boot.txt_city%=Città
+ 147 boot.txt_refresh%=Aggiorna
+ 148 boot.file.demo.currentzone=/etc/inosid/currentzone.txt
+ 149 boot.file.demo.timezoneinfo=/etc/inosid/timezoneinfo.txt
+ 150 boot.file.currentzone=${tempdir}currentzone.txt
+ 151 boot.file.timezoneinfo=${tempdir}timezoneinfo.txt
+ 152 
+ 153 user.txt_root_password%=Password di Root
+ 154 user.txt_root_again%=Ripetere
+ 155 user.txt_real_name%=Nome Reale
+ 156 user.txt_desc_root_password%=Questa password è per l'amministratore.
+ 157 user.txt_desc_password2%=Per favore, ripetere la password.
+ 158 user.txt_desc_password%=Almeno 6 caratteri, massimo 20
+ 159 user.txt_optional%=Opzionale
+ 160 user.txt_desc_login%=Consentiti: a..z, 0..9 e _
+ 161 
+ 162 user.txt_user_data%=Impostazioni dell'utente
+ 163 user.txt_login_name%=Nome di login
+ 164 user.txt_password%=Password
+ 165 user.txt_again%=Di nuovo
+ 166 
+ 167 user.WRONG_CHARS%=Caratter(e|i) sbagliat(o|i):
+ 168 
+ 169 network.txt_network%=Rete
+ 170 network.txt_host%=Nome del Computer
+ 171 network.txt_desc_host%=Deve iniziare con una lettera, dopo la quale possono essere usati lettere o numeri.
+ 172 network.txt_services%=Servizi da avviare:
+ 173 network.txt_ssh%=Avviare ssh
+ 174 network.txt_descr_ssh%=Sessioni Sicure in Rete.
+ 175 network.opt_ssh%=no;sì
+ 176 network.DEFAULT_HOST%=siductionbox
+ 177 network.txt_firmware_intro%=È stato individuato hardware necessitante di firmware non-libero. Questo può essere selezionato qui.
+ 178 network.txt_firmware_intro2%=Installando questo firmware aggiungerete sorgenti non-libere al vostro sistema e questo non soddisfarà più i principi della DFSG.
+ 179 network.txt_module%=Modulo:
+ 180 network.txt_statements%=Comandi di installazione:
+ 181 network.txt_action%=Azione:
+ 182 network.txt_button_install_all%=Installare tutti i moduli
+ 183 network.txt_found_firmware%=Sono stati trovati già installati questi moduli: ###INSTALLED_MODULES###
+ 184 network.txt_button_install%=Installare il modulo
+ 185 network.txt_link_text%=Log dell'ultima installazione
+ 186 
+ 187 run.txt_title%=Installazione
+ 188 run.txt_info%=Avete fornito tutta l'informazione richiesta per l'installazione di siduction.
+ 189 run.txt_tip%=Per verificare nuovamente o cambiare qualcosa premete "Indietro".
+ 190 run.txt_tip2%=Se tutto è corretto premete "Salva la configurazione e installa".
+ 191 run.txt_force%=Forza l'installazione:
+ 192 run.txt_descr_force%=Ignora RAM- Partizione- e altre verifiche.
+ 193 run.opt_force%=no;sì
+ 194 run.button%=<input type="invia" name="button_install" value="Salva la configurazione e installa" />
+ 195 run.info_running%=L'installazione è finita. Durata: ###DURATION###   Riavviare adesso.
+ 196 run.txt_rootfs%=Filesystem di root
+ 197 run.description_wait%=Saranno richiesti pochi minuti.
+ 198 run.wait.intro%=L'installazione è in corso.
+ 199 
+ 200 wait.txt_wait%=In attesa...
+ 201 wait.txt_intro%=L'installazione riprenderà non appena l'applicazione in esecuzione ###PROGRAM### è terminata.
+ 202 wait.txt_cancel%=Cancella
+ 203 wait.txt_demotext%=Modo Demo: Verrà simulata l'esecuzione del programma.
+ 204 wait.refresh=3
+ 205 wait.PROGRESS_STATE%=In corso:
+ 206 
+ 207 ready.txt_title%=Installazione Completata
+ 208 ready.txt_intro%=L'installazione di siduction è terminata con successo. Riavviare il sistema.
+ 209 ready.txt_failed%=Spiacente, l'installazione di siduction <strong>è fallita</strong>. Eliminate l'errore e <a href="http:run">iniziate nuovamente</a>.
+ 210 ready.txt_runtime%=Durata dell'installazione: ###DURATION###
+ 211 ready.txt_help%=Avete problemi? Navigate nell'IRC channel o nel forum.
+ 212 ready.txt_reboot%=Riavviare
+ 213 ready.txt_details=Log
+
+sidu-installer
+RSS
+Atom

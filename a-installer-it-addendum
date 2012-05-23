@@ -1,0 +1,23 @@
+Please, note that I've just committed, as suggested, a full italian translation of the siduction installer program.
+I controlled every step simulating a true installation. All is OK, but ...
+Here is the but...
+When in the Wellcome! table you click on Live USB-stick Installer, a new table is opened that should absolutely be translated into italian.
+Here is the translation:
+
+*****
+install-usb-gui
+Questo strumento crea un dispositivo USB avviabile di siduction
+Usatelo a vostro rischio: vi è offerto senza alcuna garanzia
+Dispositivo USB:
+Foprmattate il dispositivo con ext2 o fat32 prima di usare questo strumento!
+Codici di avvio
+Elenco dei codici di avvio
+Esempio: lang=it tz=Europe/Rome toram
+Per gli utenti di netbook: usare il codice vga=778
+persist
+X  Cancella              V  Applica
+*****
+
+Many thanks for the attention.
+
+Giorgio Cittadini
