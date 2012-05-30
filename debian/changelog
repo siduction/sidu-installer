@@ -1,4 +1,4 @@
-sidu-installer (1.3+nmu1) UNRELEASED; urgency=low
+sidu-installer (1.3+nmu3) UNRELEASED; urgency=low
 
   [ J. Hamatoma ]
   * Italian translations (Giorgio Cittadini)
@@ -7,8 +7,10 @@ sidu-installer (1.3+nmu1) UNRELEASED; urgency=low
 
   [ Ulrich Beckmann ]
   * revised sidu-installer_pt.conf
+  * revised sidu_installer_pt.conf 30.06.
+  * revised sidu_installer_pt.conf 29.06.
 
- -- Ulrich Beckmann <siduction@bequimao.de>  Tue, 29 May 2012 23:14:26 +0200
+ -- Ulrich Beckmann <siduction@bequimao.de>  Wed, 30 May 2012 17:44:03 +0200
 
 sidu-installer (1.2.1) unstable; urgency=low
 
