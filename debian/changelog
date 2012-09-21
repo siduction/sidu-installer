@@ -1,8 +1,12 @@
 sidu-installer (1.4) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * Test launch env for ${DISPLAY} to install also in nox 
 
- -- Ovidiu Angelescu <mrhsaacdoh@gmail.com>  Sat, 23 Jun 2012 14:36:29 +0300
+  [ Alf Gaida ]
+  * Rebuild closes #855
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 21 Sep 2012 10:26:34 +0200
 
 sidu-installer (1.3) unstable; urgency=low
 
