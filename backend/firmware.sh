@@ -5,7 +5,8 @@ ARG=$3
 
 #RUN="echo simulating" 
 TEMP1=$ANSWER.tmp
-set -x
+
+test -f "$TEMP1" && rm $TEMP1
 INPUT=fw-test.txt
 test -f $INPUT || INPUT=""
 case "$CMD" in
