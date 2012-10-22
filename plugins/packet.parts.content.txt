@@ -1,0 +1,45 @@
+FOUND_FIRMWARE:
+<div class="textblock">
+###PART_INSTALLED_FW###
+###PART_FW_SEPARATOR###
+###PART_MISSING_FW###
+</div>
+
+FW_SEPARATOR:
+<div class="horicontal_line"></div>
+
+INSTALLED_FW:
+<p>###txt_found_firmware###
+</p>
+
+MISSING_FW:
+<p>###txt_firmware_intro###</p>
+<p>###txt_firmware_intro2###</p>
+###PART_BUTTON_ALL###
+<table>
+<tr>
+	<th>###txt_module###</th>
+	<th>###txt_statements###</th>
+	<th>###txt_action###</th>
+</tr>
+###ROWS_FW_MODULES###
+</table>
+###PART_LOG_FIRMWARE###
+</div>
+
+BUTTON_ALL:
+<p class="center">
+<input type="submit" name="button_install_all" value="###txt_button_install_all###" />
+</p>
+
+LOG_FIRMWARE:
+<p><a href="###URL_LOG###">###txt_link_text###</a>
+</p>
+
+SOURCE_FOUND:
+<p>###txt_contrib_installed###</p>
+
+SOURCE_MISSED:
+<p><input type="submit" name="button_contrib" value="###txt_button_contrib###"></p>
+
+END:

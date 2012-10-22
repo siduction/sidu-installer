@@ -1,4 +1,12 @@
-sidu-installer (1.4) unstable; urgency=low
+sidu-installer (1.5) unstable; urgency=low
+
+  * Firmware handling moved to a separate page
+  * GPT handling, Logical volumes
+  * dependency: siguibui 1.3
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 25 Feb 2012 23:03:06 +0100
+ 
+sidu-installer (1.4) UNRELEASED; urgency=low
 
   [ Ovidiu Angelescu ]
   * Test launch env for ${DISPLAY} to install also in nox 

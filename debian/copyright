@@ -6,6 +6,14 @@ Files: *
 Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
 License: GPL-3.0+
 
+Files: config/*_it.conf
+Copyright: 2012 Giorgio Cittadini <giocitta@gmail.com>
+License: GPL-3.0+
+
+Files: config/*_pt.conf
+Copyright: 2012 Ulrich Beckmann  <siduction@bequimao.de>
+License: GPL-3.0+
+
 Files: debian/*
 Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
            2011-2012 Alf Gaida <agaida@siduction.org>

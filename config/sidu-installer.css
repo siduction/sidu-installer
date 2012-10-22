@@ -95,6 +95,8 @@ h1, h2, h3 {
 .next_button{
 		float: right;
 }
+input[type=submit] { background: #cccccc; font-weight: bold; }
+option[selected=selected] { background: #cccccc; font-weight: bold; }
 .navigation input { background: #ff6600; font-weight: bold; }
 .prev_button{
 		float: left;

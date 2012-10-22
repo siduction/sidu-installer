@@ -62,6 +62,7 @@ EOS
 	test -n "$VERBOSE" && ls -ld $ANSWER
 	rm -f $PROGRESSFILE
 	test -n "$VERBOSE" && echo $PROGRESSFILE was removed
+	popd >/dev/null 2>&1
 }
 
 fll_install
