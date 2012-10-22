@@ -9,7 +9,7 @@ $blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
 my %disks;
 my $verbose = 0;
 my $mountpoint = "/tmp/partinfo-mount";
-my %months = ( 
+my %months = (
 	"Jan" => "01",
 	"Feb" => "02",
 	"Mar" => "03",
@@ -26,6 +26,10 @@ my %months = (
 my $gptDisks;
 my @s_vg;
 my @s_lv;
+my @s_fdFree;
+my @s_fdEmpty;
+
+system("./automount-control.sh disable");
 
 if (! -d $mountpoint){
 	mkdir $mountpoint;
@@ -52,7 +56,7 @@ foreach $dev (keys %blkids){
 		$key = $1 . sprintf ("%03d", $2);
 	} else {
 		$key = $dev;
-	} 
+	}
 	$sorted{$key} = $dev;
 }
 foreach $key (sort keys %sorted){
@@ -65,6 +69,8 @@ foreach $key (sort keys %disks){
 print "!GPT=$gptDisks;\n";
 print '!VG=', join(';', @s_vg), "\n";
 print '!LV=', join(';', @s_lv), "\n";
+
+system("./automount-control.sh enable");
 exit 0;
 
 # searches for extended info of a partition
@@ -87,12 +93,12 @@ sub detective{
 		$info .= &firstLineOf("$dirMount/etc/aptosid-version", "subdistro");
 		$info .= &firstLineOf("$dirMount/etc/sidux-version", "subdistro");
 		$info .= &firstLineOf("$dirMount/etc/siduction-version", "subdistro");
-		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";		
+		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";
 	}
 	if ($dirMount eq $mountpoint){
 		system ("umount $mountpoint");
 	}
-	
+
 	if ($fs =~ /fs:ext\d/){
 		open(TUNE, "tune2fs -l $dev|");
 		my $date;
@@ -149,7 +155,7 @@ sub getVG{
 		}
 	}
 	close VG;
-	
+
 	my $vg;
 	my $lvs;
 	foreach $vg (@s_vg){
@@ -202,7 +208,7 @@ sub getFdiskInfo{
 sub getGdiskInfo{
 	my $disk = shift;
 	my $cmd = shift;
-	$cmd =~ s!DISK!/dev/$disk! if $cmd =~ /\|/; 
+	$cmd =~ s!DISK!/dev/$disk! if $cmd =~ /\|/;
 	open(CMD, $cmd) || die "$gdisk failed: $!";
 	my $sector = 512;
 	my $sectors = 0;
@@ -221,13 +227,13 @@ sub getGdiskInfo{
 #Disk /dev/sda: 3907029168 sectors, 1.8 TiB
 		} elsif (/^Disk\s+\S+:\s+(\d+)/){
 			$sectors = $1;
-			$gptDisks .= ';' . $disk if $isGpt; 
+			$gptDisks .= ';' . $disk if $isGpt;
 #   GPT: present
 		} elsif (/^\s*GPT: present/){
-			$isGpt = 1; 
+			$isGpt = 1;
 		}
 	}
-	$disks{$disk} = int($sectors * 1.0 * $sector / 1024); 
+	$disks{$disk} = int($sectors * 1.0 * $sector / 1024);
 	close CMD;
 }
 sub getBlockId{
@@ -274,7 +280,7 @@ sub mergeDevs{
 			my $size = "\t$1" if $val =~ /(size:\d+)/;
 			my $ptype = "\t$1" if $val =~ /(id:\w+)/;
 			my $info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
-			$blkids{$dev} = "$info$size$ptype$info2"; 
+			$blkids{$dev} = "$info$size$ptype$info2";
 		}
 	}
 }
