@@ -1,3 +1,11 @@
+sidu-installer (1.6) unstable; urgency=low
+
+  * latest changes by hamatoma, see git log
+    mostly gnome-related
+  * fixes #928
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 23 Oct 2012 19:25:49 +0200
+
 sidu-installer (1.5) unstable; urgency=low
 
   * Firmware handling moved to a separate page
