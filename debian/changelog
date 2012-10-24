@@ -1,4 +1,4 @@
-sidu-installer (1.5.1) UNRELEASED; urgency=low
+sidu-installer (1.6.1) UNRELEASED; urgency=low
 
   * Fix: call of automount-control in install.sh
   * Fix: syntax of automount-control
@@ -6,6 +6,14 @@ sidu-installer (1.5.1) UNRELEASED; urgency=low
   * rebuild closes #934
 
  -- J. Hamatoma <hama@siduction.net>  Wed, 24 Oct 2012 10:24:49 +0200
+
+sidu-installer (1.6) unstable; urgency=low
+
+  * latest changes by hamatoma, see git log
+    mostly gnome-related
+  * fixes #928
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 23 Oct 2012 19:25:49 +0200
 
 sidu-installer (1.5) unstable; urgency=low
 
