@@ -29,7 +29,7 @@ my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
 
-system("./automount-control.sh disable");
+system("./automount-control.sh disabled");
 
 if (! -d $mountpoint){
 	mkdir $mountpoint;
@@ -70,7 +70,7 @@ print "!GPT=$gptDisks;\n";
 print '!VG=', join(';', @s_vg), "\n";
 print '!LV=', join(';', @s_lv), "\n";
 
-system("./automount-control.sh enable");
+system("./automount-control.sh enabled");
 exit 0;
 
 # searches for extended info of a partition
