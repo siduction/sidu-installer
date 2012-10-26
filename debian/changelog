@@ -1,10 +1,14 @@
-sidu-installer (1.6.2) UNRELEASED; urgency=low
+sidu-installer (1.6.2) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * Changed automount-control to automount-control.sh in install.sh
   * Added a symlink under /usr/share/sidu-installer/backend for automount-control.sh 
   * Changed in shellserver.conf START_GUI_HOME=/home/aptosid to /home/siducer
 
- -- Ovidiu Angelescu <convbsd@siduction.net>  Fri, 26 Oct 2012 02:48:34 +0300
+  [ Alf Gaida ]
+  * rebuild closes #936
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 26 Oct 2012 20:57:52 +0200
 
 sidu-installer (1.6.1) unstable; urgency=low
 
