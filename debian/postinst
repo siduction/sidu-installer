@@ -29,7 +29,8 @@ MkLink index.php $SRC
 MkLink base $SRC
 
 # Create the links to the shellserver:
-cd /usr/share/siguibui/backend
+SRC_INI=/usr/share/siguibui/backend
+cd $SRC_INI
 SRC=../../sidu-installer/backend
 MkLink install.sh $SRC
 MkLink partinfo.pl $SRC
@@ -37,6 +38,7 @@ MkLink partinfo.sh $SRC
 MkLink timezoneinfo.sh $SRC
 MkLink firmware.sh $SRC
 MkLink firmware.pl $SRC
+MkLink2 $SRC_INI/automount-control.sh $SRC
 MkLink2 /var/cache/siguibui/public /usr/share/sidu-installer
 
 popd >/dev/null

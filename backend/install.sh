@@ -45,7 +45,7 @@ function fll_install(){
 	CONFIG=$HOME/.sidconf
 	mv $CONFIGFILE $CONFIG
 	grep CRYPT= $CONFIG
-	./automount-control disabled
+	./automount-control.sh disabled
 	pushd $FLL_SEARCHPATH
 	test -n "$VERBOSE" && echo "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"
 	test -n "$SHELLSERSVERLOG" && echo >>$SHELLSERSVERLOG "progress: $PROGRESSFILE FLL_SEARCHPATH=$FLL_SEARCHPATH"
@@ -64,7 +64,7 @@ EOS
 	rm -f $PROGRESSFILE
 	test -n "$VERBOSE" && echo $PROGRESSFILE was removed
 	popd >/dev/null 2>&1
-	./automount-control enabled
+	./automount-control.sh enabled
 }
 
 fll_install
