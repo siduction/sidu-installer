@@ -12,6 +12,7 @@ License: GPL-3.0+
 
 Files: config/*_pt.conf
 Copyright: 2012 Ulrich Beckmann  <siduction@bequimao.de>
+           2012 Paulo Piacenti <piacenti@sercomtel.com.br>
 License: GPL-3.0+
 
 Files: debian/*

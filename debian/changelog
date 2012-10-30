@@ -1,8 +1,16 @@
 sidu-installer (1.6.3) unstable; urgency=low
 
   * translations (en + it)
+  * closes #951
 
  -- J. Hamatoma <hama@siduction.net>  Wed, 24 Oct 2012 15:01:19 +0200
+
+sidu-installer (1.6.2+nmu1) UNRELEASED; urgency=low
+
+  * Non-maintainer upload.
+  * sidu-installer_pt.conf mail hama 12/10/24
+
+ -- Ulrich Beckmann <siduction@bequimao.de>  Tue, 30 Oct 2012 20:42:43 +0100
 
 sidu-installer (1.6.2) unstable; urgency=low
 
