@@ -1,3 +1,9 @@
+sidu-installer (1.6.4) unstable; urgency=low
+
+  * change .desktop file (name) to Installer
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 19 Nov 2012 01:01:01 +0100
+
 sidu-installer (1.6.3) unstable; urgency=low
 
   * translations (en + it)
