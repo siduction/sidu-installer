@@ -1,3 +1,11 @@
+sidu-installer (1.6.4) unstable; urgency=low
+
+  * install (linking) of nonfree.sh to sigubui/shellserver
+  * closes #971
+  * rebuild closes #
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 26 Nov 2012 21:33:50 +0100
+
 sidu-installer (1.6.3) unstable; urgency=low
 
   * translations (en + it)
