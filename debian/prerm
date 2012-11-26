@@ -16,6 +16,8 @@ pushd /usr/share/$PROJ >/dev/null
 RmLink index.php
 RmLink base
 RmLink public
+cd backend
+RmLink automount-control.sh
 
 # Remove the links to the shellserver:
 cd /usr/share/siguibui/backend
@@ -25,7 +27,7 @@ RmLink partinfo.sh
 RmLink timezoneinfo.sh
 RmLink firmware.sh
 RmLink firmware.pl
-
+RmLink nonfree.sh
 popd >/dev/null
 
 # Debhelpertoken added, review needed

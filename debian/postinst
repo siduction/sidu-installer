@@ -38,6 +38,7 @@ MkLink partinfo.sh $SRC
 MkLink timezoneinfo.sh $SRC
 MkLink firmware.sh $SRC
 MkLink firmware.pl $SRC
+MkLink nonfree.sh $SRC
 MkLink2 $SRC_INI/automount-control.sh $SRC
 MkLink2 /var/cache/siguibui/public /usr/share/sidu-installer
 
