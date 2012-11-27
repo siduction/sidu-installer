@@ -1,8 +1,13 @@
+sidu-installer (1.6.7) unstable; urgency=low
+
+  * rebuild closes #990 
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 27 Nov 2012 01:19:14 +0100
+
 sidu-installer (1.6.6) unstable; urgency=low
 
   * deinstall: remove of automount-control.sh
   * install: link of nonfree.sh
-  * rebuild closes #990
 
  -- J. Hamatoma <hama@siduction.net>  Tue, 27 Nov 2012 00:22:26 +0100
 
