@@ -1,9 +1,13 @@
 sidu-installer (1.6.9) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * added romanian translation again because I have updated only changelog
     and forgot to add translation
 
- -- Ovidiu Angelescu <convbsd@siduction.net>  Tue, 04 Dec 2012 22:48:14 +0200
+  [ Alf Gaida ]
+  * rebuild closes #1025
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 04 Dec 2012 23:43:16 +0100
 
 sidu-installer (1.6.8) unstable; urgency=low
 
