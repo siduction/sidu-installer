@@ -119,7 +119,7 @@ class DiskInfo {
 				if (count($cols) == 2){
 					// Disks
 					$this->disks[$dev] = $cols[1];
-					$diskList .= ';/dev/' . $dev;
+					$diskList .= ';/dev/' . $dev . " (MBR)";
 					continue;
 				}
 				$infos = array();
@@ -155,8 +155,8 @@ class DiskInfo {
 		// strip the first separator:
 		$partitions = substr($partitions, 1);
 		$this->session->userData->setValue('', 'partinfo', $partitions);
-		$this->session->extendList('boot.opt_target', 'boot', 'opt_target',
-				substr($diskList, 1));
+		$value = substr($diskList, 1);
+		$this->session->extendList('boot.opt_target', 'boot', 'opt_target', $value);
 	}
 	/** Reads the partition infos from the user data.
 	 */

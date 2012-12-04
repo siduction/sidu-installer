@@ -2,7 +2,7 @@
 /**
  * Builds the core content of the additional packages page.
  * Implements a plugin.
- * 
+ *
  * @author hm
  */
 class PacketPage extends Page{
@@ -10,29 +10,27 @@ class PacketPage extends Page{
 	var $firmwareFile;
 	/// List of installed firmware modules. Separated by ' '.
 	var $installedModules;
-	/// Array of uninstalled modules. 
+	/// Array of uninstalled modules.
 	// Each module is the name and the commands needed for installation
-	// Example: rt73usb|apt-get install firmware-ralink|modprobe -r rt73usb|modprobe rt73us 
+	// Example: rt73usb|apt-get install firmware-ralink|modprobe -r rt73usb|modprobe rt73us
 	var $missingModules;
 	/// Node of the last installation log:
 	var $nodeLog;
-	
+
 	/** Constructor.
-	 * 
+	 *
 	 * @param $session
 	 */
 	function __construct(&$session){
 		parent::__construct($session, 'packet');
 		$this->firmwareFile = $session->tempDir . 'fwdetect.txt';
-		$this->setDefaultOption('ssh', 0, true);
-		$this->setEmptyToDefault('host', 'network.DEFAULT_HOST');
 		$this->nodeLog = 'firmware_log.txt';
 		$this->missingModules = null;
 		$this->installedModules = null;
 		$this->readFirmwareFile();
 	}
 	/** Calls the script firmware.sh to get firmware info.
-	 * 
+	 *
 	 * @param $timeout	number of seconds which the method waits for an answer.
 	 * 					If 0 no timeout is set
 	 */
@@ -51,7 +49,7 @@ class PacketPage extends Page{
 			if (strlen($content) > 3){
 				$this->missingModules = explode("\n", $content);
 				if (strncmp($this->missingModules[0], '+', 1) == 0){
-					$this->installedModules = str_replace('|', ' ', 
+					$this->installedModules = str_replace('|', ' ',
 						substr($this->missingModules[0], 2));
 					unset($this->missingModules[0]);
 				}
@@ -71,10 +69,10 @@ class PacketPage extends Page{
 		$content = $this->session->readfile($answer);
 		if (file_exists($answer))
 			unlink($answer);
-		return !empty($content);	
+		return !empty($content);
 	}
 	/** Builds the core content of the page.
-	 * 
+	 *
 	 * Overwrites the method in the baseclass.
 	 */
 	function build(){
@@ -105,7 +103,7 @@ class PacketPage extends Page{
 				$this->clearPart('FW_SEPARATOR');
 			else
 				$this->replacePartWithTemplate('FW_SEPARATOR');
-			
+
 			if ($this->missingModules == null){
 				$this->clearPart('MISSING_FW');
 			} else {
@@ -123,7 +121,7 @@ class PacketPage extends Page{
 					$row .= '|BUTTON_INSTALL_' . strval($ix);
 					$this->setRow('fw_modules', $row);
 				}
-				$this->fillRows('fw_modules');	
+				$this->fillRows('fw_modules');
 			}
 			if (! file_exists($this->session->publicDir . $this->nodeLog))
 				$this->clearPart('LOG_FIRMWARE');
@@ -132,17 +130,17 @@ class PacketPage extends Page{
 				$this->replaceMarker('URL_LOG', $this->session->urlPublicDir . $this->nodeLog);
 			}
 		}
-	}		
+	}
 	/** Returns an array containing the input field names.
-	 * 
+	 *
 	 * @return an array with the field names
 	 */
 	function getInputFields(){
-		$rc = array('host', 'ssh');
+		$rc = array();
 		return $rc;
 	}
 	/** Will be called on a button click.
-	 * 
+	 *
 	 * @param $button	the name of the button
 	 * @return false: a redirection will be done. true: the current page will be redrawn
 	 */
@@ -160,9 +158,9 @@ class PacketPage extends Page{
 			$progress = null;
 			$this->session->exec($answer, SVOPT_DEFAULT,
 				$program, $params, 0);
-						//                      123456789 12345			
+						//                      123456789 12345
 		} elseif (strncmp($button, 'button_install_', 15) == 0){
-			$modules = ""; 
+			$modules = "";
 			if (strcmp ($button, 'button_install_all') == 0){
 				foreach ($this->missingModules as $ix => $line){
 					$pos = strpos($line, '|');
@@ -179,18 +177,18 @@ class PacketPage extends Page{
 			$answer = $this->session->publicDir . $node;
 			$params = array();
 			$params[] = 'install';
-			$params[] = $modules; 
+			$params[] = $modules;
 			$program = 'firmware';
 			$progress = null;
 			$this->session->exec($answer, SVOPT_DEFAULT,
 				$program, $params, 0);
 			$description = "";
 			$redraw = $this->startWait($answer, $program, $description, $progress);
-			
+
 		} else {
 			$this->session->log("unknown button: $button");
 		}
 		return $redraw;
-	} 
+	}
 }
 ?>

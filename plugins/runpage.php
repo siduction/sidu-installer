@@ -72,10 +72,10 @@ class RunPage extends Page{
 		$params[] = "progress=$progress";
 		$params[] = "configfile=$shellConfig";
 
-		$curValue = '/dev/' . $this->session->userData->getValue('rootfs', 'root');
+		$rootDevice = '/dev/' . $this->session->userData->getValue('rootfs', 'root');
 		$lines[] = "# Here the siduction-System will be installed";
 		$lines[] = "# This value will be checked by function module_hd_check";
-		$lines[] = "HD_CHOICE='$curValue'";
+		$lines[] = "HD_CHOICE='$rootDevice'";
 		$lines[] = "";
 
 
@@ -195,7 +195,10 @@ class RunPage extends Page{
 			$curValue = 'partition';
 			break;
 		default:
-			$curValue = $this->getUserData('target');
+			$curValue = $this->session->userData->getValue('boot', 'target');
+			$ix = strpos($curValue, ' ');
+			if ($ix > 0)
+				$curValue = substr($curValue, 0, $ix);
 			break;
 		}
 		$lines[] = "# Where the Boot-Loader will be installed";
