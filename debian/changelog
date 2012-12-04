@@ -1,10 +1,31 @@
-sidu-installer (1.6.8) UNRELEASED; urgency=low
+sidu-installer (1.7.0) UNRELEASED; urgency=low
 
   * better info about the grub installation target
   * removing useless stuff from packetpage.php
   * closes #1019
 
  -- J. Hamatoma <hama@siduction.net>  Wed, 05 Dec 2012 00:31:03 +0100
+
+sidu-installer (1.6.9) unstable; urgency=low
+
+  [ Ovidiu Angelescu ]
+  * added romanian translation again because I have updated only changelog
+    and forgot to add translation
+
+  [ Alf Gaida ]
+  * rebuild closes #1025
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 04 Dec 2012 23:43:16 +0100
+
+sidu-installer (1.6.8) unstable; urgency=low
+
+  [ Ovidiu Angelescu ]
+  * added romanian translation 
+
+  [ Alf Gaida ]
+  * rebuild closes #1016 
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 04 Dec 2012 00:17:43 +0100
 
 sidu-installer (1.6.7) unstable; urgency=low
 
