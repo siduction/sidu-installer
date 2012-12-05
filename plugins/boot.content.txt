@@ -19,9 +19,11 @@
 </td>
 </tr>
 </table>
-<p>###txt_desc_target_1###</p>
-<p>###txt_desc_target_2###</p>
-<p>###txt_desc_target_3###</p>
+<ul>
+<li>###txt_desc_target_1###</li>
+<li>###txt_desc_target_2###</li>
+<li>###txt_desc_target_3###</li>
+</ul>
 </div>
 <div class="textblock">
 <table border="0">
