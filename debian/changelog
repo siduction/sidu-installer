@@ -1,3 +1,9 @@
+sidu-installer (1.7.1) UNRELEASED; urgency=low
+
+  * ro translation for messages about installing grub to target partition
+
+ -- Ovidiu Angelescu <convbsd@siduction.net>  Wed, 05 Dec 2012 07:47:03 +0200
+
 sidu-installer (1.7.0) UNRELEASED; urgency=low
 
   * better info about the grub installation target
