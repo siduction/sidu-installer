@@ -1,3 +1,9 @@
+sidu-installer (1.7.4) UNRELEASED; urgency=low
+
+  * updated romanian translation
+
+ -- Ovidiu Angelescu <convbsd@siduction.net>  Thu, 06 Dec 2012 20:05:03 +0200
+
 sidu-installer (1.7.3) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
