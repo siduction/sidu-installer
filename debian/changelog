@@ -1,8 +1,12 @@
-sidu-installer (1.7.4) UNRELEASED; urgency=low
+sidu-installer (1.7.4) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * updated romanian translation
 
- -- Ovidiu Angelescu <convbsd@siduction.net>  Thu, 06 Dec 2012 20:05:03 +0200
+  [ Alf Gaida ]
+  * rebuild closes #1030
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 07 Dec 2012 02:40:24 +0100
 
 sidu-installer (1.7.3) unstable; urgency=low
 
