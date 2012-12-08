@@ -1,3 +1,10 @@
+sidu-installer (1.7.6) UNRELEASED; urgency=low
+
+  * fixed a bug that prevents in gnome umount of /tmp/partinfo-mount
+    when multiple partitions are on harddrive 
+
+ -- Ovidiu Angelescu <convbsd@siduction.net>  Sat, 08 Dec 2012 23:27:08 +0200
+
 sidu-installer (1.7.5) unstable; urgency=low
 
   [ J. Hamatoma ]

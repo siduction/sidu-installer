@@ -29,8 +29,6 @@ my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
 
-system("./automount-control.sh disabled");
-
 if (! -d $mountpoint){
 	mkdir $mountpoint;
 	print STDERR $mountpoint, " created\n" if $verbose;
@@ -70,7 +68,6 @@ print "!GPT=$gptDisks;\n";
 print '!VG=', join(';', @s_vg), "\n";
 print '!LV=', join(';', @s_lv), "\n";
 
-system("./automount-control.sh enabled");
 exit 0;
 
 # searches for extended info of a partition
@@ -80,6 +77,7 @@ sub detective{
 	my $info = "";
 	my $dirMount = &getMountPoint($dev);
 	if ($dirMount eq ""){
+		system ("./automount-control.sh disabled");
 		system ("mount -o ro $dev $mountpoint");
 		$dirMount = $mountpoint;
 	}
@@ -96,6 +94,7 @@ sub detective{
 		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";
 	}
 	if ($dirMount eq $mountpoint){
+		system ("./automount-control.sh enabled");
 		system ("umount $mountpoint");
 	}
 
