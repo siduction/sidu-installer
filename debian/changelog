@@ -1,9 +1,13 @@
-sidu-installer (1.7.7) UNRELEASED; urgency=low
+sidu-installer (1.7.7+nmu1) UNRELEASED; urgency=low
 
+  [ J. Hamatoma ]
   * Correction of the Italian texts (from Giorgio)
   * Dependencies corrected
 
- -- J. Hamatoma <hama@siduction.net>  Sun, 09 Dec 2012 16:18:00 +0100
+  [ Ulrich Beckmann ]
+  * sidu-installer_pt.conf mail hama 12/12/05
+
+ -- Ulrich Beckmann <siduction@bequimao.de>  Sun, 09 Dec 2012 18:10:45 +0100
 
 sidu-installer (1.7.6) unstable; urgency=low
 
