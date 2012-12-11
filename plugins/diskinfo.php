@@ -208,6 +208,8 @@ class DiskInfo {
 				|| $this->pageIndex == PAGE_ROOTFS && $item->megabytes < $minSize && $item->megabytes > 0
 				|| $this->pageIndex == PAGE_MOUNTPOINT && ! $hasFileSys;
 				$disk = preg_replace('/[0-9]/', '', $item->device);
+				if (preg_match('/sr[0-9]+/', $item->device))
+					$ignored = true;
 				if (empty($disk))
 					continue;
 				if (! isset($disks[$disk])){
