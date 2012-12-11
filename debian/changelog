@@ -1,9 +1,13 @@
-sidu-installer (1.7.9) UNRELEASED; urgency=low
+sidu-installer (1.7.9) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * fix: sr0 in rootfs devices only in Italian
   * only a workaround: explicite exclusion
 
- -- J. Hamatoma <hama@siduction.net>  Tue, 11 Dec 2012 21:36:10 +0100
+  [ Alf Gaida ]
+  * rebuild ohne ticket
+
+ -- Alf Gaida <agaida@siduction.org>  Tue, 11 Dec 2012 21:54:06 +0100
 
 sidu-installer (1.7.8) unstable; urgency=low
 
