@@ -5,8 +5,7 @@ Maintainer: J. Hamatoma <hama@siduction.net>
 Uploaders: Ferdinand Thommes <devil@siduction.org>,
            Alf Gaida <agaida@siduction.org>
 Build-Depends: debhelper (>= 9)
-Standards-Version: 3.9.3
-Homepage: http://siduction.org
+Standards-Version: 3.9.4
 Vcs-git:  git://git3@git.siduction.org:code/sidu-installer
 Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
 
@@ -24,4 +23,3 @@ Description: GUI for the siduction installer
  sidu-installer provides a graphical user interface for the siduction installer.
  This installer can be started on from the live linux system to install the 
  system to a harddisk.
-

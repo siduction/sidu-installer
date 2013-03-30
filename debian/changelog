@@ -1,3 +1,14 @@
+sidu-installer (1.7.10) unstable; urgency=low
+
+  * Standards 3.9.4
+  * Homepage deleted
+  * new copyright format
+  * Source: fixed
+  * License CC-BY-SA-3.0 fixed
+  * refs #1103
+
+ -- Alf Gaida <agaida@siduction.org>  Sat, 30 Mar 2013 17:45:27 +0100
+
 sidu-installer (1.7.9) unstable; urgency=low
 
   [ J. Hamatoma ]
