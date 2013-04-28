@@ -1,8 +1,14 @@
-sidu-installer (1.7.13) UNRELEASED; urgency=low
+sidu-installer (1.7.13) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * changes for sidu-installer.desktop to rules
 
- -- Ovidiu Angelescu <convbsd@siduction.net>  Sun, 28 April 2013 22:20:27 +0300
+  [ Alf Gaida ]
+  * added convbsd to uploaders
+  * make the find a little bit smarter and working
+  * refs #1173 #1170
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 29 Apr 2013 00:16:32 +0200
 
 sidu-installer (1.7.12) UNRELEASED; urgency=low
 
