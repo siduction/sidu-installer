@@ -38,5 +38,5 @@ create-icons:
 	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm
 	
 override_dh_fixperms:
-	chmod 755 debian/*/usr/share/applications/siduction/sidu-installer.desktop ; \
+	find debian -name sidu-installer.desktop -exec chmod {} \;
 	dh_fixperms

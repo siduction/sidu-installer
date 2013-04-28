@@ -3,7 +3,8 @@ Section: admin
 Priority: optional
 Maintainer: J. Hamatoma <hama@siduction.net>
 Uploaders: Ferdinand Thommes <devil@siduction.org>,
-           Alf Gaida <agaida@siduction.org>
+ Alf Gaida <agaida@siduction.org>,
+ Ovidiu Angelescu <convbsd@siduction.net>,
 Build-Depends: debhelper (>= 9)
 Standards-Version: 3.9.4
 Vcs-git:  git://git3@git.siduction.org:code/sidu-installer
