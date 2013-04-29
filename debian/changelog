@@ -1,3 +1,9 @@
+sidu-installer (1.7.15) UNRELEASED; urgency=low
+
+  * changed sidu-installer mode to 755 
+
+ -- Ovidiu Angelescu <convbsd@siduction.net>  Mon, 29 April 2013 13:04:27 +0300
+
 sidu-installer (1.7.14) UNRELEASED; urgency=low
 
   * changed rules to fix package
