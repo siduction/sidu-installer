@@ -1,3 +1,9 @@
+sidu-installer (1.7.14) UNRELEASED; urgency=low
+
+  * changed rules to fix package
+
+ -- Ovidiu Angelescu <convbsd@siduction.net>  Mon, 29 April 2013 05:57:27 +0300
+
 sidu-installer (1.7.13) unstable; urgency=low
 
   [ Ovidiu Angelescu ]

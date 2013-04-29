@@ -39,4 +39,4 @@ create-icons:
 	
 override_dh_fixperms:
 	find debian -name sidu-installer.desktop -exec chmod 755 {} \;
-	dh_fixperms
+
