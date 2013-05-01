@@ -36,8 +36,3 @@ create-icons:
 	mkdir -p icons/pixmaps
 	convert icons/hicolor/32x32/apps/sidu-installer.png icons/pixmaps/sidu-installer.xpm
 	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm
-	
-override_dh_fixperms:
-	dh_fixperms
-	find debian -name sidu-installer.desktop -exec chmod 755 {} \;
-
