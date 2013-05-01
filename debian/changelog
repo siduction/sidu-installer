@@ -1,9 +1,10 @@
-sidu-installer (1.7.16) UNRELEASED; urgency=low
+sidu-installer (1.7.16) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * changes to rules to apply first dh_fixperms and after that
     to chmod 755 sidu-installer.desktop 
 
- -- Ovidiu Angelescu <convbsd@siduction.net>  Mon, 29 April 2013 19:28:27 +0300
+ -- Alf Gaida <agaida@siduction.org>  Wed, 01 May 2013 11:14:39 +0200
 
 sidu-installer (1.7.15) UNRELEASED; urgency=low
 
