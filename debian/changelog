@@ -3,8 +3,11 @@ sidu-installer (1.7.16) unstable; urgency=low
   [ Ovidiu Angelescu ]
   * changes to rules to apply first dh_fixperms and after that
     to chmod 755 sidu-installer.desktop 
+  
+  [ Alf Gaida ]
+  * ./*desktop changed permission to 644 to prevent lintian whining 
 
- -- Alf Gaida <agaida@siduction.org>  Wed, 01 May 2013 11:14:39 +0200
+ -- Alf Gaida <agaida@siduction.org>  Wed, 01 May 2013 11:20:07 +0200
 
 sidu-installer (1.7.15) UNRELEASED; urgency=low
 
