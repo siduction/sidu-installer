@@ -8,8 +8,11 @@ my $blkid = shift;
 $blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
 my %disks;
 my $verbose = 0;
-my $mountpoint = "/tmp/partinfo-mount";
-my %months = (
+my $gv_mount_base = "/tmp/partinfo-mount";
+my $gv_log = "/tmp/partinfo_err.log";
+my $gv_mount_no = 0;
+my %lvm;
+my %months = ( 
 	"Jan" => "01",
 	"Feb" => "02",
 	"Mar" => "03",
@@ -28,48 +31,79 @@ my @s_vg;
 my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
-
-if (! -d $mountpoint){
-	mkdir $mountpoint;
-	print STDERR $mountpoint, " created\n" if $verbose;
-}
-my @diskDevs = &getDiskDev;
-#&getFdiskInfo;
-foreach(@diskDevs){
-	&getGdiskInfo($_, $gdisk);
-}
-# get the info from gdisk:
 my %devs;
-
-&getVG;
-# get the info from blkid
-
-my %blkids = &getBlockId;
-&mergeDevs;
-
-
+my %blkids;	
+my @diskDevs;
 my (%sorted, $key, $dev);
-foreach $dev (keys %blkids){
-	if ($dev =~ /(\D+)(\d+)/){
-		$key = $1 . sprintf ("%03d", $2);
-	} else {
-		$key = $dev;
-	}
-	$sorted{$key} = $dev;
-}
-foreach $key (sort keys %sorted){
-	$dev = $sorted{$key};
-	print $dev, "\t", $blkids{$dev}, "\n";
-}
-foreach $key (sort keys %disks){
-	print $key, "\t", $disks{$key}, "\n";
-}
-print "!GPT=$gptDisks;\n";
-print '!VG=', join(';', @s_vg), "\n";
-print '!LV=', join(';', @s_lv), "\n";
+
+system ("./automount-control.sh disabled");
+&main();
+system ("./automount-control.sh enabled");
 
 exit 0;
 
+sub main{
+	if (! -d $gv_mount_base){
+		mkdir $gv_mount_base;
+		print STDERR $gv_mount_base, " created\n" if $verbose;
+	}
+	@diskDevs = &getDiskDev;
+	#&getFdiskInfo;
+	foreach(@diskDevs){
+		&getGdiskInfo($_, $gdisk);
+	}
+	# get the info from gdisk:
+	&getVG;
+	# get the info from blkid
+	
+	%blkids = &getBlockId;
+	&mergeDevs;
+	
+	
+	foreach $dev (keys %blkids){
+		if ($dev =~ /(\D+)(\d+)/){
+			$key = $1 . sprintf ("%03d", $2);
+		} else {
+			$key = $dev;
+		}
+		$sorted{$key} = $dev;
+	}
+	foreach $key (sort keys %sorted){
+		$dev = $sorted{$key};
+		print $dev, "\t", $blkids{$dev}, "\n";
+	}
+	foreach $key (sort keys %disks){
+		print $key, "\t", $disks{$key}, "\n";
+	}
+	print "!GPT=$gptDisks;\n";
+	print '!VG=', join(';', @s_vg), "\n";
+	print '!LV=', join(';', @s_lv), "\n";
+	&UnmountAll();
+}
+
+sub UnmountAll{
+	opendir(DIR, $gv_mount_base);
+	my $dir;
+	my $run = 0;
+	while ($run < 2){
+		$run++;
+		my $errors = 0;
+		while ($dir = readdir(DIR)){
+			next if $dir =~ /\.{1,2}/;
+			my $full = "$gv_mount_base/$dir";
+			system ("echo $full >>$gv_log 2>&1");
+			system ("umount $full >>$gv_log 2>&1");
+			rmdir $full;
+			if (-d $full){
+				print 
+				system ("lsof +d $full >>$gv_log 2>&1");
+				$errors++;
+			}
+		}
+		last if $errors == 0;
+		sleep 1;
+	}
+}	
 # searches for extended info of a partition
 sub detective{
 	my $dev = shift;
@@ -77,9 +111,9 @@ sub detective{
 	my $info = "";
 	my $dirMount = &getMountPoint($dev);
 	if ($dirMount eq ""){
-		system ("./automount-control.sh disabled");
-		system ("mount -o ro $dev $mountpoint");
-		$dirMount = $mountpoint;
+		$dirMount = sprintf("$gv_mount_base/p%03d", ++$gv_mount_no);
+		mkdir $dirMount;
+		system ("mount -o ro $dev $dirMount >>$gv_log 2>&1");
 	}
 	if ($fs eq "ntfs" || $fs =~ /^vfat|fat\d/){
 		if (-d "$dirMount/windows/system32"){
@@ -93,9 +127,9 @@ sub detective{
 		$info .= &firstLineOf("$dirMount/etc/siduction-version", "subdistro");
 		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";
 	}
-	if ($dirMount eq $mountpoint){
-		system ("./automount-control.sh enabled");
-		system ("umount $mountpoint");
+	if ($dirMount =~ /^$gv_mount_base/){
+		system ("umount $dirMount >>$gv_log 2>&1");
+		rmdir $dirMount;
 	}
 
 	if ($fs =~ /fs:ext\d/){
@@ -298,4 +332,168 @@ sub getSizeOfLvmPartition{
 	}
 	close INP;
 	return $size;
+}
+sub prettySize{
+	my $kbyte = shift;
+	my $rc;
+	if ($kbyte >= 9*1024*1024){
+		$rc = int($kbyte / 1024 / 1024) . ' GiB';
+	} elsif ($kbyte >= 1024*1024){
+		$rc = sprintf("%.2f", $kbyte / 1024.0 / 1024) . ' GiB';
+	} elsif ($kbyte >= 1024){
+		$rc = int($kbyte / 1024) . ' MiB';
+	} else{
+		$rc = sprintf("%.2f", $kbyte / 1024.0) . ' MiB';
+	}
+	return $rc;
+}
+	
+sub physicalView{
+	if (open(INP, "pvdisplay|")){
+		my ($pvName, $vgName, $size, %devs, %unassigned, %assigned);
+		while(<INP>){
+			chomp;
+			if (/PV Name\s+(\S+)/){
+				$pvName = $1;
+			} elsif (/VG Name\s+(\S+)/){
+				$vgName = $1;
+			} elsif (/VG Name\s*$/){
+				$vgName = '?';
+			} elsif (m!PV Size\s+(\S.*)!){
+				$size = $1;
+				$size =~ s!\s*/.*$!!;
+			} elsif (/---/){
+				if ($pvName ne ""){
+					if ($vgName eq '?'){
+						$unassigned{$pvName} = "|$pvName|$size";
+					} else {
+						$devs{$vgName} .= "\t|$pvName|$size";
+						$assigned{$pvName} = 1;
+					}
+					$vgName = "";
+				}
+			}
+		}
+		if ($vgName eq '?'){
+			$unassigned{$pvName} = "|$pvName|$size";
+		} elsif ($pvName ne ""){
+			$devs{$vgName} .= "\t|$pvName|$size";
+			$assigned{$pvName} = 1;
+		}
+		my ($key, $out);
+		foreach $key (sort keys %devs){
+			$out .= "\f\t$key" . $devs{$key};
+		}
+		foreach $key (%assigned){
+			if ($lvm{$key}){ 
+				delete($lvm{$key});
+			}
+		}
+		print "PhLVM:$out\n";
+		$out = '';
+		for $key (sort keys %unassigned){
+			delete($lvm{$key}) if $unassigned{$key};
+			$out .= "\t" . $unassigned{$key}; 
+		} 
+		print "FreeLVM:", $out, "\n";
+		$out = '';
+		for $key (sort keys %lvm){
+			$out .= "\t|$key|" . &prettySize($lvm{$key}); 
+		} 
+		print "MarkedLVM:", $out, "\n";
+		close INP;
+	}
+}
+
+
+sub logicalView{
+	if (open(INP, "lvdisplay|")){
+		my ($lvName, $vgName, $size, $access, %devs, %snaps, $parent);
+		while(<INP>){
+			chomp;
+			if (/LV Name\s+(\S+)/){
+				$lvName = $1;
+				$lvName =~ s!/dev/[^/]+/!!;
+			} elsif (/VG Name\s+(\S+)/){
+				$vgName = $1;
+			} elsif (m!LV Size\s+(\S.*)!){
+				$size = $1;
+			} elsif (m!LV snapshot status.*\sfor\s+(\S+)!){
+				$parent = $1;
+				$parent =~ s!/dev/[^/]+/!!;
+			} elsif (m!LV Write Access\s+(\S.*)!){
+				$access = $1;
+			} elsif (/--- Logical volume/){
+				if ($lvName ne ""){
+					if ($parent){
+						$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
+						$parent = '';
+					} else {
+						$devs{$vgName} .= "\t|$lvName|$size|$access";
+					}
+				}
+			}
+		}
+		if ($lvName ne ""){
+			if ($parent){
+				$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
+			} else {
+				$devs{$vgName} .= "\t|$lvName|$size|$access";
+			}
+		}
+		close INP;
+		my ($key, $out);
+		foreach $key (sort keys %devs){
+			$out .= "\f\t$key" . $devs{$key}; 
+		}
+		if ($out ne ""){
+			print "LogLVM:$out\n";
+		}
+		$out = '';
+		foreach $key (sort keys %snaps){
+			$out .= "\f\t$key" . $snaps{$key}; 
+		}
+		if ($out ne ""){
+			print "SnapLVM:$out\n";
+		}
+	}
+}
+sub vgInfo {
+	if (open(INP, "vgdisplay|")){
+		my ($vgName, $size, $access, $status, $free, $alloc, %vgs, $peSize);
+		while(<INP>){
+			chomp;
+			if (/VG Name\s+(\S+)/){
+				$vgName = $1;
+			} elsif (m!VG Size\s+(\S.*)!){
+				$size = $1;
+			} elsif (m!VG Access\s+(\S.*)!){
+				$access = $1;
+			} elsif (m!VG Status\s+(\S.*)!){
+				$status = $1;
+			} elsif (m!Alloc PE / Size.*/\s+(\S.*)!){
+				$alloc = $1;
+			} elsif (m!Free  PE / Size.*/\s+(\S.*)!){
+				$free = $1;
+			} elsif (m!PE Size\s+(\S.*)!){
+				$peSize = $1;
+			} elsif (/--- Volume group/){
+				if ($vgName ne ""){
+					$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
+				}
+			}
+		}
+		if ($vgName ne ""){
+			$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
+		}
+		my ($key, $out);
+		foreach $key (sort keys %vgs){
+			$out .= "\t|$key" . $vgs{$key}; 
+		}
+		if ($out ne ""){
+			print "VgLVM:$out\n";
+		}
+		close INP;
+	}
+
 }

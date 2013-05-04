@@ -20,3 +20,7 @@ debian/files
 debian/sidu-installer.postinst.debhelper
 debian/sidu-installer.postrm.debhelper
 debian/sidu-installer.substvars
+backend/automount-control.sh
+backend/reboot.sh
+backend/startgui.sh
+backend/shellserver.sh
