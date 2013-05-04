@@ -67,7 +67,7 @@ class PartitionPage extends Page{
 	function onButtonClick($button){
 		$redraw = true;
 		if (strcmp($button, 'button_refresh') == 0){
-			// Do nothing
+			$this->diskInfo->buildInfoTable();
 		} elseif (strcmp($button, 'button_reload') == 0){
 			$this->diskInfo->forceReload();
 			$this->session->gotoPage('partition', 'partition.onButtonClick');

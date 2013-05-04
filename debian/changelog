@@ -1,10 +1,12 @@
-sidu-installer (1.7.20) UNRELEASED; urgency=low
+sidu-installer (1.7.21) UNRELEASED; urgency=low
 
   * partinfo.pl: better handling of mount/umount
   * Italian config: missing excluded sd\d+
   * postinst: missing -f in ln command
+  * fix: the button "refresh" works only the second time
+  * closes #1164
 
- -- J. Hamatoma <hama@siduction.net>  Sat, 04 May 2013 18:11:02 +0200
+ -- J. Hamatoma <hama@siduction.net>  Sat, 04 May 2013 19:16:41 +0200
 
 sidu-installer (1.7.17) unstable; urgency=low
 
