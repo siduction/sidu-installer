@@ -162,26 +162,27 @@ class PacketPage extends Page{
 		} elseif (strncmp($button, 'button_install_', 15) == 0){
 			$modules = "";
 			if (strcmp ($button, 'button_install_all') == 0){
+				$modules = "-all";
 				foreach ($this->missingModules as $ix => $line){
 					$pos = strpos($line, '|');
-					$modules .= ';' . substr($line, 0, $pos);
+					$modules .= ltrim(substr($line, $pos));
 				}
-				$modules = substr($modules, 1);
 			} else {
 				$ix = intval(substr($button, 15));
 				$line = $this->missingModules[$ix];
-				$pos = strpos($line, '|');
-				$modules .= substr($line, 0, $pos);
+				$modules .= ltrim($line);
 			}
 			$node = 'fw_install_' . strval(time()) . '.txt';
 			$answer = $this->session->publicDir . $node;
 			$params = array();
 			$params[] = 'install';
-			$params[] = $modules;
+			$params[] = str_replace(' ', '~', $modules);
 			$program = 'firmware';
 			$progress = null;
 			$this->session->exec($answer, SVOPT_DEFAULT,
 				$program, $params, 0);
+			# force rebuilding of the info file:
+			unlink($this->firmwareFile);
 			$description = "";
 			$redraw = $this->startWait($answer, $program, $description, $progress);
 

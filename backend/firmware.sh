@@ -11,7 +11,13 @@ INPUT=fw-test.txt
 test -f $INPUT || INPUT=""
 case "$CMD" in
 info)
+	FN=/tmp/fw-update.done
+	if [ ! -f $FN ] ; then
+		$RUN apt-get update
+		touch $FN
+	fi
 	perl firmware.pl $INPUT >$TEMP1
+	cp $TEMP1 /tmp/last.info
 	mv $TEMP1 $ANSWER
 	;;
 install)
@@ -26,20 +32,49 @@ install)
 		UPDATE=1
 	fi 	
 	date "+%Y.%m.%d-%H:%M:%S Installing firmware..." >$TEMP1
-	if [ $UPDATE ] ; then
+	if [ 1 = 1 -o $UPDATE ] ; then
 		echo "apt-get update" >>$TEMP1
 		apt-get update | tail -n 5 >>$TEMP1
 	fi
 	while [ -n "$ARG" ] ; do
 		ITEM=${ARG%%;*}
-		ARG=${ARG#*;}
-		test "$ARG" = "$ITEM" && ARG=
+		if [ "$ITEM" = "$ARG" ] ; then
+			ARG=
+		else
+			ARG=${ARG#*;}
+		fi
 		if [ -n "$ITEM" ] ; then
-			echo "fw-detect -i $ITEM" >>$TEMP1 
-			$RUN fw-detect -i $ITEM >>$TEMP1 2>&1
+		    CMDLIST=${ITEM#*|}
+		    if [ "$CMDLIST" = "$ITEM" ] ; then
+		    	MODULE="$ITEM"
+		    	CMDLIST=
+		    else
+		    	MODULE="${ITEM%%|*}"
+		    fi
+			if [ "$MODULE" = "amd64-microcode" -o "$MODULE" = "intel-microcode" ] ; then
+				$RUN apt-get install $MODULE >>$TEMP1 2>&1
+			elif [ "$MODULE" = "-all" ] ; then
+				echo "fw-detect -vvv -y" >>$TEMP1
+				$RUN fw-detect -vvv -y >>$TEMP1 2>&1
+			else
+				echo "fw-detect -vvv -i $MODULE" >>$TEMP1 
+				$RUN fw-detect -i $MODULE >>$TEMP1 2>&1
+			fi
+			while [ -n "$CMDLIST" ] ; do
+				SUBCMD=${CMDLIST%%|*}
+				if [ "$SUBCMD" = "$CMDLIST" ] ; then
+					CMDLIST=
+				else
+					CMDLIST=${CMDLIST#*|}
+				fi
+				SUBCMD="$(echo $SUBCMD | sed 's/~/ /g')"
+				echo "$SUBCMD" >>$TEMP1
+				$RUN $SUBCMD >>$TEMP1 2>&1
+			done
 		fi
 	done
 	if [ -f $TEMP1 ] ; then
+		cp $TEMP1 /tmp/last.answer
 		mv $TEMP1 $ANSWER
 	else
 		touch $ANSWER
@@ -52,5 +87,4 @@ install)
 	echo "unknown command: $CMD" | tee $ANSWER
 	;;
 esac
-set +x
 chmod uog+rw $ANSWER
