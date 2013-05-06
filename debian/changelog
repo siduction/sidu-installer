@@ -1,5 +1,6 @@
-sidu-installer (1.7.23) UNRELEASED; urgency=low
+sidu-installer (1.7.23) unstable; urgency=low
 
+  [ J. Hamatoma ]
   * partinfo.pl: better handling of mount/umount
   * Italian config: missing excluded sd\d+
   * postinst: missing -f in ln command
@@ -11,7 +12,10 @@ sidu-installer (1.7.23) UNRELEASED; urgency=low
   * closes: #538
   * closes: #1059
 
- -- J. Hamatoma <hama@siduction.net>  Mon, 06 May 2013 01:11:39 +0200
+  [ Alf Gaida ]
+  * rebuild closes #1180
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 06 May 2013 02:48:51 +0200
 
 sidu-installer (1.7.17) unstable; urgency=low
 
