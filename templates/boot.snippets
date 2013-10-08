@@ -1,0 +1,52 @@
+MAIN:
+<div id="text_area">
+<h1>{{boot.txt_bootloader}}</h1>
+<div class="textblock">
+<p>{{boot.txt_description}}
+</p>
+<table border="0">
+<tr><td class="col_label">{{boot.txt_manager}}:</td>
+<td>
+<select name="loader" size="2">
+{{body_loader}}
+</select>
+</td>
+</tr>
+<tr><td class="col_label">{{boot.txt_target}}:</td>
+<td>
+<select name="target" size="3">
+{{body_target}}
+</select>
+</td>
+</tr>
+</table>
+<ul>
+<li>{{boot.txt_desc_target_1}}</li>
+<li>{{boot.txt_desc_target_2}}</li>
+<li>{{boot.txt_desc_target_3}}</li>
+</ul>
+</div>
+<div class="textblock">
+<table border="0">
+<tr>
+<td>{{boot.txt_region}}:</td>
+<td>
+<select name="region" size="5" onchange="document.getElementById('butrefresh').click();">
+{{body_region}}
+</select>
+</td>
+<td>{{boot.txt_city}}:</td>
+<td>
+<select name="city" size="5" >
+{{body_city}}
+</select>
+</td>
+<td>
+<input id="butrefresh" type="submit" name="button_refresh" value="{{boot.txt_refresh}}" />
+</td>
+</tr>
+</table>
+<div class="error_message">{{err_region}}</div>
+</div>
+</div> <!-- text_area-->
+

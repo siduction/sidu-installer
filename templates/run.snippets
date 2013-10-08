@@ -1,0 +1,72 @@
+MAIN:
+<div id="text_area">
+	{{INSTALL_OR_READY}}
+</div>
+
+WAIT:
+<h1>{{run.txt_title}}</h1>
+<div class="textblock">
+	<p>{{run.wait.intro}}</p>
+	<p>{{run.description_wait}}</p>
+</div>
+<div class="textblock center">
+	<br/>
+	<div class="wait_progress_frame">
+		<div class="wait_progress" style="width:{{width}}%">{{percentage}}%
+		</div>
+	</div>
+	<div class="progress_state">{{wait.progress_state}} {{task}}
+	</div>
+	<div class="center">
+		<input type="submit" name="button_cancel" value="{{wait.txt_cancel}}" />
+	</div>
+</div>
+
+
+INSTALL:
+<h1>{{run.txt_title}}</h1>
+<div class="textblock">
+	<p>{{run.txt_info}}</p>
+	<p>{{run.txt_tip}}</p>
+	<p>{{run.txt_tip2}}</p>
+</div>
+<div class="textblock">
+	{{TABLE}}
+	<p>{{run.txt_force}}
+		<select name="force" size="1">
+			{{body_force}}
+		</select>
+		({{run.txt_descr_force}})
+	</p>
+</div>
+<div class="textblock center">
+	{{BUTTON_OR_INFO}}
+</div>
+
+BUTTON_INSTALL:
+<input type="submit" name="button_install" value="{{run.txt_button_install}}" />
+
+
+READY:
+<h1>{{run.txt_ready_title}}</h1>
+
+<div class="textblock">
+	{{status}}
+</div>
+<div class="textblock center">
+	{{run.txt_ready_runtime}}
+</div>
+<div class="textblock">
+	{{run.txt_ready_help}}
+</div>
+<div class="textblock center">
+	<input type="submit" name="button_reboot" value="{{run.txt_ready_reboot}}" />
+</div>
+<div class="textblock details">
+	<h2>{{run.txt_ready_details}}</h2>
+	<pre>{{details}}
+	</pre>
+	<input type="submit" name="button_reinstall" value="{{run.txt_reinstall}}" />
+</div>
+
+END:

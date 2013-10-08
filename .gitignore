@@ -1,3 +1,10 @@
+# don't track debian build stuff
+/debian/files
+/debian/*log
+/debian/*substvars
+/debian/sidu-installer
+
+
 sqlite.db
 *.pyc
 installer/static/public

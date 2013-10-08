@@ -1,0 +1,99 @@
+MAIN:
+<div id="text_area">
+<h1>{{mountpoint.txt_partition}}</h1>
+<div class="textblock">
+<p>{{mountpoint.txt_intro}}</p>
+<p>{{mountpoint.txt_intro2}}</p>
+<p>{{mountpoint.txt_intro3}}</p>
+<table width="100%">
+	<tr>
+		<th>{{mountpoint.txt_device}}</th>
+		<th>{{mountpoint.txt_mount}}</th>
+		<th>{{mountpoint.txt_action}}</th>
+	</tr>
+	<tr>
+		<td>
+{{DEV_SELECTOR}}
+		</td>
+		<td>
+{{POINT_SELECTOR}}
+		</td>
+		<td><input type="submit" name="button_add" value="{{mountpoint.txt_add}}" />
+		</td>
+	</tr>
+	<tr>
+		<td colspan="2"><div class="center">{{mountpoint.txt_switch}}</div>
+		</td>
+	</tr>
+	<tr>
+		<td>
+		<input type="submit" name="button_dev" value="{{button_dev_selector}}" /> 
+		</td>
+		<td>
+		<input type="submit" name="button_point" value="{{button_point_selector}}" /> 
+		</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+{{err_add_mount2}}
+
+<div class="horicontal_line"></div>
+{{TABLE_MOUNTS}}
+<div class="horicontal_line"></div>
+<table class="table_col5">
+	<tr>
+		<td>{{mountpoint.txt_mount_on_boot}}</td>
+		<td><select name="mountonboot" size="1">
+			{{body_mountonboot}}
+			</select>
+		</td>
+		<td>{{mountpoint.txt_desc_mount_on_boot}}</td>
+		<td>&nbsp;</td>
+		<td>&nbsp;</td>
+	</tr>
+</table>
+</div>
+<div class="textblock">
+{{INFO}}
+</div>
+
+</div> <!-- text_area-->
+
+TABLE_MOUNTS:
+<table id="table_partition_mount" class="table_col5">
+	<tr>
+		<th>{{diskinfo.txt_device}}</th>
+		<th>{{diskinfo.txt_label}}</th>
+		<th>{{diskinfo.txt_fs}}</th>
+		<th>{{mountpoint.txt_mount}}</th>
+		<th>{{mountpoint.txt_action}}</th>
+	</tr>
+	{{ROWS}}
+</table>
+
+DEVICE:
+		<select name="add_dev" size="1">
+		{{body_add_dev}}
+		</select>
+
+LABEL:
+		<select name="add_label" size="1">
+		{{body_add_label}}
+		</select>
+
+COMBO:
+		<select name="add_mount" size="1">
+		{{body_add_mount}}
+		</select>
+
+TEXT:
+		<input type="text" name="add_mount2" value="{{val_add_mount2}}" size="10" />
+
+BUTTON_DEL:
+<input type="submit" name="button_del_{{no}}" value="{{mountpoint.txt_button_del}}" />
+
+ERROR_PREFIX:
+<div class="error_message">
+
+ERROR_SUFFIX:
+</div>

@@ -1,0 +1,88 @@
+MAIN:
+<div id="text_area">
+<h1>{{user.txt_user_data}}</h1>
+<div class="textblock">
+<table>
+<tr>
+{{ROOT_PW}}
+</tr>
+</table>
+</div>
+<div class="textblock">
+<table>
+	<tr>
+		<td class="col_label">{{user.txt_real_name}}:</td>
+		<td><input type="text" name="real_name" value="{{val_real_name}}" size="20" maxlength="64" />{{err_real_name}}
+		</td>
+		<td>{{user.txt_optional}}
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">{{user.txt_login_name}}:</td>
+		<td><input type="text" name="name" value="{{val_name}}" size="20" maxlength="20" />{{err_name}}
+		</td>
+		<td>{{user.txt_desc_login}}
+		</td>
+	</tr>
+	<tr>
+{{USER_PW}}
+	</tr>
+</table>
+</div>
+<div class="textblock">
+<input type="checkbox" name="show_passwd" size="1" value="y" {{checked_show_passwd}}
+	onchange="document.getElementById('butactivate').click();" />
+{{user.txt_show_passwd}}
+&nbsp;
+<input id="butactivate" type="submit" name="button_activate" value="{{diskinfo.txt_infostate}}" /> 
+</div>
+</div> <!-- text_area-->
+
+
+ROOT_PW:
+		<td class="col_label">{{user.txt_root_password}}:</td>
+		<td><input type="password" name="root_pass" value="{{val_root_pass}}" size="20" maxlength="20" />{{err_root_pass}}
+		</td>
+		<td>{{user.txt_desc_root_password}}<br />{{user.txt_desc_password}}
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">{{user.txt_root_again}}:</td>
+		<td><input type="password" name="root_pass2" value="{{val_root_pass2}}" size="20" maxlength="20" />{{err_root_pass2}}
+		<td>{{user.txt_desc_password2}}
+		</td>
+		</td>
+
+ROOT_PW_DISPLAYED:
+		<td class="col_label">{{user.txt_root_password}}:</td>
+		<td><input type="text" name="root_pass" value="{{val_root_pass}}" size="20" maxlength="20" />{{err_root_pass}}
+		</td>
+		<td>{{user.txt_desc_root_password}}<br />{{user.txt_desc_password}}
+		</td>
+
+USER_PW:
+		<td class="col_label">{{user.txt_password}}:</td>
+		<td><input type="password" name="pass" value="{{val_pass}}" size="20" maxlength="20" />{{err_pass}}
+		</td>
+		<td>{{user.txt_desc_password}}
+		</td>
+	</tr>
+	<tr>
+		<td class="col_label">{{user.txt_again}}:</td>
+		<td><input type="password" name="pass2" value="{{val_pass2}}" size="20" maxlength="20" />{{err_pass2}}
+		</td>
+		<td>{{user.txt_desc_password2}}
+		</td>
+
+USER_PW_DISPLAYED:
+		<td class="col_label">{{user.txt_password}}:</td>
+		<td><input type="text" name="pass" value="{{val_pass}}" size="20" maxlength="20" />{{err_pass}}
+		</td>
+		<td>{{user.txt_desc_password}}
+		</td>
+
+ERROR_PREFIX:
+<div class="error_message">
+
+ERROR_SUFFIX:
+</div>

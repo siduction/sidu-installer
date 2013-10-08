@@ -1,4 +1,4 @@
-:sidu-installer (2.0.1) experimental; urgency=low
+sidu-installer (2.0.1) experimental; urgency=low
 
   * renamed to sidu-installer
   * progress bar while running autopart or partinfo

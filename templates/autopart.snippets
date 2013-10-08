@@ -1,0 +1,133 @@
+MAIN:
+<div id="text_area">
+<h1>{{autopart.txt_title}}</h1>
+{{CONTENT}}
+</div>
+
+WAIT:
+<div class="textblock">
+<p>{{message}}</p>
+</div>
+<div class="textblock">
+{{PROGRESS}}
+<div class="center"><input type="submit" name="button_cancel" value="{{wait.txt_cancel}}" />
+</div>
+</div>
+
+NO_SPACE:
+<div class="textblock">
+<p>{{autopart.txt_no_space1}}</p>
+<p>{{autopart.txt_no_space2}}</p>
+<p>{{autopart.txt_no_space3}}</p>
+<div class="error_message">{{error_message}}</div>
+<div class="center">
+<input type="submit" name="button_manual" value="{{autopart.txt_button_manual}}" />
+<input type="submit" name="button_reload" value="{{partition.txt_reload}}" />
+</div>
+</div>
+
+READY:
+<div class="textblock">
+<p>{{success}}</p>
+</div>
+<div class="textblock">
+<b>{{run.txt_ready_details}}:</b>
+<pre>
+{{lines}}
+</pre>
+<p><a href="{{fullLog}}" target="">{{autopart.txt_full_log}}</a></p>
+{{RETRY}}
+</div> 
+<div class="textblock">
+<div class="center">
+<input type="submit" name="button_manual" value="{{autopart.txt_button_manual}}" />
+<input type="submit" name="button_reload" value="{{partition.txt_reload}}" />
+</div>
+</div>
+
+RETRY:
+<input type="submit" name="button_retry" value="{{autopart.txt_button_retry}}" />
+
+ENOUGH_SPACE:
+<div class="textblock">
+<p>{{autopart.txt_intro1}}</p>
+<div class="center">
+<input type="submit" name="button_manual" value="{{autopart.txt_button_manual}}" />
+<input type="submit" name="button_reload" value="{{partition.txt_reload}}" />
+</div>
+</div>
+<div class="textblock">
+<table class="table_col5">
+<tr><td>{{autopart.txt_template}}:</td>
+	<td><select name="template" size="1" onchange="autoClick('button_activate');">
+{{body_template}}
+	</select></td>
+	<td><input type="submit" name="button_activate" 
+		value="{{autopart.txt_activate}}" /> </td>
+	<td colspan="2">&nbsp;</td>
+</tr>
+</table>
+<div class="horicontal_line"></div>
+{{TEMPLATE}}
+<div class="error_message">{{error_message}}</div>
+<div class="center"><input class="main_button" type="submit" name="button_run1" 
+		value="{{autopart.txt_button_create}}"  />
+</div>
+</div>
+
+STD_LVM:
+<p>{{autopart.txt_std_descr}}</p>
+<div class="horicontal_line"></div>
+<p>{{autopart.txt_intro_free_part}}</p>
+{{PARTITIONS}}
+<div class="horicontal_line"></div>
+{{PARAMETER}}
+
+PARAM_STD:
+<table class="table_col5">
+	<tr>
+{{DISK}}
+{{PARTITION}}
+{{ACTIVATE}}
+</table>
+
+PARAM_STD:
+<table class="table_col5">
+<tr>
+	<td>{{autopart.txt_vg}}</td>
+	<td><input name="vg" type="text" size="10" value="{{val_vg}}" /></td>
+	<td><input type="submit" name="button_recalc" value="{{autopart.txt_proposals}}" /></td>
+	<td>&nbsp;</td>
+	<td><input id="butcheck" type="submit" name="button_check" value="{{autopart.txt_button_check}}" />
+	</td>
+</tr>
+<tr>
+	<td>{{autopart.txt_size_boot}}:<br/>
+		<input name="size_boot" type="text" size="10" value="{{val_size_boot}}" 
+			/>
+	</td>
+	<td>{{autopart.txt_size_root}}:<br/>
+		<input name="size_root" type="text" size="10" value="{{val_size_root}}" 
+			 />
+	</td>
+	<td>{{autopart.txt_size_home}}:<br/>
+		<input name="size_home" type="text" size="10" value="{{val_size_home}}" 
+			/>
+	</td>
+	<td>{{autopart.txt_size_swap}}:<br/>
+		<input name="size_swap" type="text" size="10" value="{{val_size_swap}}" 
+			onblur="autoClick('button_check');" />
+	</td>
+	<td>{{autopart.txt_sizefree}}:<br/>
+		{{size_free}}/{{size_total}}
+	</td>
+</tr>
+<tr><td colspan="5">{{autopart.txt_std_hints}}</td>
+</tr>
+</table>
+<p></p>
+
+ACTIVATE:
+		<td><input type="submit" name="button_target_activate" value="{{autopart.txt_activate}}" />
+		</td>
+

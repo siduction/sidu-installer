@@ -1,0 +1,30 @@
+MAIN:
+<div id="text_area">
+<h1>{{network.txt_network}}</h1>
+<div class="textblock">
+<table>
+	<tr>
+		<td class="col_label">{{network.txt_host}}:</td>
+		<td><input type="text" name="host" value="{{val_host}}" size="20" maxlength="20" />{{err_host}}
+		</td>
+		<td>{{network.txt_desc_host}}
+		</td>
+	</tr>
+</table>
+</div>
+<div class="textblock">
+<p>{{network.txt_services}}</p>
+<table border="0">
+<tr><td class="col_label">{{network.txt_ssh}}:</td>
+<td>
+<select name="ssh" size="1">
+{{body_ssh}}
+</select>
+</td>
+<td>{{network.txt_descr_ssh}}
+</td>
+</tr>
+</table>
+</div>
+</div> <!-- text_area-->
+

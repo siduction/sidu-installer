@@ -1,0 +1,62 @@
+MAIN:
+<div id="text_area">
+	<h1>{{packet.txt_title}}</h1>
+	<div class="textblock">
+		<p>{{packet.txt_intro}}</p>
+		<p>{{packet.txt_intro2}}</p>
+		{{SOURCES}}
+	</div>
+{{FOUND_FIRMWARE}}
+</div> <!-- text_area-->
+
+FOUND_FIRMWARE:
+<div class="textblock">
+	{{INSTALLED_FW}}
+	{{FW_SEPARATOR}}
+	{{MISSING_FW}}
+</div>
+
+FW_SEPARATOR:
+<div class="horicontal_line"></div>
+
+INSTALLED_FW:
+<p>{{packet.txt_found_firmware}}<br/>
+{{installed}}
+</p>
+
+MISSING_FW:
+<p>{{packet.txt_firmware_intro}}</p>
+<p>{{packet.txt_firmware_intro2}}</p>
+{{BUTTON_ALL}}
+{{TABLE_MISSED}}
+{{LOG_FIRMWARE}}
+
+TABLE_MISSED:
+<table>
+<tr>
+	<th>{{packet.txt_module}}</th>
+	<th>{{packet.txt_statements}}</th>
+	<th>{{packet.txt_action}}</th>
+</tr>
+{{ROWS}}
+</table>
+
+BUTTON_ALL:
+<p class="center">
+<input type="submit" name="button_install_all" value="{{packet.txt_button_install_all}}" />
+</p>
+
+LOG_FIRMWARE:
+<p><a href="{{log}}">{{packet.txt_link_text}}</a>
+</p>
+
+SOURCE_FOUND:
+<p>{{packet.txt_contrib_installed}}</p>
+
+SOURCE_MISSED:
+<p><input type="submit" name="button_contrib" value="{{packet.txt_button_contrib}}" /></p>
+
+BUTTON_INSTALL:
+<input type="submit" name="button_inst_{{no}}" value="{{packet.txt_button_install}}" />
+
+END:

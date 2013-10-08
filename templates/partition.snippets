@@ -1,0 +1,49 @@
+MAIN:
+<div id="text_area">
+<h1>{{partition.txt_title}}</h1>
+<div class="textblock">
+<p>{{partition.txt_intro}}</p>
+<p>{{partition.txt_intro2}}</p>
+<p>{{partition.txt_intro3}}</p>
+<p>{{partition.txt_intro4}}</p>
+<p>{{partition.txt_intro5}}</p>
+<p class="center"><input type="submit" name="button_auto" value="{{partition.txt_button_auto}}" />
+</p>
+<table id="table_partition_partman" class="table_col5">
+	<tr>
+		<td class="col_label">{{partition.txt_partman}}:
+		</td>
+		<td>
+			<select name="partman" size="1">
+			{{body_partman}}
+			</select>
+		</td>
+		<td class="col_label">{{partition.txt_disk}}:
+		</td>
+		<td>
+			<select name="disk" size="1">
+			{{body_disk}}
+			</select>
+		</td>
+		<td>
+			<input type="submit" name="button_exec" value="{{diskinfo.txt_exec}}" />
+		</td>
+	</tr>
+</table>
+<div class="error_message">{{err_disk}}</div>
+<div class="center"><input type="submit" name="button_reload" value="{{partition.txt_reload}}" />
+</div>
+</div>
+<div class="textblock">
+{{INFO}}
+</div>
+</div> <!-- text_area-->
+
+
+
+INFO_WAIT:
+<div class="textblock warning">
+{{partition.txt_no_info}}
+</div>
+
+END:
