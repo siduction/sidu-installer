@@ -1,8 +1,8 @@
     [Desktop Entry]
     Type=Application
-    Exec=sidu-installer
+    Exec=sidu-installer-control start
     Icon=sidu-installer
-    Name=Installer
+    Name=sidu-installer
     GenericName=sidu-installer
     GenericName[de]=sidu-installer
     Categories=System;

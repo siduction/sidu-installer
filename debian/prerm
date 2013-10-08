@@ -6,21 +6,21 @@ if grep -q $PROJ /etc/hosts ; then
 	echo "virtual host removed: $PROJ"
 fi
 
-# delete the links from the toolkit:
+# delete the links from the sidu-base:
 function RmLink(){
 	if [ -L $1 ] ; then
 		rm -f $1
 	fi
 }
 pushd /usr/share/$PROJ >/dev/null
-RmLink index.php
-RmLink base
-RmLink public
-cd backend
-RmLink automount-control.sh
+
+RmLink installer/static/public
+RmLink backend/automount-control.sh
+
+#cd backend
 
 # Remove the links to the shellserver:
-cd /usr/share/siguibui/backend
+cd /usr/share/sidu-base/backend
 RmLink install.sh
 RmLink partinfo.pl
 RmLink partinfo.sh
@@ -28,6 +28,9 @@ RmLink timezoneinfo.sh
 RmLink firmware.sh
 RmLink firmware.pl
 RmLink nonfree.sh
+RmLink autopart.sh
+RmLink autopart.pl
+
 popd >/dev/null
 
 # Debhelpertoken added, review needed

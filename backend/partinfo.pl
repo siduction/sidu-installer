@@ -1,17 +1,22 @@
 #! /usr/bin/perl
+# Gets the partition info.
+# @param testRun	"": normal run otherwise: name of the test
+#
 use strict;
-my $gdisk = shift;
-# If there is a GPT and a MBR gdisk asks which partition table should be used.
-# 1: GPT 2: MBR 3: clean GPT
-$gdisk = "echo 1 | gdisk -l DISK|" unless $gdisk;
-my $blkid = shift;
-$blkid = "/sbin/blkid -c /dev/null|" unless $blkid;
-my %disks;
+
+my $s_fnProgress = shift;
+$s_fnProgress = "/tmp/partinfo.progress" unless $s_fnProgress;
+
+my $s_testRun = shift;
+# /dev/sda -> 123456 (KiByte)
+my %s_disks;
 my $verbose = 0;
 my $gv_mount_base = "/tmp/partinfo-mount";
 my $gv_log = "/tmp/partinfo_err.log";
 my $gv_mount_no = 0;
-my %lvm;
+my %s_lvm;
+# minimal size of a partition in bytes:
+my $s_minPartSize = 10*1024*1024;
 my %months = ( 
 	"Jan" => "01",
 	"Feb" => "02",
@@ -26,40 +31,55 @@ my %months = (
 	"Nov" => "11",
 	"Dec" => "12"
 );
-my $gptDisks;
+my $s_gptDisks;
 my @s_vg;
 my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
-my %devs;
+my %s_devs;
+my %s_lvDevs;
 my %blkids;	
-my @diskDevs;
 my (%sorted, $key, $dev);
+my $s_gapPart;
+my $s_maxTasks = 10;
+my $s_currTask = 0;
+# <name> -> <from>-<to>
+my %s_extParts;
+my %s_damagedDisks;
+my $s_hints;
 
-system ("./automount-control.sh disabled");
-&main();
-system ("./automount-control.sh enabled");
+if ($s_testRun){
+	&runTest;
+} else {
+	system ("./automount-control.sh disabled");
+	&main();
+	system ("./automount-control.sh enabled");
+}
 
 exit 0;
 
+# ===
+# main routine.
 sub main{
 	if (! -d $gv_mount_base){
 		mkdir $gv_mount_base;
 		print STDERR $gv_mount_base, " created\n" if $verbose;
 	}
-	@diskDevs = &getDiskDev;
-	#&getFdiskInfo;
-	foreach(@diskDevs){
-		&getGdiskInfo($_, $gdisk);
-	}
-	# get the info from gdisk:
+	&Progress("disk info (partprobe)");
+	my @diskDevs = &getDiskDev;
+	
+	&Progress("volume group info");
 	&getVG;
 	# get the info from blkid
 	
+	&Progress("block id info");
 	%blkids = &getBlockId;
+	&Progress("-merging infos");
 	&mergeDevs;
+	&Progress("logical volume info");
+	&getLvmPartitions;
 	
-	
+	&Progress("-writing info");
 	foreach $dev (keys %blkids){
 		if ($dev =~ /(\D+)(\d+)/){
 			$key = $1 . sprintf ("%03d", $2);
@@ -72,23 +92,30 @@ sub main{
 		$dev = $sorted{$key};
 		print $dev, "\t", $blkids{$dev}, "\n";
 	}
-	foreach $key (sort keys %disks){
-		print $key, "\t", $disks{$key}, "\n";
+	foreach $dev (sort keys %s_lvDevs){
+		print $dev, "\t", $s_lvDevs{$dev}, "\n";
 	}
-	print "!GPT=$gptDisks;\n";
+	foreach $key (sort keys %s_disks){
+		print $key, "\t", $s_disks{$key}, "\n";
+	}
+	print "!GPT=$s_gptDisks;\n";
 	print '!VG=', join(';', @s_vg), "\n";
 	print '!LV=', join(';', @s_lv), "\n";
+	print "!GapPart=", $s_gapPart, "\n";
+	print "!damaged=", join(';', sort keys %s_damagedDisks), "\n";
 	&UnmountAll();
 }
 
+# ===
+# release all mounts done by the script itself
 sub UnmountAll{
-	opendir(DIR, $gv_mount_base);
+	my @files = readStream("UnmountAll", $gv_mount_base);
 	my $dir;
 	my $run = 0;
 	while ($run < 2){
 		$run++;
 		my $errors = 0;
-		while ($dir = readdir(DIR)){
+		foreach $dir (@files){
 			next if $dir =~ /\.{1,2}/;
 			my $full = "$gv_mount_base/$dir";
 			system ("echo $full >>$gv_log 2>&1");
@@ -103,8 +130,12 @@ sub UnmountAll{
 		last if $errors == 0;
 		sleep 1;
 	}
-}	
+}
+	
+# ===
 # searches for extended info of a partition
+# @param dev	e.g. /dev/sda2
+# @param fs		file system, e.g. ext4
 sub detective{
 	my $dev = shift;
 	my $fs = shift;
@@ -132,10 +163,10 @@ sub detective{
 		rmdir $dirMount;
 	}
 
-	if ($fs =~ /fs:ext\d/){
-		open(TUNE, "tune2fs -l $dev|");
+	if ($fs =~ /fs:ext\d/ || $fs eq "auto"){
+		my @lines = readStream("detective", "tune2fs -l $dev|");
 		my $date;
-		while(<TUNE>){
+		foreach(@lines){
 			#Filesystem created:       Sun May  1 07:53:47 2011
 			if (/Filesystem created:\s+\w+\s+(\w+)\s+(\d+)\s+\S+\s+(\d+)/){
 				my $month = $months{$1};
@@ -147,134 +178,344 @@ sub detective{
 				$info .= "\tmodified:$3.$month.$2";
 			}
 		}
-		close TUNE;
 	}
 	return $info;
 }
+
 my %s_mounts;
 my $s_mounts;
+# ===
+# Finds the mountpoint of a device
+# @param dev	e.g. /dev/sda
+# @return 		"": not found
+#				otherwise: the mountpoint
 sub getMountPoint{
 	my $dev = shift;
 	if ($s_mounts eq ""){
-		open(INP, "mount|");
-		while(<INP>){
+		my @lines = readStream("getMountPoint", "mount|");
+		foreach(@lines){
 			if (/^(\S+)\s+on\s+(\S+)/){
 				$s_mounts{$1} = $2;
 			}
 		}
-		close INP;
 		$s_mounts = 1;
 	}
 	return $s_mounts{$dev};
 }
+# ===
+# Gets the first line of a file
+# @param 	file	the filename, e.g. /etc/siduction-version
+# @param 	prefix	this string will be put in front of the result
+# @return	"\t$prefix:<first_line> 
 sub firstLineOf{
 	my $file = shift;
 	my $prefix = shift;
 	my $rc = "";
 	if (-f $file){
-		open(INP, $file);
-		$rc = "\t$prefix:" . <INP>;
+		my @lines = readStream("firstOfLine", $file);
+		$rc = "\t$prefix:" . $lines[0];
 		chomp $rc;
-		close INP;
 	}
 	return $rc;
 }
+
+# ===
+# Gets the volume group info
+# The info will be stored in @lvs
 sub getVG{
-	open(VG, "vgdisplay|");
+	my @lines = readStream("getVG", "vgdisplay|");
 	my $vgs = "";
-	while(<VG>){
+	foreach(@lines){
 		if (/VG Name\s+(\S+)/){
 			push(@s_vg, $1);
 		}
 	}
-	close VG;
 
-	my $vg;
-	my $lvs;
+	my ($vg, @lvs, $lv);
 	foreach $vg (@s_vg){
-		open(LS, "ls -1 /dev/$vg/*|");
-		while(<LS>){
-			chomp;
-			next unless m!/dev/$vg/(\S+)!;
-			push(@s_lv, "$vg/$1");
+		@lvs = findFiles("getVG", "/dev/$vg");
+		foreach $lv(@lvs){		
+			next if $lv =~ /^\.{1,2}$/;
+			push(@s_lv, "$vg/$lv");
 		}
-		close LS;
 	}
 }
 
+# ===
+# Gets the disk device info
+# fills: %s_damagedDisks
+# @return 	e.g. ("sda", "sdc")
 sub getDiskDev{
-	opendir(DIR, "/sys/block");
-	my @files = readdir(DIR);
+	&Progress("partprobe");
+	my @lines = readStream("getDiskDev", "partprobe -s|");
 	my @rc;
-	closedir DIR;
-	foreach (@files){
-		# find all names without a digit:
-		push @rc, $_ unless /\d/ && ! /mmcblk\d/ || /^\.{1,2}$/;
+	
+	# count the interesting disks:
+	foreach (@lines){
+		if (m!Warning: /dev/(\w+)!){
+			$s_damagedDisks{$1} = 1;
+		} elsif (m!/dev/(\w+):\s+(msdos|gpt)\s+partitions\s(.+)!){
+			$s_maxTasks += 1;
+		}
+	}
+
+	foreach (@lines){
+#/dev/sda: msdos partitions 1 2 3 4 <5 6>                                                                                          
+#/dev/sdb: gpt partitions 1 5 6 7 
+		if (m!/dev/(\w+):\s+(msdos|gpt)\s+partitions\s(.+)!){
+			my ($dev, $class, $parts) = ($1, $2, $3);
+			next if $s_damagedDisks{$dev};
+			push(@rc, $dev);
+			if ($class eq "msdos"){
+				&Progress("fdisk");
+				&getFdiskInfo($dev);
+			} else {
+				&Progress("gdisk");
+				&getGdiskInfo($dev);
+			}
+		}                                                                                                 
+	}
+	my @disks = getEmptyDisks();
+	foreach (@disks){
+		&Progress("empty disk");
+		# fdisk calculates the partition gaps (here the whole disk)
+		getFdiskInfo($_);
 	}
 	return @rc;
 }
 
-sub getFdiskInfo{
-	my $fdisk = "fdisk -l |";
-	open(CMD, $fdisk) || die "$fdisk failed: $!";
-	my ($dev, $size, $ptype, $info);
-	while(<CMD>){
-		s/\*/ /;
-		if (/^(\S+)\s+\d+\s+\d+\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)/){
-			$dev = $1;
-			$size = $2;
-			$ptype = $3;
-			$info = $4;
-			# forget extended:
-			if ($ptype != 5){
-				$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
+# ===
+# Finds an unused primary partition number
+# Fills: $s_hints
+# @param ref_partList	In/Out: e.g. " 1 4 "
+# @return				0: no unused number
+#						otherwise: an unused number
+sub findFreePrimary{
+	my $refPartList = shift;
+	my $rc = 0;
+	if ($$refPartList != /\S/){
+		$rc = 1;
+	} else {
+		my $last = 0;
+		for (sort split/ /, $$refPartList){
+			if (/(\d+)/){
+				if ($1 > $last + 1){
+					$rc = $last + 1;
+					last;
+				}
+				$last = $1;
 			}
+		}
+		$rc = 0 if $rc > 4;
+		if ($rc == 0){
+			$s_hints .= ";missingPrimary";
+		} else {
+			$$refPartList .= "$rc ";
+		}
+	}
+	return $rc;
+}
+
+# ===
+# Gets the disks without a partition table.
+# @return	e.g ("sdc", "sdx")
+sub getEmptyDisks{
+	my @files = findFiles("getEmptyDisk", "/sys/block");
+	my @rc;
+	my $dev;
+	foreach $dev (@files){
+		# find all names without a digit:
+		next if $dev =~ /^\.{1,2}$/;
+		next if $dev =~ /\d/ && $dev !~ /mmcblk\d/;
+		# already recognised by partprobe?
+		next if $s_disks{$dev} ne "";
+		push @rc, $dev;
+	}
+	return @rc;
+}
+
+
+# ===
+# Gets the info from fdisk.
+# @param disk		partition device, e.g. sda
+# Fills: %s_devs, %s_disks, %s_extParts, $s_hints, $s_gapPart
+sub getFdiskInfo{
+	my $disk = shift;
+	my @lines = readStream("getFdiskInfo", "fdisk -l /dev/$disk|");
+	my ($dev, $size, $ptype, $info, $min, $max);
+	my $sectorSize = 512;
+	my $sectorCount = -1;
+	my @sectors;
+	my @partNos;
+	my ($extMin, $extMax) = (-1, -1);
+	foreach(@lines){
+#/dev/sda6       118061056  1000215215   441077080   8e  Linux LVM
+		if (m!^(/dev/[a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)!){
+			my ($dev, $partno, $min, $max, $size, $ptype, $info)  = ($1, $2, $3, $4, $5, $6, $7);
+			# extended partition?
+			if ($ptype == 5){
+				$s_extParts{$disk} = "$min-$max";
+				($extMin, $extMax) = ($min, $max);
+			} elsif ($ptype ne "ee"){
+				# ignore extended and protective partitions:
+				$s_devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
+				push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
+				push(@partNos, $partno);
+			}
+		} elsif (/total\s+(\d+)\s+sectors/){
+			$sectorCount = $1;
+		} elsif (m!logical/physical\): (\d+) bytes!){
+			$sectorSize = $1;
 		} elsif (/^Disk\s+([^:]+):.*\s(\d+)\s+bytes/){
 			my ($dev, $bytes) = ($1, $2);
 			my $mb = length($bytes) <= 6 ? 1 : substr($bytes, 0, length($bytes) - 6);
-			$disks{$1} = $mb;
+			$s_disks{$disk} = $mb;
 		}
 	}
-	close CMD;
+	@sectors = sort(@sectors);
+	@partNos = sort(@partNos);
+	my $lastMax;
+	my ($no);
+	my $maxPartNo = $partNos[$#partNos];
+	my $partList = " " . join(" ", @partNos) . " ";
+	# 4 primary partitions makes it impossible to expand
+	if ($partList eq " 1 2 3 4 " && $extMin > 0){
+		$s_hints .= ";4primeries";
+	} else {
+		my ($noGap, $lbound, $ubound);
+		my $lastMax = 2047;
+		foreach(@sectors){
+			# forget the ext. partition?
+			$extMax = -1 if $extMin < 0;
+			my ($min, $max, $no) = split(/-/);
+			my $count = $min - $lastMax;
+			if ($count*$sectorSize > $s_minPartSize){
+				# in extended?
+				if ($min >= $extMin && $min < $extMax){
+					# is there a rest of the primary?
+					if ($lastMax < $extMin - $s_minPartSize / $sectorSize){
+						$lbound = $lastMax + 1;
+						$ubound = $extMin - 1;
+						$noGap = findFreePrimary(\$partList);
+						$s_gapPart .= ";$disk!$noGap-$lbound-$ubound";
+					}
+					$noGap = $maxPartNo <= 4 ? 5 : $maxPartNo + 1;
+					$maxPartNo = $noGap;
+					# the first 48 sectors in the extendet partition are reserved:
+					$lastMax = $extMin + 47 if $lastMax < $extMin + 47;
+					$max = $extMax if $max > $extMax;
+				} else {
+					if ($min > $extMax){
+						# is there a rest of the extended partition?
+						if ($lastMax < $extMax - $s_minPartSize/$sectorSize){
+							$lbound = $lastMax + 1;
+							# the first 48 sectors in the extendet partition are reserved:
+							$lbound = $extMin + 47 if $lbound < $extMin + 47;
+							$ubound = $extMax;
+							$noGap = $maxPartNo >= 5 ? $maxPartNo + 1 : 5;
+							$maxPartNo = $noGap;
+							$s_gapPart .= ";$disk!$noGap-$lbound-$ubound";
+							$extMin = -1;	
+						}
+					}
+					$lastMax = $extMax if $min > $extMin && $lastMax < $extMax;
+					next if ($min - $lastMax) * $sectorSize < $s_minPartSize;
+					$noGap = findFreePrimary(\$partList);
+					next if $noGap <= 0;
+				}
+				$s_gapPart .= ";$disk!$noGap-" . ($lastMax + 1) . "-" . ($min - 1);
+				$partList .= "$no ";
+			}
+			$lastMax = $max;		
+		}
+		if (($sectorCount - $lastMax) * $sectorSize > $s_minPartSize){
+			my $ubound = $sectorCount - 1;
+			my $lbound = $lastMax + 1;
+			# in extended?
+			if ($lastMax >= $extMin && $lastMax <= $extMax){
+				$noGap = $maxPartNo <= 4 ? 5 : $maxPartNo + 1;
+				$maxPartNo = $noGap;
+				$lbound = $extMin + 48 if $lbound < $extMin + 48;
+				$ubound = $extMax if $ubound > $extMax;
+			} else {
+				$noGap = findFreePrimary(\$partList);
+			}
+			if ($noGap > 0){
+				$s_gapPart .= ";$disk!$noGap-$lbound-$ubound";
+			}
+		}
+	}
 }
 
+
+# ===
+# Gets the info from gdisk
+# Fills: %s_devs, $s_disks, $s_gapPart, s_gptDisks
+# @param disk	e.g. sda
+# @param cmd	the call of gdisk, e.g. sdc
 sub getGdiskInfo{
 	my $disk = shift;
-	my $cmd = shift;
-	$cmd =~ s!DISK!/dev/$disk! if $cmd =~ /\|/;
-	open(CMD, $cmd) || die "$gdisk failed: $!";
-	my $sector = 512;
-	my $sectors = 0;
+	my @lines = readStream("getGdiskInfo", "echo 1 | gdisk -l /dev/$disk|");
+	my $sectorSize = 512;
+	my $lastSector = -1;
+	my @sectors;
+	my @partNos;
 	my $isGpt = 0;
-	while(<CMD>){
+	foreach(@lines){
 		s/\*/ /;
 #   5        96392048        98799749   1.1 GiB     8200  Linux swap
 #   6        98801798       176714999   37.2 GiB    8300  Linux filesystem
 		if (/^\s+(\d+)\s+(\d+)\s+(\d+)\s+\S+\s+\S+B\s+([0-9A-Fa-f]+)\s+(.*)/){
 			my ($partno, $min, $max, $ptype, $info) = ($1, $2, $3, $4, $5);
+			push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
+			push(@partNos, $partno);
 			my $dev = "/dev/$disk$partno";
-			my $size = int(($max - $min + 1) * 1.0 * $sector / 1024);
-			$devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
-		} elsif (/sector size:\s+(\d+)/){
-			$sector = $1;
+			my $size = int(($max - $min + 1) * 1.0 * $sectorSize / 1024);
+			$s_devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 #Disk /dev/sda: 3907029168 sectors, 1.8 TiB
-		} elsif (/^Disk\s+\S+:\s+(\d+)/){
-			$sectors = $1;
-			$gptDisks .= ';' . $disk if $isGpt;
+		} elsif (m!Logical sector size: (\d+) bytes!){
+			$sectorSize = $1;
+		} elsif (/last usable sector is (\d+)/){
+			$lastSector = $1;
 #   GPT: present
 		} elsif (/^\s*GPT: present/){
 			$isGpt = 1;
 		}
 	}
-	$disks{$disk} = int($sectors * 1.0 * $sector / 1024);
-	close CMD;
+	$s_gptDisks .= ';' . $disk if $isGpt;
+	if ($lastSector >= 0){
+		$s_disks{$disk} = int(($lastSector - 34) * 1.0 * $sectorSize / 1024);
+	}
+	@sectors = sort(@sectors);
+	@partNos = sort(@partNos);
+	my $lastMax = 2047;
+	my ($no, $lbound, $ubound);
+	my $maxPartNo = $partNos[$#partNos];
+	my $partList = " " . join(" ", @partNos) . " ";
+	foreach(@sectors){
+		my ($min, $max, $no) = split(/-/);
+		my $count = $min - $lastMax;
+		if ($count*$sectorSize > $s_minPartSize){
+			my $noGap = $no - 1;
+			$noGap = ++$maxPartNo if $partList =~ / $noGap /;
+			$lbound = $lastMax + 1;
+			$ubound = $min - 1;
+			$s_gapPart .= ";$disk!$noGap-$lbound-$ubound"; 
+		}
+		$lastMax = $max;		
+	}
+	if (($lastSector - $lastMax) * $sectorSize > $s_minPartSize){
+		$maxPartNo++;
+		$lastMax++;
+		$s_gapPart .= ";$disk!$maxPartNo-$lastMax-$lastSector";
+	}
 }
 sub getBlockId{
 	my ($label, $uuid, $fs, $info2);
 	my ($dev, $info);
 	my %blkids;
-	open(CMD, $blkid) || die "$blkid failed: $!";
-	while(<CMD>){
+	my @lines = readStream("getBlockId", "/sbin/blkid -c /dev/null|");
+	foreach(@lines){
 		if (/^(\S+):/){
 			my $dev = $1;
 			my ($info, $label, $uuid, $fs, $size, $info);
@@ -287,8 +528,8 @@ sub getBlockId{
 			if (/UUID="([^"]+)"/){
 				$uuid = "\tuuid:$1";
 			}
-			if ($devs{$dev} ne ""){
-				$info=$devs{$info}
+			if ($s_devs{$dev} ne ""){
+				$info=$s_devs{$info}
 			}
 			if (/mapper/){
 				$size = getSizeOfLvmPartition($dev);
@@ -298,15 +539,23 @@ sub getBlockId{
 			$blkids{$dev} = "$label$fs$uuid$info$size";
 		}
 	}
-	close CMD;
 	return %blkids;
 }
-
+sub getLvmPartitions{
+	my ($lv, $size, $info, $fs);
+	for $lv(@s_lv){
+		$dev = "/dev/$lv";
+		$size = getSizeOfLvmPartition($dev);
+		$fs = "auto";
+		$info = &detective($dev, $fs);
+		$s_lvDevs{$lv} = "size:$size\tpinfo:$info";
+	}
+}
 sub mergeDevs{
 	# merge the two fields:
-	foreach $dev (keys %devs){
+	foreach $dev (keys %s_devs){
 		my $info = $blkids{$dev};
-		my $val = $devs{$dev};
+		my $val = $s_devs{$dev};
 		if ($info eq ""){
 			$blkids{$dev} = $val;
 		} else {
@@ -349,56 +598,55 @@ sub prettySize{
 }
 	
 sub physicalView{
-	if (open(INP, "pvdisplay|")){
-		my ($pvName, $vgName, $size, %devs, %unassigned, %assigned);
-		while(<INP>){
-			chomp;
-			if (/PV Name\s+(\S+)/){
-				$pvName = $1;
-			} elsif (/VG Name\s+(\S+)/){
-				$vgName = $1;
-			} elsif (/VG Name\s*$/){
-				$vgName = '?';
-			} elsif (m!PV Size\s+(\S.*)!){
-				$size = $1;
-				$size =~ s!\s*/.*$!!;
-			} elsif (/---/){
-				if ($pvName ne ""){
-					if ($vgName eq '?'){
-						$unassigned{$pvName} = "|$pvName|$size";
-					} else {
-						$devs{$vgName} .= "\t|$pvName|$size";
-						$assigned{$pvName} = 1;
-					}
-					$vgName = "";
+	my @lines = readStream("physicalView", "pvdisplay|");
+	my ($pvName, $vgName, $size, %devs, %unassigned, %assigned);
+	foreach(@lines){
+		chomp;
+		if (/PV Name\s+(\S+)/){
+			$pvName = $1;
+		} elsif (/VG Name\s+(\S+)/){
+			$vgName = $1;
+		} elsif (/VG Name\s*$/){
+			$vgName = '?';
+		} elsif (m!PV Size\s+(\S.*)!){
+			$size = $1;
+			$size =~ s!\s*/.*$!!;
+		} elsif (/---/){
+			if ($pvName ne ""){
+				if ($vgName eq '?'){
+					$unassigned{$pvName} = "|$pvName|$size";
+				} else {
+					$s_devs{$vgName} .= "\t|$pvName|$size";
+					$assigned{$pvName} = 1;
 				}
+				$vgName = "";
 			}
 		}
 		if ($vgName eq '?'){
 			$unassigned{$pvName} = "|$pvName|$size";
 		} elsif ($pvName ne ""){
-			$devs{$vgName} .= "\t|$pvName|$size";
+			$s_devs{$vgName} .= "\t|$pvName|$size";
 			$assigned{$pvName} = 1;
 		}
 		my ($key, $out);
 		foreach $key (sort keys %devs){
-			$out .= "\f\t$key" . $devs{$key};
+			$out .= "\f\t$key" . $s_devs{$key};
 		}
 		foreach $key (%assigned){
-			if ($lvm{$key}){ 
-				delete($lvm{$key});
+			if ($s_lvm{$key}){ 
+				delete($s_lvm{$key});
 			}
 		}
 		print "PhLVM:$out\n";
 		$out = '';
 		for $key (sort keys %unassigned){
-			delete($lvm{$key}) if $unassigned{$key};
+			delete($s_lvm{$key}) if $unassigned{$key};
 			$out .= "\t" . $unassigned{$key}; 
 		} 
 		print "FreeLVM:", $out, "\n";
 		$out = '';
-		for $key (sort keys %lvm){
-			$out .= "\t|$key|" . &prettySize($lvm{$key}); 
+		for $key (sort keys %s_lvm){
+			$out .= "\t|$key|" . &prettySize($s_lvm{$key}); 
 		} 
 		print "MarkedLVM:", $out, "\n";
 		close INP;
@@ -407,30 +655,29 @@ sub physicalView{
 
 
 sub logicalView{
-	if (open(INP, "lvdisplay|")){
-		my ($lvName, $vgName, $size, $access, %devs, %snaps, $parent);
-		while(<INP>){
-			chomp;
-			if (/LV Name\s+(\S+)/){
-				$lvName = $1;
-				$lvName =~ s!/dev/[^/]+/!!;
-			} elsif (/VG Name\s+(\S+)/){
-				$vgName = $1;
-			} elsif (m!LV Size\s+(\S.*)!){
-				$size = $1;
-			} elsif (m!LV snapshot status.*\sfor\s+(\S+)!){
-				$parent = $1;
-				$parent =~ s!/dev/[^/]+/!!;
-			} elsif (m!LV Write Access\s+(\S.*)!){
-				$access = $1;
-			} elsif (/--- Logical volume/){
-				if ($lvName ne ""){
-					if ($parent){
-						$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
-						$parent = '';
-					} else {
-						$devs{$vgName} .= "\t|$lvName|$size|$access";
-					}
+	my @lines = readStream("logicalView", "lvdisplay|");
+	my ($lvName, $vgName, $size, $access, %devs, %snaps, $parent);
+	foreach(@lines){
+		chomp;
+		if (/LV Name\s+(\S+)/){
+			$lvName = $1;
+			$lvName =~ s!/dev/[^/]+/!!;
+		} elsif (/VG Name\s+(\S+)/){
+			$vgName = $1;
+		} elsif (m!LV Size\s+(\S.*)!){
+			$size = $1;
+		} elsif (m!LV snapshot status.*\sfor\s+(\S+)!){
+			$parent = $1;
+			$parent =~ s!/dev/[^/]+/!!;
+		} elsif (m!LV Write Access\s+(\S.*)!){
+			$access = $1;
+		} elsif (/--- Logical volume/){
+			if ($lvName ne ""){
+				if ($parent){
+					$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
+					$parent = '';
+				} else {
+					$s_devs{$vgName} .= "\t|$lvName|$size|$access";
 				}
 			}
 		}
@@ -438,13 +685,13 @@ sub logicalView{
 			if ($parent){
 				$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
 			} else {
-				$devs{$vgName} .= "\t|$lvName|$size|$access";
+				$s_devs{$vgName} .= "\t|$lvName|$size|$access";
 			}
 		}
 		close INP;
 		my ($key, $out);
 		foreach $key (sort keys %devs){
-			$out .= "\f\t$key" . $devs{$key}; 
+			$out .= "\f\t$key" . $s_devs{$key}; 
 		}
 		if ($out ne ""){
 			print "LogLVM:$out\n";
@@ -459,28 +706,27 @@ sub logicalView{
 	}
 }
 sub vgInfo {
-	if (open(INP, "vgdisplay|")){
-		my ($vgName, $size, $access, $status, $free, $alloc, %vgs, $peSize);
-		while(<INP>){
-			chomp;
-			if (/VG Name\s+(\S+)/){
-				$vgName = $1;
-			} elsif (m!VG Size\s+(\S.*)!){
-				$size = $1;
-			} elsif (m!VG Access\s+(\S.*)!){
-				$access = $1;
-			} elsif (m!VG Status\s+(\S.*)!){
-				$status = $1;
-			} elsif (m!Alloc PE / Size.*/\s+(\S.*)!){
-				$alloc = $1;
-			} elsif (m!Free  PE / Size.*/\s+(\S.*)!){
-				$free = $1;
-			} elsif (m!PE Size\s+(\S.*)!){
-				$peSize = $1;
-			} elsif (/--- Volume group/){
-				if ($vgName ne ""){
-					$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
-				}
+	my @lines = readStream("vgInfo", "vgdisplay|");
+	my ($vgName, $size, $access, $status, $free, $alloc, %vgs, $peSize);
+	foreach(@lines){
+		chomp;
+		if (/VG Name\s+(\S+)/){
+			$vgName = $1;
+		} elsif (m!VG Size\s+(\S.*)!){
+			$size = $1;
+		} elsif (m!VG Access\s+(\S.*)!){
+			$access = $1;
+		} elsif (m!VG Status\s+(\S.*)!){
+			$status = $1;
+		} elsif (m!Alloc PE / Size.*/\s+(\S.*)!){
+			$alloc = $1;
+		} elsif (m!Free  PE / Size.*/\s+(\S.*)!){
+			$free = $1;
+		} elsif (m!PE Size\s+(\S.*)!){
+			$peSize = $1;
+		} elsif (/--- Volume group/){
+			if ($vgName ne ""){
+				$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
 			}
 		}
 		if ($vgName ne ""){
@@ -493,7 +739,353 @@ sub vgInfo {
 		if ($out ne ""){
 			print "VgLVM:$out\n";
 		}
-		close INP;
 	}
+}
 
+# Writes the progress file.
+#@param task	name of the current task
+sub Progress{
+	my $task = shift;
+	if ($task =~ /^-/){
+		$task = substr($task, 1);
+	} else {
+		$task = "collecting " . $task;
+	}
+	$task .= " ...";
+	if ($s_currTask == $s_maxTasks){
+		$s_maxTasks += 5;
+	}
+	my $temp = $s_fnProgress . ".tmp";
+	open(PROGRESS, ">$temp") || die "$temp: $!";
+	my $percent = int(100 * $s_currTask / $s_maxTasks);
+	print PROGRESS <<EOS;
+PERC=$percent
+CURRENT=<b>$task</b>
+COMPLETE=completed $s_currTask of $s_maxTasks
+EOS
+	close PROGRESS;
+	unlink $s_fnProgress if -f $s_fnProgress;
+	rename $temp, $s_fnProgress;
+}
+
+# Gets the files of a given directory.
+# In test mode this directoy will be simulated.
+# @param id		caller's id
+# @param dir	name of the directory, e.g. "/sys/block"
+# @return		an array of the names, e.g. ("sda", "sdb")
+sub findFiles{
+	my $id = shift;
+	my $dir = shift;
+	my @rc;
+	
+	if (! $s_testRun){
+		opendir(DIR, $dir) || die "$dir: $!";
+		@rc = readdir(DIR);
+		closedir DIR;
+	} elsif ($id eq "getEmptyDisk") {
+		if ($s_testRun =~ /gapPart/){
+			@rc = (".", "..", "dm-0", "sdd1", "sda", "sdb", "sdc", "sdx");
+		} else {
+			die "not implemented";
+		}
+	}
+	return @rc
+}
+
+# ===
+# Reads a stream into an array of lines.
+# A stream can be a file or the output of an extern command.
+# For tests this can be a file.
+# @param id		defines the stream to open
+# @param device	a filename or a external command, e.g. "partprobe -s |"
+sub readStream{
+	my $id = shift;
+	my $device = shift; 
+	my $content = "<!None>";
+	my @rc;
+	if (! $s_testRun){
+		if (open(INP, $device)){
+			@rc = <INP>;
+		} else {
+			print "+++ $device: $!";
+		}
+	} elsif ($id eq "UnmountAll"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "getDiskDev"){
+		if ($s_testRun =~ /gapPart/) {
+			$content = "/dev/sdb: gpt partitions 1 5 6 7 125
+/dev/sdc: msdos partitions 1 2 3 4 <5 6 7>                                                                                          
+";                                                                                                  
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "detective"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "getMountPoint"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "firstOfLine"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "getVG"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "getFdiskInfo"){
+		if ($s_testRun =~ /gapPart/) {
+			$content;
+			if ($device =~ /sdx/){
+				$content = "Disk /dev/sdx: 16.0 GB, 15999172608 bytes
+64 heads, 32 sectors/track, 15258 cylinders, total 31248384 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x00000000
+Disk /dev/sdb doesn't contain a valid partition table";
+			} elsif ($device =~ /sd[ab]/){
+				$content = "";		
+			} elsif ($device =~ /sdc/){		
+				$content = "Disk /dev/sdc: 16.0 GB, 15999172608 bytes
+64 heads, 32 sectors/track, 15258 cylinders, total 31248384 sectors
+Units = sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+Disk identifier: 0x1c313117
+   Device Boot      Start         End      Blocks   Id  System
+/dev/sdc1   *       80000       99999       48976   8e  Linux LVM
+/dev/sdc4          300001    31248383    15474191+   5  Extended
+/dev/sdc5         1024000     2457599      716800   83  Linux
+/dev/sdc6         4194304    10485759     3145728   83  Linux
+/dev/sdc7        10487808    10897407      204800   83  Linux";
+			} else {
+				die "not implemented";
+			}
+		} else {
+			die "not implemented: $device";
+		}
+	} elsif ($id eq "getGdiskInfo"){
+		if ($s_testRun =~ /gapPart/) {
+			$content = "
+GPT fdisk (gdisk) version 0.8.5
+Partition table scan:
+  MBR: MBR only
+  BSD: not present
+  APM: not present
+  GPT: not present
+***************************************************************
+Found invalid GPT and valid MBR; converting MBR to GPT format.
+***************************************************************
+Disk /dev/sdb: 31248384 sectors, 14.9 GiB
+Logical sector size: 512 bytes                                                                                                    
+Disk identifier (GUID): 796EA58D-DB68-430F-939B-3AFA7B81AAC7                                                                      
+Partition table holds up to 128 entries                                                                                           
+First usable sector is 34, last usable sector is 31248350                                                                         
+Partitions will be aligned on 2048-sector boundaries                                                                              
+Total free space is 23015709 sectors (11.0 GiB)                                                                                   
+Number  Start (sector)    End (sector)  Size       Code  Name                                                                     
+   1            2048           99999   47.8 MiB    8E00  Linux LVM                                                                
+   5         1024000         2457599   700.0 MiB   8300  Linux filesystem                                                         
+   6         4194304        10485759   3.0 GiB     8300  Linux filesystem                                                         
+   7        10487808        10897407   200.0 MiB   8300  Linux filesystem 
+";
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "getBlockId"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "physicalView"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "logicalView"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} elsif ($id eq "vgInfo"){
+		if ($s_testRun =~ /all/){
+		} else {
+			die "not implemented";
+		}
+	} else {
+		die "unknown id: $id";
+	}	
+	@rc = split(/\n/, $content) unless $content eq "<!None>";
+	return @rc;
+}
+# ===
+# Writes a temporary file.
+# @param fn			node name, e.g. "gdisk.inp"
+# @param content	the file's content
+# @return			the full name of the new file
+sub writeTempFile{
+	my $fn = shift;
+	my $content = shift;
+	my $dir = "/tmp/testPartInfo/";
+	mkdir $dir unless -d $dir;
+	$fn = $dir . $fn;
+	open(OUT, ">$fn") || die "$fn: $!";
+	print OUT $content;
+	close OUT;
+	return $fn;
+}
+# ===
+# Runs the test selected by the program argument.
+sub runTest{
+	if ($s_testRun eq "gapPart"){
+		&testGapPart();
+	} else {
+		die "unknown test: $s_testRun";
+	}
+}
+
+# ===
+sub testGapPart{
+	&testGetDiskDev;
+}
+# Builds a pointer to the first different position of 2 strings.
+# @param x	1st string
+# @param y	2nd string
+# @return	the pointer, e.g. "-----^"
+sub MkPointer{
+	my $x = shift;
+	my $y = shift;
+	my $len = 1;
+	while($len < length($x) && substr($x, $len) == substr($y, $len)){
+		$len++;
+	}
+	my $ptr = ("-" x $len) . "^";
+	return $ptr;
+}
+#== Tests equality of two strings.
+# @param prefix	id of the test
+# @param x		first string
+# @param y		2nd string
+# @return		0: different 1: equal
+sub Equal{
+	my $prefix = shift;
+	my $x = shift;
+	my $y = shift;
+	if ($x ne $y){
+		if ($x !~ /\n/){
+			print "Difference at $prefix:\n$x\n$y\n", 
+				MkPointer($x, $y), "\n";
+		} else {
+			my @x = split(/\n/, $x);
+			my @y = split(/\n/, $y);
+			my ($ix, $max) = (0, $#x);
+			$max = $#y if $#x < $#y;
+			while($ix <= $max){
+				if ($x[$ix] ne $y[$ix]){
+					print "Difference at $prefix in line ", $ix + 1, "\n", 
+						$x[$ix], "\n", $y[$ix], "\n",
+						MkPointer($x[$ix], $y[$ix]), "\n";
+					last;
+				}
+				$ix++;
+			}
+		}
+	}
+	return $x eq $y;
+}
+
+#== Tests equality of two arrays.
+# @param prefix	id of the test
+# @param x		first array (reference)
+# @param y		2nd array (reference)
+# @param sep	separator, should not part of the strings. Default: "|"
+# @return		0: different 1: equal
+sub EqualArray{
+	my $prefix = shift;
+	my $refX = shift;
+	my $refY = shift;
+	my $sep = shift;
+	$sep = "|" unless $sep;
+	my $x = join($sep, @$refX);
+	my $y = join($sep, @$refY);
+	return Equal($prefix, $x, $y);
+}
+
+#== 
+# Tests equality of two hashes.
+# @param prefix	id of the test
+# @param x		first hash (reference)
+# @param y		2nd hask (reference)
+# @param sep	separator, should not part of the strings. Default: "|"
+# @return		0: different 1: equal
+sub EqualHash{
+	my $prefix = shift;
+	my $refX = shift;
+	my $refY = shift;
+	my $sep = shift;
+	my (@x, @y);
+	for (sort keys %$refX){
+		my $val = $$refX{$_};
+		$val =~ s/\s+$//;
+		$val =~ s/\t/ /g;
+		push(@x, "$_=>$val");
+	} 
+	for (sort keys %$refY){
+		my $val = $$refY{$_};
+		$val =~ s/\s+$//;
+		$val =~ s/\t/ /g;
+		push(@y, "$_=>" . $val);
+	} 
+	return EqualArray($prefix, \@x, \@y, $sep);
+}
+#===
+# Builds a hash from a string.
+# @param x		string to convert. Starts with a separator, e.g. ";a=>1;b=>3"
+# @return		the hash
+sub toHash{
+	my $x = shift;
+	my %hash;
+	my $sep = substr($x, 0, 1);
+	$x = substr($x, 1);
+	my @x = split(/$sep/, $x);
+	foreach(@x){
+		my @y = split(/=>/, $_);
+		$hash{$y[0]} = $y[1];
+	}
+	return \%hash;
+}
+sub testGetDiskDev{
+	&getDiskDev;
+	my @a = ("abc", "def");
+	my @b = ("abc", "123");
+	die"!" unless Equal("s_gapPart",  
+		";sdb!4-100000-1023999;sdb!8-2457600-4194303;sdb!9-10897408-31248350;sdc!2-2048-79999;sdc!3-100000-300000;sdc!8-300049-1023999;sdc!9-2457600-4194303;sdc!10-10897408-31248383;sdx!1-2048-31248383",
+		$s_gapPart);
+	die unless EqualHash("s_devs", toHash("
+/dev/sdb1=>size:48976\tptype:8E00\tpinfo:Linux LVM
+/dev/sdb5=>size:716800\tptype:8300\tpinfo:Linux filesystem
+/dev/sdb6=>size:3145728\tptype:8300\tpinfo:Linux filesystem
+/dev/sdb7=>size:204800\tptype:8300\tpinfo:Linux filesystem
+/dev/sdc1=>size:48976 ptype:8e pinfo:Linux LVM
+/dev/sdc5=>size:716800 ptype:83 pinfo:Linux
+/dev/sdc6=>size:3145728\tptype:83\tpinfo:Linux
+/dev/sdc7=>size:204800\tptype:83\tpinfo:Linux
+"),
+		\%s_devs, "\n");
+	die unless EqualHash("s_disks", toHash(";sdb=>15624158;sdc=>15999;sdx=>15999"),
+		\%s_disks, ";");
+	die unless EqualHash("s_extParts", toHash(";sdc=>300001-31248383"),
+		\%s_extParts, "\n");
+	die unless Equal("s_hints", "",
+		$s_hints);
 }

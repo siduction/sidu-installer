@@ -27,8 +27,8 @@ current)
 	;;
 set)
 	CITY=$(echo $PARAM | cut -d/ -f2)
-	if [ -n $CITY ] ; then
-		echo $PARAM >/etc/timezone
+	if [ -n "$CITY" ] ; then
+		echo "$PARAM" >/etc/timezone
 	else
 		echo "Not a timezone setting: $PARAM"
 	fi

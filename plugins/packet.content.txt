@@ -1,9 +1,0 @@
-<div id="text_area">
-<h1>###txt_title###</h1>
-<div class="textblock">
-<p>###txt_intro###</p>
-<p>###txt_intro2###</p>
-###PART_SOURCES###
-</div>
-###PART_FOUND_FIRMWARE###
-</div> <!-- text_area-->

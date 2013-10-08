@@ -3,43 +3,14 @@ Upstream-Name: sidu-installer
 Source: git://git.siduction.org/code/sidu-installer
 
 Files: *
-Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
-License: GPL-3.0+
-
-Files: config/*_it.conf
-Copyright: 2012 Giorgio Cittadini <giocitta@gmail.com>
-License: GPL-3.0+
-
-Files: config/*_pt.conf
-Copyright: 2012 Ulrich Beckmann  <siduction@bequimao.de>
-           2012 Paulo Piacenti <piacenti@sercomtel.com.br>
+Copyright: 2011-2013 J. Hamatoma <hama@siduction.net>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2011-2012 J. Hamatoma <hama@siduction.net>
+Copyright: 2011-2013 J. Hamatoma <hama@siduction.net>
            2011-2013 Alf Gaida <agaida@siduction.org>
 License: GPL-3.0+
 
-Files: config/sidu-installer.css
-Copyright: 2011 J. Hamatoma <hama@siduction.net>
-           2011 Sven Strohmeier <se7enelven@gmail.com>
-           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
-License: GPL-3.0+
-
-Files: config/sidu-installer.html
-Copyright: 2011 J. Hamatoma <hama@siduction.net>
-           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
-License: GPL-3.0+
-
-Files: images/*
-Copyright: 2011 Sven Strohmeier <se7enelven@gmail.com>
-           2011 Hendrik Lehmbruch <hlehmbruch@gmx.net>
-License: CC-BY-SA-3.0,
-         GPL-3.0+
-
-Files:images/index.html
-Copyright: 2011 J. Hamatoma <hama@siduction.net>
-License: GPL-3.0+
 
 License: GPL-3.0+
  This program is free software: you can redistribute it and/or modify

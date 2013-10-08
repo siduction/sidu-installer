@@ -14,6 +14,24 @@ mapfile -t <$PARAMFILE LINES
 PROGRESSFILE=$(echo ${LINES[3]} | sed -e 's/\n//; s/progress=//i;')
 CONFIGFILE=$(echo ${LINES[4]} | sed -e 's/\n//; s/configfile=//i;')
 rm -f $PARAMFILE
+
+
+if [ -n "$DUMMY_INSTALL" ] ; then
+	NO=1
+	while [ $NO != 11 ] ; do
+		echo === Dummy Installation Answer $NO: $ANSWER Progress: $PROGRESSFILE
+		sleep 10
+		cat <<EOS >$PROGRESSFILE
+PERC=0.${NO}0
+CURRENT=<b>Part $NO</b>
+COMPLETE=completed $NO of 10
+EOS
+	        NO=$(expr $NO + 1)
+	done
+	echo "Fertig!" >$ANSWER
+	echo === Dummy Installation ready
+	exit 0
+fi	
 test -n "$VERBOSE" && echo "Config: $CONFIGFILE"
 # fll-installer:progress.pm needs a non empty DISPLAY
 test -n "$DISPLAY" || export DISPLAY=:0

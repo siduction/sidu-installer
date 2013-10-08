@@ -1,38 +1,28 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
-# Sample debian/rules that uses debhelper.
-# This file was originally written by Joey Hess and Craig Small.
-# As a special exception, when this file is copied by dh-make into a
-# dh-make output file, you may use that output file without restriction.
-# This special exception was added by Craig Small in version 0.37 of dh-make.
 
 # Uncomment this to turn on verbose mode.
 export DH_VERBOSE=1
 
-%:
+%: 
 	dh $@ 
 
-create-icons:
-	# requires inkscape and imagemagick to be installed
-	@if [ ! -x /usr/bin/convert ]; then \
-		echo "ERROR: imagemagick not installed!" ; \
-		false ; \
-	fi
-	@if [ ! -x /usr/bin/inkscape ]; then \
-		echo "ERROR: inkscape not installed!" ; \
-		false ; \
-	fi
-	
+override_dh_auto_build:
 	# create XDG compatible icons from SVG
-	for i in 16 22 32 48 64 128; do \
-		mkdir -p "icons/hicolor/$${i}x$${i}/apps" ; \
-		inkscape --export-width=$${i} \
-			 --export-height=$${i} \
-			 --export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/sidu-installer.png" \
-				$(CURDIR)/icons/sidu-installer.svg ; \
-	done
+#	for i in 16 22 32 48 64 128; do \
+#		mkdir -p "icons/hicolor/$${i}x$${i}/apps" ; \
+#		inkscape --export-width=$${i} \
+#			 --export-height=$${i} \
+#			 --export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/sidu-installer.png" \
+#				$(CURDIR)/icons/sidu-installer.svg ; \
+#	done
 	
 	# create XPM icons for the debian menu system
 	mkdir -p icons/pixmaps
-	convert icons/hicolor/32x32/apps/sidu-installer.png icons/pixmaps/sidu-installer.xpm
-	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm
+#	convert icons/hicolor/32x32/apps/sidu-installer.png icons/pixmaps/sidu-installer.xpm
+#	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm
+	
+override_dh_auto_clean:
+	rm -rf icons/pixmaps
+	rm -rf icons/hicolor
+	dh_auto_clean

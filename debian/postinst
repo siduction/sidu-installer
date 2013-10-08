@@ -13,8 +13,9 @@ if ! grep -q "sidu-installer" /etc/hosts ; then
 fi
 
 # Create the links from the toolkit:
-pushd /usr/share/sidu-installer >/dev/null
-SRC=../siguibui
+MY_DIR=/usr/share/sidu-installer
+pushd $MY_DIR >/dev/null
+MY_BACKEND=../sidu-base
 function MkLink(){
 	if [ ! -L $1 ] ; then
 		ln -sf $2/$1 $1
@@ -25,22 +26,24 @@ function MkLink2(){
 		ln -sf $1 $2
 	fi
 }
-MkLink index.php $SRC
-MkLink base $SRC
 
 # Create the links to the shellserver:
-SRC_INI=/usr/share/siguibui/backend
-cd $SRC_INI
-SRC=../../sidu-installer/backend
-MkLink install.sh $SRC
-MkLink partinfo.pl $SRC
-MkLink partinfo.sh $SRC
-MkLink timezoneinfo.sh $SRC
-MkLink firmware.sh $SRC
-MkLink firmware.pl $SRC
-MkLink nonfree.sh $SRC
-MkLink2 $SRC_INI/automount-control.sh $SRC
-MkLink2 /var/cache/siguibui/public /usr/share/sidu-installer
+BASE_BACKEND=/usr/share/sidu-base/backend
+cd $BASE_BACKEND
+MY_BACKEND=../../sidu-installer/backend
+
+MkLink install.sh $MY_BACKEND
+MkLink partinfo.pl $MY_BACKEND
+MkLink partinfo.sh $MY_BACKEND
+MkLink timezoneinfo.sh $MY_BACKEND
+MkLink firmware.sh $MY_BACKEND
+MkLink firmware.pl $MY_BACKEND
+MkLink nonfree.sh $MY_BACKEND
+MkLink autopart.sh $MY_BACKEND
+MkLink autopart.pl $MY_BACKEND
+
+MkLink2 $BASE_BACKEND/automount-control.sh $MY_BACKEND
+MkLink2 /var/cache/sidu-base/public $MY_DIR/installer/static/
 
 popd >/dev/null
 

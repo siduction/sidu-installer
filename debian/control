@@ -1,26 +1,28 @@
 Source: sidu-installer
-Section: admin
-Priority: optional
+Section: web
+Priority: extra
 Maintainer: J. Hamatoma <hama@siduction.net>
-Uploaders: Ferdinand Thommes <devil@siduction.org>,
- Alf Gaida <agaida@siduction.org>,
- Ovidiu Angelescu <convbsd@siduction.net>,
-Build-Depends: debhelper (>= 9)
+Uploaders: Alf Gaida <agaida@siduction.org>,
+ Hendrik Lehmbruch <hendrikl@siduction.org>,
+ Ferdinand Thommes <devil@siduction.org>,
+Build-Depends: debhelper (>= 9),
+ inkscape,
+ imagemagick,
 Standards-Version: 3.9.4
+Homepage: http://siduction.org
 Vcs-git:  git://git3@git.siduction.org:code/sidu-installer
 Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
 
 Package: sidu-installer
 Architecture: all
-Depends: ${misc:Depends}, 
-	perl (>= 5.0),
-	php5-cgi (>= 5.0),
-	siguibui (>= 2.3),
-	tzdata (>=1989),
-	whois (>=1.0),
-	btrfs-tools
-Suggests: gparted
-Description: GUI for the siduction installer
- sidu-installer provides a graphical user interface for the siduction installer.
- This installer can be started on from the live linux system to install the 
- system to a harddisk.
+Depends: ${misc:Depends},
+ python (>= 2.7),
+ python-support (>= 0.90),
+ pywwetha (>= 1.1.1),
+ sidu-base(>= 0.4.6)
+Description: installer for siduction
+ The main content is a set of HTML files describing features, handling
+ and tips for siduction.
+ A framework manages the common view of the pages: the navigation (menu),
+ the header (with logo and links to other siduction sites) and the footer
+ are generated for each page from a single template.

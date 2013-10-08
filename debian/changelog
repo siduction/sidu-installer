@@ -1,3 +1,103 @@
+:sidu-installer (2.0.1) experimental; urgency=low
+
+  * renamed to sidu-installer
+  * progress bar while running autopart or partinfo
+  * partinfo: refactoring, regression tests, partprobe
+  * partinfo: new strategy to find partition gaps
+  * sidu-installer-desktop: does not start the sidu-manual
+  * css: .main_button: orange background for important buttons
+  * waiting for autopart inside the page autopart
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 23:41:44 +0200
+
+sidu-installer2 (1.99.4) unstable; urgency=low
+
+  * corrections because of the renaming
+  * XHTML fixes
+  * success/failure notice in RunPage
+  * empty log of installation fixed
+  * autopart: partprobe produce safer disk info
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 22:30:36 +0200
+
+sidu-installer2 (1.99.4) unstable; urgency=low
+
+  * package source renamed to isource
+  * needed by Djinn for simple change of applications
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 08:02:41 +0200
+
+sidu-installer2 (1.99.3) unstable; urgency=low
+
+  * partinfo.pl: finding gaps in the partition table
+  * autopart: automatic partition creation
+  * dynamic page list: new field .pages in GlobalPage
+  * using SessionBase.deleteFile()
+  * switching between automatic and manual partitioning
+  * JavaScript: siduction.js: autoClick(), clickAndSet()
+  * CheckPage: configuration check
+  * adding wait fields are moved to sidu-base
+  * diskpage: rebuild only if the last try is older than 30 sec
+  * logfile initialization with basicConfig()
+  * runpage: wait is included in this page
+  * runpage: HTML error: duplicate id text_area,
+  * runpage: wrong comment destroys syntax
+  * dummy installation for testing
+  * sidu-installer2-control: controlling shellserver
+  * starting logging is moved to pywwetha
+  * new: debian/sidu-installer2.lintian-overrides
+  * timezone info: changing now works. Size of choice fields reduced.
+  * adaptions for Djinn (a Django replacement)
+  * BTRFS info text will be shown only if BTRFS is choosen
+  * corrections of XHTML structure
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 08:00:05 +0200
+
+sidu-installer2 (1.99.2) unstable; urgency=low
+
+  * partinfo.pl: LV as partitions, ignoring empty disks
+  * visible/unvisible password (checkbox)
+  * fix: wrong size for disks/partitions (factor 1024)
+  * JavaScript: automatic click for selects
+
+ -- J. Hamatoma <hama@siduction.net>  Tue, 06 Aug 2013 00:04:47 +0200
+
+sidu-installer2 (0.13.2) unstable; urgency=low
+
+  * umlauts in additional info of the partitions
+  * typo in de
+  * wrong behaviour of button_refresh on "partition"
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 17 Jul 2013 23:29:13 +0200
+
+sidu-installer2 (1.99.1) unstable; urgency=low
+
+  * Initial version
+  * UserPage
+  * DiskInfo
+  * partition, rootfs, mountpoint
+
+  * preload of tasks
+  * installation and integration into the shellserver
+  * waitpage, bootpage, networkpage, rootfspage
+  * packetpage
+  * run, adaptions in all configurations
+  * default values in option fields
+  * RunPage
+  * some methods have been moved from Session to Page
+  * WaitPage can handle translations (from install.sh)
+  * PartitionPage: start of partitioning program works
+  * German umlauts replaced by HTML tags
+  * Urls changed for other django environments
+  * runpage(): ready part
+  * new: DiskInfo.getDiskOfPartition()
+  * unicode() instead of str()
+  * warning if BTRFS and GPT
+  * correction BTRFS warning
+  * clearing cookies
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 17 Jul 2013 19:56:05 +0200
+
 sidu-installer (1.7.23) unstable; urgency=low
 
   [ J. Hamatoma ]
