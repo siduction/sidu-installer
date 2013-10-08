@@ -4,6 +4,9 @@
 /debian/*substvars
 /debian/sidu-installer
 
+# don't track generated files
+/icons/hicolor/
+/icons/pixmaps/
 
 sqlite.db
 *.pyc

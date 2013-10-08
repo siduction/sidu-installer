@@ -1,4 +1,4 @@
-sidu-installer (2.0.1) experimental; urgency=low
+sidu-installer (2.0.1) next; urgency=low
 
   * renamed to sidu-installer
   * progress bar while running autopart or partinfo
@@ -10,7 +10,7 @@ sidu-installer (2.0.1) experimental; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 23:41:44 +0200
 
-sidu-installer2 (1.99.4) unstable; urgency=low
+sidu-installer (1.99.6) unstable; urgency=low
 
   * corrections because of the renaming
   * XHTML fixes
@@ -20,14 +20,14 @@ sidu-installer2 (1.99.4) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 22:30:36 +0200
 
-sidu-installer2 (1.99.4) unstable; urgency=low
+sidu-installer (1.99.5) next; urgency=low
 
   * package source renamed to isource
   * needed by Djinn for simple change of applications
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 08:02:41 +0200
 
-sidu-installer2 (1.99.3) unstable; urgency=low
+sidu-installer (1.99.4) next; urgency=low
 
   * partinfo.pl: finding gaps in the partition table
   * autopart: automatic partition creation
@@ -53,7 +53,7 @@ sidu-installer2 (1.99.3) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 09 Sep 2013 08:00:05 +0200
 
-sidu-installer2 (1.99.2) unstable; urgency=low
+sidu-installer (1.99.3) next; urgency=low
 
   * partinfo.pl: LV as partitions, ignoring empty disks
   * visible/unvisible password (checkbox)
@@ -62,7 +62,7 @@ sidu-installer2 (1.99.2) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Tue, 06 Aug 2013 00:04:47 +0200
 
-sidu-installer2 (0.13.2) unstable; urgency=low
+sidu-installer2 (1.99.2) next; urgency=low
 
   * umlauts in additional info of the partitions
   * typo in de
@@ -70,7 +70,7 @@ sidu-installer2 (0.13.2) unstable; urgency=low
 
  -- J. Hamatoma <hama@siduction.net>  Wed, 17 Jul 2013 23:29:13 +0200
 
-sidu-installer2 (1.99.1) unstable; urgency=low
+sidu-installer (1.99.1) next; urgency=low
 
   * Initial version
   * UserPage
