@@ -491,9 +491,8 @@ class DiskInfoPage(Page):
             rc.append(item)
         return rc
       
-    def buildFreePartitionTable(self, disk):
-        '''Builds a table containing checkboxes for each free space of one or
-        all disks.
+    def buildFreePartitionTable(self, disk = None):
+        '''Builds a table containing checkboxes for each free space of disks.
         @param disk:     None: all disks
                          only partitions of this disk will be used, e.g. sda
         @return: a 5 column table containing the checkboxes
@@ -529,6 +528,29 @@ class DiskInfoPage(Page):
             colsOfLine = []
         self._currentRows.append(colsOfLine)
         body = self.buildTable(self, None)
+        return body
+    
+    def buildFreePartitionComboBox(self, comboName):
+        '''Builds a combobox for each free space of on  disks.
+        @param comboName:     the name of the field
+        @return: a combobox definition (HTML)
+        '''
+        names = []
+        values = []
+        for item in self._emptyPartitions:
+            info = item.split('-')
+            name = info[0].replace("!", "")
+            values.append(name)
+            sectorFrom = int(info[1])
+            sectorTo = int(info[2])
+            size = self.humanReadableSize((sectorTo - sectorFrom)*512)
+            text = "{:s} {:s} [{:s}-{:s}]".format(name, size,
+                self.humanReadableSize(sectorFrom*512),
+                self.humanReadableSize(sectorTo*512))
+            names.append(text)
+        body = self._snippets.get("COMBO_FREEPART")
+        body = body.replace("!name!", comboName)
+        body = self.fillDynamicSelected(comboName, names, values, body)
         return body
     
     def buildProgress(self, fileProgress = None):

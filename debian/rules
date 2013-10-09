@@ -8,13 +8,15 @@ export DH_VERBOSE=1
 	dh $@ 
 
 override_dh_auto_build:
+	# hama special: the following code does not work in my environment
+	# With the variable Z I can remove the code by replacing (in a script)
 	# create XDG compatible icons from SVG
 	for i in 16 22 32 48 64 128; do \
-	    mkdir -p "icons/hicolor/$${i}x$${i}/apps" ; \
-	    inkscape --export-width=$${i} \
-	        --export-height=$${i} \
-		--export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/sidu-installer.png" \
-		$(CURDIR)/icons/sidu-installer.svg ; \
+	   mkdir -p "icons/hicolor/$${i}x$${i}/apps" ; \
+	   inkscape --export-width=$${i} \
+	      --export-height=$${i} \
+	      --export-png="$(CURDIR)/icons/hicolor/$${i}x$${i}/apps/sidu-installer.png" \
+	      $(CURDIR)/icons/sidu-installer.svg ; \
 	done
 
 	# create XPM icons for the debian menu system

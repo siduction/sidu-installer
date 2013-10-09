@@ -17,8 +17,6 @@ pushd /usr/share/$PROJ >/dev/null
 RmLink installer/static/public
 RmLink backend/automount-control.sh
 
-#cd backend
-
 # Remove the links to the shellserver:
 cd /usr/share/sidu-base/backend
 RmLink install.sh
@@ -30,6 +28,11 @@ RmLink firmware.pl
 RmLink nonfree.sh
 RmLink autopart.sh
 RmLink autopart.pl
+
+test -d /usr/local/lib/site_perl && cd /usr/local/lib/site_perl
+RmLink sidu_test.pm 
+RmLink sidu_basic.pm 
+RmLink sidu_recorder.pm 
 
 popd >/dev/null
 

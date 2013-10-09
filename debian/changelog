@@ -1,3 +1,18 @@
+sidu-installer (2.0.2) next; urgency=low
+
+  * refactoring of the perl scripts
+  * extracting common parts into perl modules: recorder, basic, test
+  * recorder: sessions will be recorded and can be replayed for
+    regression tests
+  * tests simular to junit
+  * usage of parted instead of gdisk/fdisk
+  * autopart.pl: argument PROGRESS moved to 3rd position
+  * better code due of using perlcritic
+  * encryption template
+  * autopart.pl: handling of encrypted partitions
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 25 Sep 2013 08:29:18 +0200
+
 sidu-installer (2.0.1) next; urgency=low
 
   * renamed to sidu-installer

@@ -1,14 +1,18 @@
-# don't track debian build stuff
-/debian/files
-/debian/*log
-/debian/*substvars
-/debian/sidu-installer
-
-# don't track generated files
-/icons/hicolor/
-/icons/pixmaps/
-
 sqlite.db
 *.pyc
 installer/static/public
 I.sh
+R
+backend/.project
+backend/A.sh
+backend/D.sh
+backend/GenPart.sh
+backend/automount-control.sh
+backend/deb.sh
+backend/format.sh
+backend/reboot.sh
+backend/sdc_lvm.sh
+backend/sdc_partinfo.sh
+backend/shellserver.sh
+backend/startgui.sh
+
