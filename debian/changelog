@@ -1,8 +1,15 @@
+sidu-installer (2.0.3) next; urgency=low
+
+  * fixed sidu-intaller.svg, use the old one
+  * closes #1354 
+
+ -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 20:29:24 +0200
+
 sidu-installer (2.0.2) next; urgency=low
 
   * fixed install, sidu-installer.desktop should be in applications
 
- -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 02:25:57 +0200
+ -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 02:26:47 +0200
 
 sidu-installer (2.0.1) next; urgency=low
 
