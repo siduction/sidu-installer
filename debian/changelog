@@ -1,3 +1,10 @@
+sidu-installer (2013.10.12) next; urgency=low
+
+  * change to date based numbering
+  * merged next to unstable
+
+ -- Alf Gaida <agaida@siduction.org>  Sat, 12 Oct 2013 12:50:25 +0200
+
 sidu-installer (2.0.3) next; urgency=low
 
   * fixed sidu-intaller.svg, use the old one
