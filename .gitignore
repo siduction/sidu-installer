@@ -16,3 +16,12 @@ backend/sdc_partinfo.sh
 backend/shellserver.sh
 backend/startgui.sh
 
+# don't track debian build crap
+/debian/files
+/debian/*.log
+/debian/*.substvars
+/debian/sidu-installer/
+
+# don't track automatically generated files
+/icons/hicolor/
+/icons/pixmaps/
