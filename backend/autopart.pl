@@ -1,31 +1,38 @@
 #! /usr/bin/perl
 #
-# Usage: autopart.pl "$CMD" "$ANSWER" "$DISKS" "$ALLOW_INIT" "$PARTS" "$VG_INFO" "$LV_INFO"
+# Usage: autopart.pl "$CMD" "$PROGRESS" "$ANSWER" "$DISKS" "$ALLOW_INIT" \
+#                    "$PARTS" "$VG_INFO" "$LV_INFO" ["PASSPHRASE"]
 
 use strict;
+use sidu_basic;
+use sidu_recorder;
+use sidu_test;
 
-my $cmd = shift;
-my $answer = shift;
-# sdb:mbr+sdc:gpt
-my $diskInfo = shift;
-# YES or NO
-my $s_allowInit = shift;
-# sdb1-2048-9999+sdb2-10000
-my $partitions = shift;
-# siduction:32M
-my $vgInfo = shift;
-# root:rider32:4G:ext4;home:home:2G:ext4;swap:swap:400M:swap
-my $lvInfo = shift;
+my $s_cmd = shift;
+my $s_answer = shift;
 # progress file, e.g. /tmp/xy.progress
 my $s_fnProgress = shift;
 $s_fnProgress = "/tmp/autopart.progress" unless $s_fnProgress;
+# sdb:mbr+sdc:gpt
+my $s_diskinfo = shift;
+# YES or NO
+my $s_allowInit = shift;
+# sdb1-2048-9999+sdb2-10000
+my $s_partitions = shift;
+# siduction:32M
+my $s_vgInfo = shift;
+# root:rider32:4G:ext4;home:home:2G:ext4;swap:swap:400M:swap
+my $s_lvInfo = shift;
+my $s_passPhrase = shift;
 
 # progress: max. number of steps (progress)
 my $s_maxTasks = 5;
-# done number of steps
+# number of done steps
 my $s_currTask = 0;
 
-my $s_errors = 0;
+# === Test equipment ===
+# "" or name of the regressiontest
+my $s_testRun = "";
 
 # Constants:
 my $MBR = "mbr";
@@ -33,53 +40,215 @@ my $GPT = "gpt";
 
 my $s_fdisk = "/sbin/fdisk";
 my $s_gdisk = "/sbin/gdisk";
-my @s_logLines;
 
 my %s_wantedDiskType;
 my %s_realDiskType;
 # name => "ptype:mdb part:1-1024-8000:2-8001-16000 ext:2"
 my %s_diskInfo;
+my $s_appl = "ap";
 
-&Progress("initialization");
-&StorePartTypeInfo($diskInfo);
+my $text = "GeHeim123456";
+my $covered = basic::Cover($text);
+my $clear = basic::Uncover($covered);
+die unless $text ne $clear;
 
-if ($cmd eq "stdlvm"){
-	if (! VGExists($vgInfo)){
-		&Progress("creating partitions");
-		&BuildLVMs($partitions);
-		if ($s_errors > 0){
-			Error ("task was aborted due to errors");
+if ($s_cmd !~ /^test(.*)/){
+    # recording:
+	recorder::Init($s_appl, 1, "/tmp/$s_appl.recorder.data");
+} else {
+	$s_testRun = $1;
+	if ($s_testRun =~ /^:(.*)/){
+		my $file = $1;
+		die "test input not found: $file" unless -f $file;
+		# replaying
+		recorder::Init($s_appl, 2, $file);
+	} else {
+		$s_cmd = "-"; 
+		recorder::Init($s_appl, 0);
+	}
+}
+basic::Init($s_fnProgress, $s_testRun ne "");
+
+basic::Progress("initialization");
+if ($s_testRun){
+    my @lines = recorder::Get("progArgs");
+    $_ = join("", @lines);
+    
+    $s_cmd = $1 if /s_cmd="([^"]*)"/;
+    $s_diskinfo = $1 if /s_diskinfo="([^"]*)"/;
+    $s_allowInit = $1 if /s_allowInit="([^"]*)"/;
+    $s_partitions = $1 if /s_partitions="([^"]*)"/;
+    $s_vgInfo = $1 if /s_vgInfo="([^"]*)"/;
+    $s_lvInfo = $1 if /s_lvInfo="([^"]*)"/;
+    $s_passPhrase = $1 if /s_passPhrase="([^"]*)"/;
+ } else {   
+    &recorder::StoreArgs(
+    	"s_cmd", $s_cmd,
+    	"s_diskinfo", $s_diskinfo,
+    	"s_allowInit", $s_allowInit,
+    	"s_partitions", $s_partitions,
+    	"s_vgInfo", $s_vgInfo,
+    	"s_lvInfo", $s_lvInfo,
+    	"s_passPhrase", $s_passPhrase);
+}
+
+&StorePartTypeInfo($s_diskinfo);
+
+system ("./automount-control.sh disabled");
+if ($s_cmd eq "-"){
+	&testSuite;
+} elsif ($s_cmd eq "stdlvm"){
+	if (! VGExists($s_vgInfo)){
+		&basic::Progress("creating partitions");
+		&CreatePartitions($s_partitions);
+		if ($basic::s_errors > 0){
+			&basic::Error ("task was aborted due to errors");
 		} else {
-			&Progress("creating volume group");
-			BuildVG($partitions, $vgInfo);
-			&Progress("creating logical volumes");
-			BuildLVs($lvInfo, $vgInfo);
+			BuildVG($s_partitions, $s_vgInfo);
+			BuildLVs($s_lvInfo, $s_vgInfo);
 		}
 	}
+} elsif ($s_cmd eq "crypt"){
+	if (! VGExists($s_vgInfo)){
+		&basic::Progress("creating partitions");
+		my ($boot, $lvm) = &CreateTwoPartitions($s_partitions, $s_lvInfo);
+        if ($boot ne ""){
+            BuildEncrypted($boot, $lvm, $s_lvInfo, $s_passPhrase);
+        }
+	}
 } else {
-	&Error("unknown command: $cmd");
-	exit 1;
+	&basic::Error("unknown command: $s_cmd");
 }
-&Progress("writing info", 1);
-my $temp = WriteFile(join("", @s_logLines), ".log");
-Exec("mv $temp $answer");
-if (! -f $answer){
-	die "+++ $temp -> $answer failed: $!";
+system ("./automount-control.sh enabled");
+my ($refExecs, $refLogs) = basic::GetVars();
+recorder::Finish("execLines", $refExecs, "logLines", $refLogs);
+if ($s_testRun){
+	&finishTest;
+} else {
+	&basic::Progress("writing info", 1);
+	my $temp = recorder::WriteFile(join("", @$refLogs), ".log");
+	&basic::Exec("mv $temp $s_answer");
+	if (! -f $s_answer){
+		die "+++ $temp -> $s_answer failed: $!";
+	}
 }
 exit(0);
 
+# ===
+# Builds a file containing the password.
+#
+# This file contains random characters, the password and random characters.
+# @param password   the file content
+# @return           (<filename>, <offset>, <lengthPw>)
+#                   <offset> is the beginning of the real password
+#                   <length> is the length of the password
+sub CreatePasswordFile{
+    my $password = shift;
+    my $fn = "/tmp/p";
+    $password = basic::UnScramble($password);
+    open(my $OUT, ">", $fn) || die "$fn: $!";
+    my $len = length($password);
+    my $offset = 128 + int(rand(512 - $len - 128));
+    my $rest = 512 - $offset - $len;
+    Fill($password, $offset, $OUT);
+    print $OUT $password;
+    Fill($password, $rest, $OUT);
+    close $OUT;
+    return ($fn, $offset, $len);
+}
+
+my @s_passwords = qw(password 123456 12345678 qwerty  abc123
+ monkey  1234567 letmein trustno1 dragon baseball 111111
+ iloveyou master sunshine ashley bailey passw0rd shadow
+ 123123 654321 superman qazwsx michael football
+ admin hallo internet pass password passwort schatz);
+ 
+# ===
+# Fills random chars into a file
+# @param charset
+# @param count
+# @param handle
+sub Fill{
+    my $charset = shift;
+    my $count = shift;
+    my $handle = shift;
+    my $charset2 = "aaaaaabcdeeeeefghiiiiijklmnoooopqrstuuuuvwxyz";
+    my $charset3 = "AAAAABCDEEEEEFGHIIIIIJKLMNOOOOOPQRSTUUUUVWXYZeE";
+    my $content = "";
+    while($count-- > 0){
+        my $rand = int(rand(100));
+        if ($rand < 60){
+            $content .= substr($charset2, rand length($charset2) - 1, 1); 
+        } elsif ($rand < 75) {
+            $content .= chr(32 + int(rand(127-32)));
+        } elsif ($rand < 85){
+            $content .= substr($charset2, rand length($charset2) - 1, 1); 
+        } elsif ($count > 5 && $rand < 95){
+            my $w = $s_passwords[rand $#s_passwords];
+            if (length($w) >= $count) {
+                $w = substr(0, $count);
+                $count -= lenght($w) - 1;
+            }
+            $content .= $w;
+        } else {
+            $content .= substr($charset, rand(length($charset) - 1), 1);
+        }
+    }
+    if ($handle){
+        print $handle $content;
+        
+    } else {
+        print $content, "\n";
+    }
+} 
+
+# ===
+# Builds the system with encrypted partitions.
+# @param boot       partition for boot, e.g. sda5
+# @param lvm        partition for LVM, e.g. sda6
+# @param lvmInfo    e.g. boot:boot:100M:ext4;root:siduction:4G:ext4
+# @param password   password, encrypted with Scramble()
+sub BuildEncrypted{
+    my $boot = shift;
+    my $lvm = shift;
+    my $lvInfo = shift;
+    my $password = shift;
+    
+    &basic::Progress("creating encrypted partition");
+    $password = basic::UnScramble($password);
+    my $content = "spawn cryptsetup -c aes-cbc-essiv:sha256 -q -s 512 luksFormat /dev/$lvm\n";
+    $content .= "sleep 2\n";
+    $content .= "send \"$password\"\n";
+    my $fn = recorder::WriteFile($content);
+    basic::Exec("expect $fn");
+    unlink $fn;
+    $content = "spawn cryptsetup -q luksOpen /dev/$lvm crypt$lvm\n";
+    $content .= "sleep 2\n";
+    $content .= "send \"$password\"\n";
+    $fn = recorder::WriteFile($content);
+    basic::Exec("expect $fn");
+    unlink $fn;
+    my $parts = "mapper/crypt$lvm-2048-4096";
+    BuildVG($parts, $s_vgInfo);
+    BuildLVs($s_lvInfo, $s_vgInfo, "boot");
+}
+
+# ===
 # Tests whether a volume group exists.
 # @param vgInfo	e.g. siduction:4M
 # @return 0: vg does not exist 1: vg exists
 sub VGExists{
 	my $vgInfo = shift;
 	my ($name, $extSize) = split(/:/, $vgInfo);
-	my $rc = -d "/dev/$name";
+	my $rc = recorder::FileExists("VGExists", "-d", "/dev/$name");
+	$rc = 0 if $s_testRun;
 	if ($rc){
-		Error("VG $name already exists. (/dev/$name exists)");
+		&basic::Error("VG $name already exists. (/dev/$name exists)");
 	}
 	return $rc;
 }
+
+# ===
 # Builds a logical volume
 # @param name		boot, root, home or swap
 # @param label		file system label
@@ -93,24 +262,26 @@ sub BuildLV{
 	my $fs = shift;
 	my $vg = shift;
 	$size = $size eq "*" ? "--extents 100%FREE" : "--size $size"; 
-	Exec("lvcreate $size --name $name $vg", 1);
+	&basic::Exec("lvcreate $size --name $name $vg", 1);
 	my $lvPath = "/dev/mapper/$vg-$name";
-	if (! -e $lvPath){
-		Error("LV $name not created");
+	if (! recorder::FileExists("BuildLV", "-e", $lvPath)){
+		&basic::Error("LV $name not created");
 	} elsif ($fs eq "swap"){
-		Exec("mkswap -L $label /dev/mapper/$vg-$name", 1);
-		Log("=== LV $name created as swap device");
+		&basic::Exec("mkswap -L $label /dev/mapper/$vg-$name", 1);
+		&basic::Log("LV $name created as swap device", 1);
 	} else {
-		my $fsFull = qx(which mkfs.$fs);
+	    # execute and return as string (list):
+		my $fsFull = join("", recorder::ReadStream("BuildLV", "<which mkfs.$fs"));
 		if ($fsFull eq ""){
-			Error("unknown filesystem: $fs");
+			&basic::Error("unknown filesystem: $fs");
 		} else {
-			Exec("mkfs.$fs -L $label $lvPath");
-			Log("=== LV $name formatted with $fs");
+			&basic::Exec("mkfs.$fs -L $label $lvPath");
+			&basic::Log("LV $name formatted with $fs", 1);
 		}
 	}
 }
 
+# ===
 # Converts a value to KiByte
 # @param value		examples: 102G 3T 8k 2M
 # @return amount of KiByte
@@ -134,6 +305,7 @@ sub toKiByte{
 	return $number
 }
 
+# ===
 # Converts a amount of KiBytes into a number and a unit.
 # @param kiByte		amount in KiBytes
 # @return			e.g. 4M or 243K or 22G
@@ -149,34 +321,60 @@ sub kiByteToSize{
 	}
 	return $size;
 }
+# ===
+# Converts a size (number + unit) into an amount of KiBytes.
+# @param size		e.g. 4M or 243K or 22G
+# @return			amount in KiBytes
+sub sizeToKiByte{
+	my $size = shift;
+	die "not a size (number+unit): $size" unless $size =~ /^(\d+)([TGMK])?$/i;
+	my ($rc, $unit) = ($1, $2);
+	$unit =~ tr/a-z/A-Z/;
+	if ($unit eq "M"){
+	    $rc *= 1024;
+	} elsif ($unit eq "G"){
+	    $rc *= 1024 * 1024;
+	} elsif ($unit eq "T"){
+	    $rc *= 1024 * 1024 * 1024;
+	}
+	return $rc;
+}
 	
+# ===
 # Builds all logical volumes:
-# @param lvInfo	e.g. root:rider32:4G:ext4;swap:swap:400M:swap	
-# @param vgInfo	e.g. siduction:4M
+# @param lvInfo	    e.g. root:rider32:4G:ext4;swap:swap:400M:swap	
+# @param vgInfo	    e.g. siduction:4M
+# @param ignored    partition to ignore, e.g. "boot"
 sub BuildLVs{
 	my $lvInfo = shift;
 	my $vgInfo = shift;
+	my $ignored = shift;
 	my ($vg, $extSize) = split(/:/, $vgInfo);
+    &basic::Progress("creating logical volumes");
 	$extSize = toKiByte($extSize);
 	my @lvs = split(/;/, $lvInfo);
 	foreach(@lvs){
 		my ($lv, $name, $size, $fs) = split(/:/);
+		next if $lv eq $ignored;
 		if ($size ne "*"){
 			$size = toKiByte($size);
 			$size = kiByteToSize(int($size / $extSize) * $extSize);
 		}
-		&Progress("creating $name");
+		&basic::Progress("creating $name");
 		BuildLV($lv, $name, $size, $fs, $vg);
 	}
 }
 
+# ===
 # Builds a volume group.
-# @param parts	the partion info of the disk
+# @param parts	the partion info of the disk, lvmInfo 
+#               e.g. sdb1-2048-9999+sdb2-10000
 # @param vgInfo	e.g. "siduction:32M"
 sub BuildVG{
 	my $parts = shift;
 	my $vgInfo = shift;
 	my ($vg, $extSize) = split(/:/, $vgInfo);
+    &basic::Progress("creating volume group");
 	# Initialize the PV:
 	my $cmd = "";
 	my @parts = split(/\+/, $parts);
@@ -185,30 +383,27 @@ sub BuildVG{
 		my @cols = split(/-/);
 		$pvList .= " /dev/" . $cols[0];
 	}
-	Exec("pvcreate --yes $pvList", 1);
-	Exec("vgcreate --physicalextentsize $extSize $vg $pvList", 1);
+	&basic::Exec("pvcreate --yes $pvList", 1);
+	&basic::Exec("vgcreate --physicalextentsize $extSize $vg $pvList", 1);
 }
 
-# Reads the disk info with fdisk.
+# ===
+# Reads the disk info with a MSDOS disk label.
 # The info will be stored in %s_diskInfo
 # @param disk 	e.g. sdb
-sub ReadFdiskInfo{
+sub ReadMsdosDisk{
 	my $disk = shift;
 	my $info = "ptype:$MBR";
-	open(DISK, "$s_fdisk -l /dev/$disk|") || die "$s_fdisk -l /dev/$disk";
-	my @lines = <DISK>;
-	close DISK;
+	my @lines = recorder::ReadStream("ReadMsdosDisk", "parted -s /dev/$disk 'unit s' print|");
 	my $parts;
 	foreach(@lines){
-		#/dev/sdb1     2048       10000        3976+  83  Linux	
-	#   if (m!^/dev/\D+(\d+)\D+(\d+)\s+(\d+)!){
-		if (m!^/dev/\D+(\d+)\D+(\d+)\s+(\d+)!){
+		if (/^\s+(\d+)\s+(\d+)\s+(\d+)/){
 			if ($parts eq ""){
 				$parts = " part";
 			}
 			$parts .= ":$1-$2-$3";		
 		}
-		if (m!^/dev/\D+(\d+).*Extended!){
+		if (m!extended!){
 			$info .= " ext:$1";
 		}
 	}
@@ -217,15 +412,14 @@ sub ReadFdiskInfo{
 	return $info;
 }
 
-# Reads the disk info with gdisk.
+# ===
+# Reads the disk info with a GUID Partition Table.
 # The info will be stored in %s_diskInfo
 # @param disk 	e.g. sdb
-sub ReadGdiskInfo{
+sub ReadGPTDisk{
 	my $disk = shift;
 	my $info = "ptype: gpt";
-	open(DISK, "$s_gdisk -l /dev/$disk|") || die "$s_gdisk -l /dev/$disk";
-	my @lines = <DISK>;
-	close DISK;
+	my @lines = recorder::ReadStream("ReadGPTDisk", "parted -s /dev/$disk 'unit s' print|");
 	my $parts;
 	foreach(@lines){
 		if (/^\s+(\d+)\s+(\d+)\s+(\d+)/){
@@ -240,6 +434,7 @@ sub ReadGdiskInfo{
 	return $info;
 }
 
+# ===
 # Returns the disk info.
 # If not known it will be read.
 # @param disk	e.g. sdb
@@ -251,18 +446,19 @@ sub GetDiskInfo{
 		my $type = FindDiskType($disk);
 		$s_diskInfo{$disk} = $type;
 		if ($type eq $MBR){
-			$rc = ReadFdiskInfo($disk);
+			$rc = ReadMsdosDisk($disk);
 		} elsif ($type eq $GPT){
-			$rc = ReadGdiskInfo($disk);
+			$rc = ReadGPTDisk($disk);
 		} elsif ($type eq "!"){
 			# error already is displayed
 		} else{
-			Error("unknown partition table: $disk");
+			&basic::Error("unknown partition table: $disk");
 		}
 	}
 	return $rc;
 }
 
+# ===
 # Returns the class of the next new partition.
 # @param disk	disk to test
 # @result		"p": primary "l": logical "b": primary or logical
@@ -277,90 +473,178 @@ sub GetNewPartClass{
 			$rc = ($info =~ /:1-.*:2-.*:3-.*:4-/) ? "l" : "b";
 		}
 	} else {
-		Error("not implemented: GetNewPartClass gpt");
+		&basic::Error("not implemented: GetNewPartClass gpt");
 	}
 	return $rc;
 }
+
+# ===
 # Stores the partition types of the disks.
 # @param info	e.g. "sdb:mda+sdb:gdb"	
 sub StorePartTypeInfo{
 	my $info = shift;
-	my $disk;
-	for $disk(split(/\+/, $info)){
-		my ($name, $type) = split(/:/, $disk);
-		$s_wantedDiskType{$name} = $type;
+	if ($info){
+    	for my $disk(split(/\+/, $info)){
+    		my ($name, $type) = split(/:/, $disk);
+    		$s_wantedDiskType{$name} = $type;
+    	}
 	}
 }
 
-# Builds all PV of a LVM
-# @param pvlist		a list of all PV partitions (which do not already exist)
+# ===
+# Builds the partitions on the disk(s)
+# @param pvlist		a list of all partitions (which do not already exist)
 #                   e.g. "sda1-9-2048-1000000+sdb1-9-2048-1000000"
-sub BuildLVMs{
+sub CreatePartitions{
 	my $pvlist = shift;
-	my $pv;
-	for $pv (split(/\+/, $pvlist)){
+	for my $pv (split(/\+/, $pvlist)){
 		my ($name, $from, $to) = split(/-/, $pv);
-		BuildPV($name, $from, $to, $MBR);
-		last if ($s_errors > 0);
+		CreateOnePartition($name, $from, $to, "lvm");
+		last if ($basic::s_errors > 0);
 	}
+	&basic::Exec("partprobe");
+}
+# ===
+# Creates the two partitions boot + LVM (encrypted partitions)
+# @param parts      the partition, e.g. sdb1-2048-9999+sdb2-10000-2000 
+# @param lvInfo     e.g. boot:boot02:256M;root:rider32:4G:ext4;home:home:2G
+# @return           (<devBoot>, <devLvm>), e.g. ("sda6", "sda7")
+#                   ("", "") error occurred
+sub CreateTwoPartitions{
+    my $parts = shift;
+    my $lvInfo = shift;
+    my ($boot, $lvm) = split(/\+/, $parts);
+    my ($bootName, $bootFrom, $bootTo) = split(/-/, $boot);
+    my ($lvmName, $lvmFrom, $lvmTo) = split(/-/, $lvm);
+    my ($rcBoot, $rcLvm);
+    
+    if ($lvmName ne $bootName){
+        # 2 different free spaces:
+        $rcBoot = CreateOnePartition($bootName, $bootFrom, $bootTo);  
+        $rcLvm = CreateOnePartition($lvmName, $lvmFrom, $lvmTo);  
+    } else {
+        # 2 partitions in a single free space:
+        die "unexpected device name: $lvmName" unless $bootName =~ /(\D+)(\d+)/;
+        my ($disk, $bootPartNo) = ($1, $2);
+        my $diskInfo = $s_diskInfo{$disk};
+        die "missing boot info: $lvInfo" 
+                unless $lvInfo =~ /boot:[^:]+:(\d+\w?):(\w+)/;
+        my ($records, $fsBoot) = (2 * sizeToKiByte($1), $2);
+        # round up to the next MiByte:
+        $records = int(($records + 2047) / 2048) * 2048;
+        # split the free space into 2 parts:
+        # a logical partition needs 1 record for partition info
+        # to be aligned we reduce the previous partition by one record:
+        $bootTo = $bootFrom + $records - 1 - 1;
+        $lvmFrom = $bootTo + 2;
+        my $createIt = 1;
+        if ($diskInfo =~ /ptype:$GPT/){
+            # make 2 partitions
+        } elsif ($diskInfo !~ / ext:/){
+            # there is no extended partition. We make it:  
+            CreateOnePartition("${disk}0", $bootFrom, $lvmTo);
+            # the logical partition needs one record, but we will be aligned:
+            $bootFrom += 2048;
+            ($bootName, $lvmName) = ($disk . "5", $disk . "6");
+        } elsif ($bootPartNo <= 4) {
+            # the free space is not in the extended partition.
+            # we need 2 primaries:
+            my @nos = &getPartNosOfDisk($disk);
+            my $count = 0;
+            foreach(@nos){
+                $count++ if $_ < 5;
+            }
+            if ($count > 2){
+                &basic::Error("too many primary partitions");
+                $createIt = 0;
+            }
+        } else {
+            # the free space is in the extended partition.
+            # we need 2 logicals:
+            my @nos = &getPartNosOfDisk($disk);
+            my $count = 0;
+            foreach(@nos){
+                $count++ if $_ < 5;
+            }
+            if ($count > 15 - 4 - 2){
+                &basic::Error("too many logical partitions");
+                $createIt = 0;
+            }
+        }
+        if ($createIt && &basic::GetErrorCount() == 0){
+            $rcBoot = CreateOnePartition($bootName, $bootFrom, $bootTo, $fsBoot);  
+            $rcLvm = CreateOnePartition($lvmName, $lvmFrom, $lvmTo, "-");  
+        }     
+    }
+	&basic::Exec("partprobe");
+    return ($rcBoot, $rcLvm);
 }
 
+
+# ===
 # Builds one PV of a LVM
-# @param name	name of the partition, e.g. sda1
-# @param from	first record (of the disk)
-# @param to		last record
-sub BuildPV{
+# @param name		name of the partition, e.g. sda1
+# @param from		first record (of the disk)
+# @param to			last record
+# @param fileSys	"lvm" or "ext4"
+# @return			the name of the created partition, e.g. sda3
+sub CreateOnePartition{
 	my $name = shift;
 	my $from = shift;
 	my $to = shift;
+	my $fileSys = shift;
+	$fileSys = "lvm" unless $fileSys;
 	my $partType = FindDiskType($name);
 	my $disk = FindDiskName($name);
+	my $newNo = -1;
 	
-	my $no;
-	$name =~ /^\D+(\d+)/;
-	$no = $1;
+	$name =~ /^(\D+)(\d+)/;
+	my ($disk, $no) = ($1, $2);
 	
 	if (! SectorsOverlap($disk, $no, $from, $to)){
-		if ($partType eq $MBR){
-			my $content = "n\n";
-			my $class = GetNewPartClass($disk);
-			if ($class eq "b"){
-				$content .= $no < 5 ? "p\n" : "l\n";
+		if ($partType eq $MBR || $partType eq $GPT){
+			my $class;
+			if ($no == 0){
+			     $class = "extended";  
 			} else {
-				$content .= $class . "\n";
+			    $class = $partType eq $MBR && $no > 4 ? "logical" : "primary";
+			} 
+			my @lines = recorder::ReadStream("CreateOnePartition", 
+				"parted -s /dev/$disk unit s mkpart $class ${from}s ${to}s print|");
+			foreach (@lines){
+				if (/^\s*(\d+)\s+(\d+)s\s+(\d+)s/ && $2 == $from && $3 == $to){
+					$newNo = $1;
+					last;
+				}
 			}
-			$content .= "$no\n$from\n$to\nt\n";
-			if (CountOfPartitions($disk) > 0){
-				$content .= "$no\n";
-			}
-			$content .= "8e\nw\n"; 
-			my $fn = WriteFile($content);
-			Exec("$s_fdisk /dev/$disk < $fn");
-			my $info = $s_diskInfo{$disk} = ReadFdiskInfo($disk);
-			if (index($info, ":$no-$from-$to") < 0){
-				Error("creating $name failed!");
-			} else {
-				Log("=== $name created");
-			}
-		} elsif ($partType eq $GPT){
-			my $content = "n\n$no\n$from\n$to\n8e00\nw\nY\n";
-			my $fn = WriteFile($content);
-			Exec("$s_gdisk /dev/$disk < $fn");
-			my $info = $s_diskInfo{$disk} = ReadGdiskInfo($disk);
-			if (index($info, ":$no-$from-$to") < 0){
-				Error("creating $name failed!");
-			} else {
-				Log("=== $name created");
+			if ($newNo < 0){
+				my $msg = "creating $name failed!";
+				foreach(@lines){
+					$msg .= " $_" if /error/i;
+				}
+				&basic::Error($msg);
+			} elsif ($partType eq $GPT && $fileSys ne "-") {
+				my $cmd;
+				if ($fileSys eq "lvm"){
+					$cmd = "name $newNo 'Linux LVM' " if $partType eq $GPT;
+					$cmd .= "set $newNo lvm on";
+				} elsif ($fileSys eq "ext4") {
+					$cmd = "name $newNo 'Linux filesystem' set $newNo lvm off";
+				} else {
+					die "unknown filesys: $fileSys";
+				}
+				&basic::Exec("parted -s /dev/$disk $cmd"); 
 			}
 		} elsif ($partType eq "!"){
 			# error already is displayed
 		} else {
-			Error("Unknown partType: $partType");
+			&basic::Error("Unknown partType: $partType");
 		}
 	}
-	Exec("partprobe");
+	return "$disk$newNo";
 }
 
+# ===
 # Counts the number of partitions of the disk.
 # @param disk	e.g. sdb
 # @return		the number of partitions of the disk
@@ -376,6 +660,7 @@ sub CountOfPartitions{
 	return $rc;
 }
 
+# ===
 # Checks whether a partition already exists or whether the
 # sectors of the new partition overlap of an existing partition
 # @param disk	e.g. sdb
@@ -391,7 +676,7 @@ sub SectorsOverlap{
 	my $info = GetDiskInfo($disk);
 	my $rc = 0;
 	if ($info =~ /:$partNo-/){
-		Error("partition $partNo already exists");
+		&basic::Error("partition $partNo already exists");
 		$rc = 1;
 	} else {
 		if ($info =~ /part:(\S+)/){
@@ -402,7 +687,7 @@ sub SectorsOverlap{
 	
 				if ($info !~ /ext:$no/
 					&& ($f >= $from && $f <= $to || $t >= $from && $t <= $to)){
-					&Error("partition $no overlaps with $partNo: $f-$t / $from-$to");
+					&basic::Error("partition $no overlaps with $partNo: $f-$t / $from-$to");
 					$rc = 1;
 				}
 			}
@@ -410,6 +695,8 @@ sub SectorsOverlap{
 	}
 	return $rc;
 }
+
+# ===
 # Finds the disk name for a given partition
 # @param part	partition name, e.g. "sda1"
 # @return       the disk name, e.g. "sda"
@@ -422,6 +709,7 @@ sub FindDiskName{
 	return $rc;
 }
 
+# ===
 # Finds the partition table type.
 # If the disk has no type (uninitialized) it will create a partition table
 # @param part	e.g. "sda1"
@@ -434,13 +722,11 @@ sub FindDiskType{
 	if ($s_realDiskType{$disk} ne ""){
 		$rc = $s_realDiskType{$disk}; 
 	} else {
-		# gdisk waits for an answer if the GDP/MBR is damaged
-		my $input = WriteFile("1\n");
-		my $answer = WriteFile("<none>");
-		Exec("$s_gdisk -l /dev/$disk  < $input >$answer");
-		open(EXEC, $answer) || Error ("$answer: $!");
-		my @lines = <EXEC>;
-		close EXEC;
+		# gdisk waits for an answer if the GPT/MBR is damaged
+		my $input = recorder::WriteFile("1\n");
+		my $answer = recorder::WriteFile("<none>");
+		my @lines = recorder::ReadStream("FindDiskType", 
+			"$s_gdisk -l /dev/$disk  < $input >$answer");
 		unlink $input;
 		unlink $answer;
 		my $mbrOnly;
@@ -450,12 +736,12 @@ sub FindDiskType{
 				$rc = $MBR;
 				$mbrOnly = $1 eq "MBR only";
 			} elsif (/GPT: damaged/){
-				Error("GPT is damaged. Must be repaired manually.");
+				&basic::Error("GPT is damaged. Must be repaired manually.");
 				$rc = "!";
 				last;
 			} elsif (/GPT: present/){
 				if ($mbrOnly){
-					Error("GPT mixed with MBR. Fix it manually with gdisk, e.g: x (expert only) z (destroy GPT)");
+					&basic::Error("GPT mixed with MBR. Fix it manually with gdisk, e.g: x (expert only) z (destroy GPT)");
 					$rc = "!";
 				} else {
 					$rc = $GPT;
@@ -466,7 +752,7 @@ sub FindDiskType{
 		if ($rc eq ""){
 			$rc = $s_wantedDiskType{$disk};
 			if ($rc eq ""){
-				Error("No partition table type given for $disk: mbr will be taken");
+				&basic::Error("No partition table type given for $disk: mbr will be taken");
 				$rc = $MBR;
 			}
 			CreatePartitionTable($disk, $rc);
@@ -476,6 +762,22 @@ sub FindDiskType{
 	return $rc;
 }
 
+# ===
+# Gets the partition numbers of a disk
+# @param disk   e.g. sda
+# @return       a sorted array of partition numbers, e.g. (1, 3, 5, 7)
+sub getPartNosOfDisk{
+    my $disk = shift;
+    
+    my $parts = getDiskInfo($disk);
+    my @cols = split(/:/, $parts);
+    my @rc;
+    foreach(@cols){
+        push(@rc, $1) if /(\d+)-\d+-\d+/;       
+    }
+    return sort @rc;
+}
+# ===
 # Creates a partition table for a disk.
 # @param disk	disk name, e.g. sdc
 # @param type	partition table type: "mbr" or "gpt"
@@ -484,84 +786,45 @@ sub CreatePartitionTable{
 	my $type = shift;
 	
 	if ($s_allowInit ne "YES"){ 
-		Error("not allowed to create a partition table");
+		&basic::Error("not allowed to create a partition table");
 	} elsif ($type eq $MBR){
-		my $fn = WriteFile("o\nw\n");
-		Exec("$s_fdisk /dev/$disk < $fn");
-		&Log("=== $disk initialized ($MBR)");
+		my $fn = recorder::WriteFile("o\nw\n");
+		&basic::Exec("$s_fdisk /dev/$disk < $fn");
+		&basic::Log("$disk initialized ($MBR)", 1);
 		unlink $fn;
 	} else {
-		open(EXEC, "|$s_gdisk /dev/$disk");
-		print EXEC "o\n", "w\n", "Y\n";
-		close EXEC;
-		&Log("=== $disk initialized ($GPT)");
+		recorder::WriteStream("CreatePartitionTable", "|$s_gdisk /dev/$disk", 
+			"o\n", "w\n", "Y\n");
+		&basic::Log("$disk initialized ($GPT)", 1);
 	}
 }
 
-# Executes a command.
-# @param cmd	the command to execute
-sub Exec{
-	my $cmd = shift;
-	my $extendedLog = shift;
-	if ($extendedLog){
-		Log("=== $cmd");
+# ===
+# do simple tests 
+sub testSuite{
+	my $test = shift;
+}
+
+# ===
+# Initializes a full size test.
+sub initializeTest{
+	if ($s_testRun eq "stdlvm"){
+		
+	} elsif ($s_testRun eq "crypt"){
+		
 	} else {
-		Log($cmd);
+		die "not implemented: $s_testRun";
 	}
-	system($cmd);
 }
 
-# Writes a given content to a temporary file.
-# @param content	content to write
-# @return 	filename
-sub WriteFile{
-	my $content = shift;
-	my $suffix = shift;
-	my $fn = "/tmp/$$." . time() . ".tmp$suffix";
-	if ($content ne "<none>"){
-		open(OUT, ">$fn") || die "$fn: $!";
-		print OUT $content;
-		close OUT;
-	}
-	return $fn;
-}
-# Logs a message.
-# @param msg	message
-sub Log{
-	my $msg = shift;
-	print $msg, "\n";
-	push(@s_logLines, $msg . "\n");
+# ===
+# Evaluation of the test result for full size tests.
+sub finishTest{
+	my @expectedExec = recorder::Get("execLines");
+	my @expectedLog = recorder::Get("logLines");
+    my ($refExecs, $refLogs) = basic::GetVars();
+	die unless test::EqualArray("LogList", $refLogs, \@expectedLog);
+	die unless test::EqualArray("ExecList", $refExecs, \@expectedExec);
 }
 
-# Handles an error message.
-# @param msg	error message
-sub Error{
-	my $msg = shift;
-	$s_errors++;
-	&Log("===+++ $msg");
-}
 
-# Writes the progress file.
-#@param task	name of the current task
-sub Progress{
-	my $task = shift;
-	my $isLast = shift;
-	$task .= " ...";
-	$s_currTask++;
-	$s_maxTasks = $s_currTask if $isLast;
-	if ($s_currTask == $s_maxTasks){
-		$s_maxTasks += 5;
-	}
-	my $temp = $s_fnProgress . ".tmp";
-	open(PROGRESS, ">$temp") || die "$temp: $!";
-	my $percent = int(100 * ($s_currTask - 1) / $s_maxTasks);
-	$percent = 5 if $percent < 5;
-	print PROGRESS <<EOS;
-PERC=$percent
-CURRENT=<b>$task</b>
-COMPLETE=completed $s_currTask of $s_maxTasks
-EOS
-	close PROGRESS;
-	unlink $s_fnProgress if -f $s_fnProgress;
-	rename $temp, $s_fnProgress;
-}

@@ -41,10 +41,13 @@ class AutoPartPage(Page):
         self.addField("adisk", None, 0)
         self.addField("apartition", None, 0)
         self.addField("vg", "siduction")
-        self.addField("size_boot")
         self.addField("size_root")
         self.addField("size_swap")
         self.addField("size_home")
+        self.addField("target")
+        self.addField("boot_part")
+        self.addField("size_boot")
+        self.addField("passphrase")
         for ix in xrange(len(self._freeSpaces)):
             self.addField("part{:d}".format(ix), None, None, "b")
         # Hidden fields:
@@ -53,15 +56,13 @@ class AutoPartPage(Page):
         self.addField("progress")
                          
 
-    def buildStandardLVM(self):
-        '''Builds the HTML code for the standard LVM template.
-         @return: the HTML code
+    def buildStdParams(self, body, target):
+        '''Builds the HTML code for the common parts of some proposals.
+        @param body:    a HTML code with placeholders
+        @param target   the HTML code with the target definitions
+        @return:        HTML code without placeholders
         '''
-        body = self._snippets.get("STD_LVM")
-        #body = body.replace("{{DISK}}", self._snippets.get("DISK"))
-        #body = body.replace("{{PARTITION}}", self._snippets.get("PARTITION"))
-        content = self._diskInfo.buildFreePartitionTable(None)
-        body = body.replace("{{PARTITIONS}}", content)
+        body = body.replace("{{PARTITIONS}}", target)
         body = body.replace("{{ACTIVATE}}", self._snippets.get("ACTIVATE"))
         body = body.replace("{{PARAMETER}}", self._snippets.get("PARAM_STD"))
         sizeAvailable = self.calcAvailableSpace()
@@ -71,7 +72,32 @@ class AutoPartPage(Page):
         body = body.replace("{{size_free}}", sizeFree)
         body = body.replace("{{size_total}}", sizeAvailable)
         return body
+        
+    def buildStandardLVM(self):
+        '''Builds the HTML code for the standard LVM template.
+         @return: the HTML code
+        '''
+        body = self._snippets.get("TEMPLATE_STD_LVM")
+        content = self._diskInfo.buildFreePartitionTable(None)
+        target = self._snippets.get("STD_PART")
+        target = target.replace("{{PARTITION_LIST}}", content)
+        body = self.buildStdParams(body, target)
+        return body
 
+    def buildEncryptedLVM(self):
+        '''Builds the HTML code for the standard LVM template.
+         @return: the HTML code
+        '''
+        body = self._snippets.get("CRYPTO_LVM")
+        content = self._snippets.get("CRYPTO_TARGET")
+        target = self._diskInfo.buildFreePartitionComboBox("target_part")
+        boot = self._diskInfo.buildFreePartitionComboBox("boot_part")
+        content = content.replace("{{COMBO_TARGET}}", target)
+        content = content.replace("{{COMBO_BOOT}}", boot)
+        body = self.buildStdParams(body, content)
+        
+        return body
+        
     def buildReady(self, answer):
         '''Builds the content if the automatic partitioning has been done.
         @param answer: the file with the answer from the shell server
@@ -141,8 +167,8 @@ class AutoPartPage(Page):
                 templ = self.getField("template")
                 if templ == "std":
                     content2 = self.buildStandardLVM()
-                elif templ == "single":
-                    content2 = ""
+                elif templ == "encrypt":
+                    content2 = self.buildEncryptedLVM()
                 else:
                     content2 = self.buildStandardLVM()
                 content = self._snippets.get("ENOUGH_SPACE")
@@ -268,7 +294,11 @@ class AutoPartPage(Page):
         sizeUsed = self.getCorrectedUsedSpace()
         if sizeAvailable - sizeUsed < 0:
             self.putError(None, "autopart.txt_too_much_space")
-        
+     
+    def checkEncryptedLVM(self):
+        '''Checks the validity of the input fields for the standard LVM proposal.
+        '''
+        self.checkStandardLVM()
     
     def checkInput(self):
         '''Checks the validity of the input fields and calculates some infos.
@@ -276,6 +306,8 @@ class AutoPartPage(Page):
         templ = self.getField("template")
         if templ == "std":
             self.checkStandardLVM()
+        elif templ == "std":
+            self.checkEncryptedLVM()
         else:
             self._session.error("unknown state: " + templ)
     
@@ -295,14 +327,13 @@ class AutoPartPage(Page):
             fp.close()
         return rc
         
-                    
-    def createStandardLVM(self):
-        '''Realizes the standard LVM proposal.
-        @return: None or the PageResult
+    def createCommon(self):
+        '''Does the common tasks for some proposals, e.g validations.
+        @return:    a tuple (pageResult: (error, answer, progress, 
+                    diskInfo, allowInit, partitions, vgInfo, lvInfo)
+                    if error == True an validation has failed
         '''
-        pageResult = None
         answer = self._session._shellClient.buildFileName("ap", ".ready")
-        program = "autopart"
         allowInit = "YES"
         diskInfo = ""
         partitions = ""
@@ -327,6 +358,7 @@ class AutoPartPage(Page):
         minSize = int(self._session.getConfigWithoutLanguage("diskinfo.root.minsize.mb"))
         size = self.getCorrectedSizeValue("size_root") / 1024
         error = False 
+        progress = None
         flavour = self.getFlavour()
         if diskInfo == "":
             error = self.putError(None, "autopart.err_missing_partition")
@@ -355,20 +387,56 @@ class AutoPartPage(Page):
                     lvInfo += ";swap:swap:{:d}:swap".format(sizeSwap)
 
             progress = self._session._shellClient.buildFileName("ap", ".progress")
-
-            params = ["stdlvm", diskInfo, allowInit, partitions, vgInfo, lvInfo,
-                      progress]
+        return (error, answer, progress, diskInfo, allowInit, partitions, 
+            vgInfo, lvInfo)
+    
+    def createStandardLVM(self):
+        '''Realizes the standard LVM proposal.
+        @return: None or the PageResult
+        '''
+        pageResult = None
+        (error, answer, progress, diskInfo, allowInit, partitions, 
+            vgInfo, lvInfo) = self.createCommon()
+        if not error:
+            program = "autopart"
+            params = ["stdlvm", progress, diskInfo, allowInit, partitions, 
+                      vgInfo, lvInfo]
         
             self.execute(answer, SVOPT_DEFAULT, program, params, 0)
             
-            intro = "wait.txt_intro"
-            description = None
             self.putField("answer", answer)
             self.putField("progress", progress)
             self._session.trace("createStandardLVM(): answer set to" + answer)
             pageResult = self._session.redirect("autopart", "createStdVG")
             self.setRefresh()
         return pageResult
+
+    def createEncryptedLVM(self):
+        '''Realizes the standard LVM proposal.
+        @return: None or the PageResult
+        '''
+        pageResult = None
+        (error, answer, progress, diskInfo, allowInit, partitions, 
+            vgInfo, lvInfo) = self.createCommon()
+        program = "autopart"
+        if not error:
+            value = self.getField("passphrase")
+            if value == None or len(value) < 3:
+                error = self.putError("passphrase", "autopart.err_short_pw")
+            
+        if not error:
+            params = ["cryptlvm", progress, diskInfo, allowInit, partitions, 
+                      vgInfo, lvInfo, Util.scrambleText(value)]
+        
+            self.execute(answer, SVOPT_DEFAULT, program, params, 0)
+            
+            self.putField("answer", answer)
+            self.putField("progress", progress)
+            self._session.trace("createStandardLVM(): answer set to" + answer)
+            pageResult = self._session.redirect("autopart", "createStdVG")
+            self.setRefresh()
+        return pageResult
+
     def createPartitons(self):
         '''Realizes the current proposal.
         @return: None or the PageResult
@@ -377,6 +445,8 @@ class AutoPartPage(Page):
         templ = self.getField("template")
         if templ == "std":
             pageResult = self.createStandardLVM()
+        elif templ == "encrypt":
+            pageResult = self.createEncryptedLVM()
         else:
             self._session.error("unknown state: " + templ)
         return pageResult

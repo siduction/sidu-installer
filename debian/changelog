@@ -1,15 +1,25 @@
 sidu-installer (2.0.3) next; urgency=low
 
   * fixed sidu-intaller.svg, use the old one
-  * closes #1354 
+  * fixed install, sidu-installer.desktop should be in applications
+  * closes #1354
 
- -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 20:29:24 +0200
+ -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 02:26:47 +0200
 
 sidu-installer (2.0.2) next; urgency=low
 
-  * fixed install, sidu-installer.desktop should be in applications
+  * refactoring of the perl scripts
+  * extracting common parts into perl modules: recorder, basic, test
+  * recorder: sessions will be recorded and can be replayed for
+    regression tests
+  * tests simular to junit
+  * usage of parted instead of gdisk/fdisk
+  * autopart.pl: argument PROGRESS moved to 3rd position
+  * better code due of using perlcritic
+  * encryption template
+  * autopart.pl: handling of encrypted partitions
 
- -- Alf Gaida <agaida@siduction.org>  Thu, 10 Oct 2013 02:26:47 +0200
+ -- J. Hamatoma <hama@siduction.net>  Wed, 25 Sep 2013 08:29:18 +0200
 
 sidu-installer (2.0.1) next; urgency=low
 
