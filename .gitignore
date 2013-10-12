@@ -17,6 +17,7 @@ backend/shellserver.sh
 backend/startgui.sh
 
 # don't track debian build crap
+/debian/*.debhelper
 /debian/files
 /debian/*.log
 /debian/*.substvars
