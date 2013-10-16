@@ -19,7 +19,7 @@ Depends: ${misc:Depends},
  python (>= 2.7),
  python-support (>= 0.90),
  pywwetha (>= 1.1.1),
- sidu-base(>= 0.4.6)
+ sidu-base(>= 0.4.9)
 Description: installer for siduction
  The main content is a set of HTML files describing features, handling
  and tips for siduction.

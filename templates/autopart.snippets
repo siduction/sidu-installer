@@ -37,7 +37,7 @@ READY:
 </pre>
 <p><a href="{{fullLog}}" target="">{{autopart.txt_full_log}}</a></p>
 {{RETRY}}
-</div> 
+</div>
 <div class="textblock">
 <div class="center">
 <input type="submit" name="button_manual" value="{{autopart.txt_button_manual}}" />
@@ -62,7 +62,7 @@ ENOUGH_SPACE:
 	<td><select name="template" size="1" onchange="autoClick('button_activate');">
 {{body_template}}
 	</select></td>
-	<td><input type="submit" name="button_activate" 
+	<td><input type="submit" name="button_activate"
 		value="{{autopart.txt_activate}}" /> </td>
 	<td colspan="2">&nbsp;</td>
 </tr>
@@ -71,7 +71,7 @@ ENOUGH_SPACE:
 {{TEMPLATE}}
 <div class="horicontal_line"></div>
 <div class="error_message">{{error_message}}</div>
-<p class="center"><input class="main_button" type="submit" name="button_run1" 
+<p class="center"><input class="main_button" type="submit" name="button_run1"
 		value="{{autopart.txt_button_create}}"  />
 </p>
 </div>
@@ -80,8 +80,15 @@ STD_PART:
 <p>{{autopart.txt_intro_free_part}}</p>
 {{PARTITION_LIST}}
 
+TEMPLATE_RAW_PARTS:
+<p>{{autopart.txt_raw_descr}}</p>
+<div class="horicontal_line"></div>
+{{PARTITIONS}}
+<div class="horicontal_line"></div>
+{{PARAMETER}}
+
 TEMPLATE_STD_LVM:
-<p>{{autopart.txt_std_descr}}</p>
+<p>{{autopart.txt_lvm_descr}}</p>
 <div class="horicontal_line"></div>
 {{PARTITIONS}}
 <div class="horicontal_line"></div>
@@ -91,14 +98,14 @@ CRYPTO_TARGET:
 <p>{{autopart.txt_intro_free_part_crypt}}</p>
 <table class="table_col5">
 <tr>
-	<td>{{autopart.txt_target}}:</br/>
+	<td>{{autopart.txt_target}}:<br/>
 		{{COMBO_TARGET}}
 	</td>
-	<td>{{autopart.txt_boot_part}}:</br/>
+	<td>{{autopart.txt_boot_part}}:<br/>
 		{{COMBO_BOOT}}
 	</td>
 	<td>{{autopart.txt_size_boot}}:<br/>
-	    <input name="size_boot" type="text" size="10" value="{{val_size_boot}}" 
+	    <input name="size_boot" type="text" size="10" value="{{val_size_boot}}"
 			/>
 	</td>
 </tr>
@@ -106,16 +113,17 @@ CRYPTO_TARGET:
 
 
 CRYPTO_LVM:
-<p>{{autopart.txt_std_descr}}</p>
+<p>{{autopart.txt_lvm_descr}}</p>
 <div class="horicontal_line"></div>
 {{PARTITIONS}}
 <div class="horicontal_line"></div>
 {{PARAMETER}}
 <div class="horicontal_line"></div>
+<div>
 	{{autopart.txt_passphrase}}:<br/>
 	<input type="text" name="passphrase" value="{{val_passphrase}}" size="40"  />
 	<div class="warning">{{err_passphrase}}</div>
-</p>
+</div>
 {{autopart.txt_descr_passhprase}}
 
 PARAM_STD1:
@@ -126,32 +134,42 @@ PARAM_STD1:
 {{ACTIVATE}}
 </table>
 
+FIRST_3_COL_VG:
+	<td>{{autopart.txt_vg}}</td>
+	<td><input name="vg" type="text" size="10" value="{{val_vg}}" /></td>
+	<td>&nbsp;</td>
+
+FIRST_3_COL_RAW:
+	<td colspan="3">&nbsp;</td>
+
 PARAM_STD:
 <table class="table_col5">
 <tr>
-	<td>{{autopart.txt_vg}}</td>
-	<td><input name="vg" type="text" size="10" value="{{val_vg}}" /></td>
+{{PARAM_FIRST_3_COL}}
 	<td><input type="submit" name="button_recalc" value="{{autopart.txt_proposals}}" /></td>
-	<td>&nbsp;</td>
-	<td><input id="butcheck" type="submit" name="button_check" 
+	<td><input id="butcheck" type="submit" name="button_check"
 		value="{{autopart.txt_button_check}}"/>
 	</td>
 </tr>
 <tr>
+	<td>{{autopart.txt_size_total}}:<br/>
+		<input name="size_total" type="text" size="10" value="{{val_size_total}}"
+			 />
+	</td>
 	<td>{{autopart.txt_size_root}}:<br/>
-		<input name="size_root" type="text" size="10" value="{{val_size_root}}" 
+		<input name="size_root" type="text" size="10" value="{{val_size_root}}"
 			 />
 	</td>
 	<td>{{autopart.txt_size_home}}:<br/>
-		<input name="size_home" type="text" size="10" value="{{val_size_home}}" 
+		<input name="size_home" type="text" size="10" value="{{val_size_home}}"
 			/>
 	</td>
 	<td>{{autopart.txt_size_swap}}:<br/>
-		<input name="size_swap" type="text" size="10" value="{{val_size_swap}}" 
+		<input name="size_swap" type="text" size="10" value="{{val_size_swap}}"
 			onblur="autoClick('button_check');" />
 	</td>
 	<td>{{autopart.txt_sizefree}}:<br/>
-		{{size_free}}/{{size_total}}
+		{{size_free}}
 	</td>
 </tr>
 <tr><td colspan="5">{{autopart.txt_std_hints}}</td>

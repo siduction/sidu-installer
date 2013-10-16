@@ -124,7 +124,7 @@ sub main{
 	push(@s_output, '!LV=' . join(';', @s_lv));
 	push(@s_output, "!GapPart=$s_gapPart");
 	push(@s_output, "!damaged=" . join(';', sort keys %s_damagedDisks));
-
+    push(@s_output, "!osinfo=" . &GetSiduInfo());
 	&basic::Progress("writing info", 1);
 	recorder::Put("partition_info", \@s_output);
 
@@ -135,6 +135,19 @@ sub main{
 	&UnmountAll();
 }
 
+# ===
+# Gets info about the current os
+# @return:  <flavour>;<arch>,<version> e.g. kde;32;11.1
+sub GetSiduInfo{
+    my $info = &firstLineOf("/etc/siduction-version");
+    # siduction 11.1 One Step Beyond - kde - 
+    die $info unless $info =~ /^\S+\s+([.\d]+)\s.*-\s+(\w+) -/;
+    my ($version, $flavour) = ($1, $2);
+    # Linux version 3.7-8.towo-siduction-amd64 (Debian 3.7-14)...
+    $info = &firstLineOf("/proc/version");
+    my $arch = $info =~ /amd64/ ? "64" : "32";
+    return "$flavour;$arch;$version";
+}
 # ===
 # release all mounts done by the script itself
 sub UnmountAll{
@@ -241,7 +254,8 @@ sub firstLineOf{
 	my $rc = "";
 	if (-f $file){
 		my @lines = recorder::ReadStream("firstOfLine", $file);
-		$rc = "\t$prefix:" . $lines[0];
+		$prefix = "\t$prefix:" if $prefix;
+		$rc = $prefix . $lines[0];
 		chomp $rc;
 	}
 	return $rc;
@@ -930,7 +944,7 @@ sub testGetDiskDev{
 	&getDiskDev;
 	my @a = ("abc", "def");
 	my @b = ("abc", "123");
-	die"!" unless Equal("s_gapPart",  
+	die "!" unless Equal("s_gapPart",  
 		";sdb!4-100000-1023999;sdb!8-2457600-4194303;sdb!9-10897408-31248350;sdc!2-2048-79999;sdc!3-100000-300000;sdc!8-300049-1023999;sdc!9-2457600-4194303;sdc!10-10897408-31248383;sdx!1-2048-31248383",
 		$s_gapPart);
 	die unless EqualHash("s_devs", toHash("
