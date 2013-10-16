@@ -38,6 +38,8 @@ class PartitionInfo:
         self._megabytes = size / 1000
         # size and unit, e.g. 11GB
         self._size = size2
+        # flavour, arch, version
+        self._osInfo = ("nox", "32", "13.2");
         
     def canBeRoot(self, minSize):
         '''Tests whether the partition can be used as root partition
@@ -184,6 +186,10 @@ class DiskInfoPage(Page):
                     self._gptDisks = line[5:]
                 elif line.startswith("!VG="):
                     self._lvmVGs = line[4:]
+                elif line.startswith("!damaged="):
+                    self._dmaged = line[9:]
+                elif line.startswith("!osinfo="):
+                    self._osInfo = line[8:].split(";")
                 elif line.startswith("!LV="):
                     self._lvmLVs = line[4:]
                     for lvm in self._lvmVGs.split(";"):
@@ -398,8 +404,10 @@ class DiskInfoPage(Page):
         @return: a list of device names starting with '-'
         '''
         rc = ["-"]
+        
         minSize = int(self._session.getConfigWithoutLanguage(
-            "diskinfo.root.minsize.mb"))
+            "diskinfo.root.minsize.mb." 
+            + self._osInfo[0]))
         for partition in self._partitionList:
             if partition.canBeRoot(minSize):
                 dev = partition._device
@@ -517,8 +525,8 @@ class DiskInfoPage(Page):
                 sectorTo = int(info[2])
                 size = self.humanReadableSize((sectorTo - sectorFrom)*512)
                 box = box.replace("{{size}}", size)
-                box = box.replace("{{from}}", self.humanReadableSize(sectorFrom*512))
-                box = box.replace("{{to}}", self.humanReadableSize(sectorTo*512))
+                box = box.replace("{{from}}", self.humanReadableSize(sectorFrom*512, 1))
+                box = box.replace("{{to}}", self.humanReadableSize(sectorTo*512, 1))
                 colsOfLine.append(box)
         ix += 1
         while ix % 5 != 0:
@@ -543,14 +551,15 @@ class DiskInfoPage(Page):
             values.append(name)
             sectorFrom = int(info[1])
             sectorTo = int(info[2])
-            size = self.humanReadableSize((sectorTo - sectorFrom)*512)
+            size = self.humanReadableSize((sectorTo - sectorFrom)*512, 1)
             text = "{:s} {:s} [{:s}-{:s}]".format(name, size,
-                self.humanReadableSize(sectorFrom*512),
-                self.humanReadableSize(sectorTo*512))
+                self.humanReadableSize(sectorFrom*512, 1),
+                self.humanReadableSize(sectorTo*512, 1))
             names.append(text)
         body = self._snippets.get("COMBO_FREEPART")
         body = body.replace("!name!", comboName)
-        body = self.fillDynamicSelected(comboName, names, values, body)
+        body = self.fillDynamicSelected(comboName, names, values, body, 
+                self._parentPage)
         return body
     
     def buildProgress(self, fileProgress = None):
@@ -575,4 +584,9 @@ class DiskInfoPage(Page):
         body = body.replace("{{no}}", unicode(no))
         body = body.replace("{{count}}", unicode(count))
         return body
-        
+    
+    def getOsInfo(self):
+        '''Returns info about the current os.
+        @return: (<flavour>, <arch>, <version>)
+        '''
+        return self._osInfo;

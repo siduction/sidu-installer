@@ -41,11 +41,13 @@ class AutoPartPage(Page):
         self.addField("adisk", None, 0)
         self.addField("apartition", None, 0)
         self.addField("vg", "siduction")
+        self.addField("size_total")
         self.addField("size_root")
         self.addField("size_swap")
         self.addField("size_home")
         self.addField("target")
         self.addField("boot_part")
+        self.addField("target_part")
         self.addField("size_boot")
         self.addField("passphrase")
         for ix in xrange(len(self._freeSpaces)):
@@ -56,24 +58,30 @@ class AutoPartPage(Page):
         self.addField("progress")
                          
 
-    def buildStdParams(self, body, target):
+    def buildStdParams(self, body, target, first3Cols):
         '''Builds the HTML code for the common parts of some proposals.
-        @param body:    a HTML code with placeholders
-        @param target   the HTML code with the target definitions
-        @return:        HTML code without placeholders
+        @param body:          a HTML code with placeholders
+        @param target         the HTML code with the target definitions
+        @param first3Cols:    the snippet name for the first 3 columns.
+        @return:              HTML code without placeholders
         '''
         body = body.replace("{{PARTITIONS}}", target)
         body = body.replace("{{ACTIVATE}}", self._snippets.get("ACTIVATE"))
-        body = body.replace("{{PARAMETER}}", self._snippets.get("PARAM_STD"))
+        content = self._snippets.get("PARAM_STD")
+        content2 = self._snippets.get(first3Cols)
+        content = content.replace("{{PARAM_FIRST_3_COL}}", content2)
+        body = body.replace("{{PARAMETER}}", content)
         sizeAvailable = self.calcAvailableSpace()
         sizeUsed = self.getCorrectedUsedSpace()
-        sizeFree =self.humanReadableSize((sizeAvailable-sizeUsed)*1024)
+        sizeFree = self.humanReadableSize((sizeAvailable-sizeUsed))
         sizeAvailable = self.humanReadableSize(sizeAvailable*1024)
+        text = self._session.getConfig("autopart.txt_size_total")
+        text = text.replace("{{size_total}}", sizeAvailable)
+        body = body.replace("{{autopart.txt_size_total}}", text)
         body = body.replace("{{size_free}}", sizeFree)
-        body = body.replace("{{size_total}}", sizeAvailable)
         return body
         
-    def buildStandardLVM(self):
+    def buildLVM(self):
         '''Builds the HTML code for the standard LVM template.
          @return: the HTML code
         '''
@@ -81,7 +89,16 @@ class AutoPartPage(Page):
         content = self._diskInfo.buildFreePartitionTable(None)
         target = self._snippets.get("STD_PART")
         target = target.replace("{{PARTITION_LIST}}", content)
-        body = self.buildStdParams(body, target)
+        body = self.buildStdParams(body, target, "FIRST_3_COL_VG")
+        return body
+
+    def buildRawPartitions(self):
+        '''Builds the HTML code for the standard LVM template.
+         @return: the HTML code
+        '''
+        body = self._snippets.get("TEMPLATE_RAW_PARTS")
+        combo = self._diskInfo.buildFreePartitionComboBox("target_part")
+        body = self.buildStdParams(body, combo, "FIRST_3_COL_RAW")
         return body
 
     def buildEncryptedLVM(self):
@@ -94,10 +111,35 @@ class AutoPartPage(Page):
         boot = self._diskInfo.buildFreePartitionComboBox("boot_part")
         content = content.replace("{{COMBO_TARGET}}", target)
         content = content.replace("{{COMBO_BOOT}}", boot)
-        body = self.buildStdParams(body, content)
+        body = self.buildStdParams(body, content, "FIRST_3_COL_VG")
         
         return body
         
+    def extractDevs(self, fileContent):
+        '''Extracts devices from the answer file.
+        @param fileContent:    the answer file
+        @return:                (boot, root, home, vg)
+        '''
+        (boot, root, home, vg) = ("", "", "", "")
+        lines = fileContent.split("\n")
+        rexpr = re.compile(r'\s*(\S+) created as (\w+)')
+        rexpr2 = re.compile(r'\s*VG (\S+) has been created')
+        for line in lines:
+            matcher = rexpr.match(line)
+            if matcher != None:
+                (dev, name) = (matcher.group(1), matcher.group(2))
+                if name == "root":
+                    root = dev
+                elif name == "home":
+                    home = dev
+                elif name == "boot":
+                    boot = dev
+            else:
+                matcher = rexpr2.match(line)
+                if matcher != None:
+                    vg = matcher.group(1)
+        return (boot, root, home, vg)
+    
     def buildReady(self, answer):
         '''Builds the content if the automatic partitioning has been done.
         @param answer: the file with the answer from the shell server
@@ -111,19 +153,19 @@ class AutoPartPage(Page):
             message = self._session.getConfig("autopart.txt_failed")
         else:
             message = self._session.getConfig("autopart.txt_successful")
-            vg = self.getField("vg")
-            value = vg + "/root"
-            self._globalPage.putField("root", value)
-            self._session.putUserData("rootfs", "root", value)
+            (boot, root, home, vg) = self.extractDevs(fileContent)
+            self._globalPage.putField("root", root)
+            self._session.putUserData("rootfs", "root", root)
             self._globalPage.putField("rootfs", "-")
             self._session.putUserData("rootfs", "filesys", "-")
             mountPoints = ""
-            if self.getField("size_home") != "0M":
-                mountPoints = " /dev/" + vg + "/home:/home"
-            if self.getField("size_boot") != "0M":
-                mountPoints += " /dev/" + vg + "/boot:/boot"
-            self._globalPage.putField("mountpoints", mountPoints)
-            self._session.putUserData("mountpoint", "mounts", "-")
+            if home != "":
+                mountPoints = " /dev/" + home + ":/home"
+            if boot != "":
+                mountPoints += " /dev/" + boot + ":/boot"
+            if mountPoints != "":
+                self._globalPage.putField("mountpoints", mountPoints)
+                self._session.putUserData("mountpoint", "mounts", mountPoints)
             self._globalPage.putField("mountonboot", "yes")
         content = content.replace("{{success}}", message)
         content = content.replace("{{lines}}", fileContent)
@@ -165,28 +207,58 @@ class AutoPartPage(Page):
                 content = self._snippets.get("NO_SPACE")
             else:
                 templ = self.getField("template")
-                if templ == "std":
-                    content2 = self.buildStandardLVM()
+                if templ == "raw":
+                    content2 = self.buildRawPartitions()
+                elif templ == "lvm":
+                    content2 = self.buildLVM()
                 elif templ == "encrypt":
                     content2 = self.buildEncryptedLVM()
                 else:
-                    content2 = self.buildStandardLVM()
+                    content2 = self.buildLVM()
                 content = self._snippets.get("ENOUGH_SPACE")
                 content = self.fillStaticSelected("template", content)
                 content = content.replace("{{TEMPLATE}}", content2)
         body = body.replace("{{CONTENT}}", content)
         return body
 
+    def findGapInfo(self, field):
+        '''Finds the partition info stored in a given field.
+        @param field:    name of the field to inspect
+        @return:         None: no info available.
+                         (<name>, <from>, <to>): the partition info
+        ''' 
+        rc = None
+        val = self.getField(field)
+        if val != None:
+            matcher = re.match("(\D+)(\d+)", val)
+            if matcher:
+                name = "{:s}!{:s}".format(matcher.group(1),
+                    matcher.group(2))
+                for item in self._freeSpaces:
+                    info = item.split("-")
+                    if info[0] == name:
+                        rc = info
+                        break;
+        return rc
+    
     def calcAvailableSpace(self):
         '''Calculates the sum of the selected free spaces:
-        @return: the size in kBytes
+        @return: the size in KiBytes
         '''
         size = 0
-        for ix in xrange(len(self._freeSpaces)):
-            val = self.getField("part{:d}".format(ix))
-            if val == "on":
-                info = self._freeSpaces[ix].split('-')
-                size += (int(info[2]) - int(info[1])) / 2
+        templ = self.getField("template")
+        if templ == "raw" or templ == "encrypt":
+            info = self.findGapInfo("target_part")
+            if info != None:
+                size = (int(info[2]) - int(info[1])) / 2
+        elif templ == "lvm":
+            for ix in xrange(len(self._freeSpaces)):
+                val = self.getField("part{:d}".format(ix))
+                if val == "on":
+                    info = self._freeSpaces[ix].split('-')
+                    size += (int(info[2]) - int(info[1])) / 2
+        else:
+            self._session.error("unknown state: " + templ)
         return size
     
     def getCorrectedSizeValue(self, field):
@@ -201,28 +273,13 @@ class AutoPartPage(Page):
         val = self.getField(field)
         size = 0
         if val != None and val != "*" and len(val) != 0:
-            rexpr = re.compile(r'^(\d+)(.*)')
-            matcher = rexpr.match(val)
-            if matcher == None:
+            size = self.sizeAndUnitToByte(val, "M")
+            if size < 0:
                 val = ""
-                self.putField(field, "")
             else:
-                size = int(matcher.group(1))
-                suffix = matcher.group(2).upper()
-                unit = None
-                if suffix == "K":
-                    unit = 1
-                elif suffix == "M":
-                    unit = 1024
-                elif suffix == "G":
-                    unit = 1024*1024
-                elif suffix == "T":
-                    unit = 1024*1024*1024
-                else:
-                    unit = 1024
-                    suffix = "M"
-                self.putField(field, str(size) + suffix)
-                size *= unit
+                val = self.humanReadableSize(size)
+                size /= 1024
+            self.putField(field, val)
         return size       
       
     def getCorrectedUsedSpace(self):
@@ -235,13 +292,23 @@ class AutoPartPage(Page):
         size += self.getCorrectedSizeValue("size_home") 
         size += self.getCorrectedSizeValue("size_swap")
         return size
-               
-    def calcStandardLVM(self):
+     
+    def getTotalSize(self):
+        '''Returns the value of the field total_size.
+        @return:    the size in KiBytes
+        '''
+        rc = self.sizeAndUnitToByte(self.getField("size_total"), "M") / 1024
+        if rc < 0:
+            rc = 0
+        return rc
+        
+    def processFieldForLeftOver(self):
         '''The field values will be tested for "*". 
         If given the field will set to a value that the total space is used.
         '''
         sizeUsed = self.getCorrectedUsedSpace()
-        sizeFree = str((self.calcAvailableSpace() - sizeUsed) / 1024) + "M"
+        sizeTotal = self.getTotalSize()
+        sizeFree = str((sizeTotal - sizeUsed) / 1024) + "M"
         if self.getField("size_boot") == "*":
             self.putField("size_boot", sizeFree)
         if self.getField("size_root") == "*":
@@ -251,35 +318,43 @@ class AutoPartPage(Page):
         if self.getField("size_home") == "*":
             self.putField("size_home", sizeFree)
 
-    def checkStandardLVM(self):
+    def check(self):
         '''Checks the validity of the input fields for the standard LVM proposal.
         '''
         MByte=1024
         GByte=1024*1024
         sizeAvailable = self.calcAvailableSpace()
-        if sizeAvailable <= 4*GByte:
+        sizeMax = self.getField("size_total")
+        if sizeMax != "" and not sizeMax.startswith("0B"):
+            sizeMax = self.sizeAndUnitToByte(sizeMax, "M") / 1024
+        else:
+            sizeMax = sizeAvailable
+            if sizeMax > 50*GByte:
+                sizeMax = 50*GByte
+            self.putField("size_total", self.humanReadableSize(1024*sizeMax))
+        if sizeMax <= 4*GByte:
             home = 0
             swap = 200
-            root = sizeAvailable - swap - home
-        elif sizeAvailable <= 8*GByte:
+            root = sizeMax - swap - home
+        elif sizeMax <= 8*GByte:
             # Min: 2709 Max: 4G
-            root = (2000*MByte + (sizeAvailable - 2000) * (4*GByte - 2000*MByte)
+            root = (2000*MByte + (sizeMax - 2000) * (4*GByte - 2000*MByte)
                     / (8*GByte - 2000*MByte))
             # Min: 409M Max: 819M
-            swap = 200 + (sizeAvailable - 200) / 10
+            swap = 200 + (sizeMax - 200) / 10
             # Min: 976 Max: 3276
-            home = sizeAvailable - root - swap
-        elif sizeAvailable <= 32*GByte:
+            home = sizeMax - root - swap
+        elif sizeMax <= 32*GByte:
             # min: 4G max: 16G
-            root = sizeAvailable / 2;
+            root = sizeMax / 2;
             # min: 822M max: 2.3G
-            swap = 310*MByte + sizeAvailable / 16
+            swap = 310*MByte + sizeMax / 16
             # min: 3274M max: 14026M
-            home = sizeAvailable - root - swap
+            home = sizeMax - root - swap
         else:
             root = 16*GByte
             swap = 2500*MByte
-            home = sizeAvailable - root - swap   
+            home = sizeMax - root - swap   
         self.getCorrectedUsedSpace()
         if self.getField("size_boot") == "":
             self.putField("size_boot", "0")
@@ -290,91 +365,90 @@ class AutoPartPage(Page):
         if self.getField("size_home") == "":
             self.putField("size_home", str(home / 1024) + "M")
         # Now replace the star if it exists:
-        self.calcStandardLVM()
+        self.processFieldForLeftOver()
         sizeUsed = self.getCorrectedUsedSpace()
-        if sizeAvailable - sizeUsed < 0:
+        if sizeMax - sizeUsed < 0:
             self.putError(None, "autopart.txt_too_much_space")
      
     def checkEncryptedLVM(self):
         '''Checks the validity of the input fields for the standard LVM proposal.
         '''
-        self.checkStandardLVM()
+        self.check()
     
     def checkInput(self):
         '''Checks the validity of the input fields and calculates some infos.
         '''
         templ = self.getField("template")
-        if templ == "std":
-            self.checkStandardLVM()
-        elif templ == "std":
-            self.checkEncryptedLVM()
+        if templ == "raw" or  templ == "lvm" or templ == "encrypt":
+            self.check()
         else:
             self._session.error("unknown state: " + templ)
     
-    def getFlavour(self):
-        rc = "siduction"
-        with open("/etc/siduction-version", "r") as fp:
-            for line in fp:
-                cols = line.split(" ")
-                rc = cols[0] + cols[1]
-                break
-            if line.find("kde") > 0:
-                rc += "-kde"
-            elif line.find("xfce") > 0:
-                rc += "-xfce"
-            elif line.find("lxde") > 0:
-                rc += "-lxde"
-            fp.close()
+    def buildShortName(self):
+        '''Returns an info about the running siduction system.
+        @return:        the flavour, e.g. "kde"
+        '''
+        (flavour, arch, version) = self._diskInfo.getOsInfo()
+        rc = "sidu-{:s}-{:s}-{:s}".format(version, arch, flavour)
         return rc
         
     def createCommon(self):
         '''Does the common tasks for some proposals, e.g validations.
         @return:    a tuple (pageResult: (error, answer, progress, 
-                    diskInfo, allowInit, partitions, vgInfo, lvInfo)
+                    diskInfo, allowInit, partitions, vgInfo, lvInfo, totalSize)
                     if error == True an validation has failed
         '''
         answer = self._session._shellClient.buildFileName("ap", ".ready")
         allowInit = "YES"
         diskInfo = ""
         partitions = ""
-        for ix in xrange(len(self._freeSpaces)):
-            part = self._freeSpaces[ix]
-            val = self.getField("part{:d}".format(ix))
-            if val == "on":
-                # e.g. "sdb!1-2048-888888"
-                disk = part.split("!")[0]
-                if disk != None and diskInfo.find(disk) < 0:
-                    if diskInfo != "":
-                        diskInfo += "+"
-                    diskInfo += disk + ":mbr"
-                if partitions != "":
-                    partitions += "+"
-                # e.g. "sdb!3-2048-100000"
-                partitions += part.replace("!", "")
-        availableSpace = self.calcAvailableSpace()
-        extensionSize = self._session.nextPowerOf2(availableSpace/2024)
+        templ = self.getField("template")
+        if templ == "raw" or templ == "encrypt":
+            info = self.findGapInfo("target_part")
+            if info != None:
+                partitions = "-".join(info).replace("!", "")
+                diskInfo = info[0].split("!")[0]
+        elif templ == "lvm":
+            for ix in xrange(len(self._freeSpaces)):
+                part = self._freeSpaces[ix]
+                val = self.getField("part{:d}".format(ix))
+                if val == "on":
+                    # e.g. "sdb!1-2048-888888"
+                    disk = part.split("!")[0]
+                    if disk != None and diskInfo.find(disk) < 0:
+                        if diskInfo != "":
+                            diskInfo += "+"
+                        diskInfo += disk + ":mbr"
+                    if partitions != "":
+                        partitions += "+"
+                    # e.g. "sdb!3-2048-100000"
+                    partitions += part.replace("!", "")
+        totalSize = self.getTotalSize()
+        extensionSize = self._session.nextPowerOf2(totalSize/2024)
         vgInfo = self.getField("vg") + ":" + str(extensionSize) + "K"
         lvInfo = ""
-        minSize = int(self._session.getConfigWithoutLanguage("diskinfo.root.minsize.mb"))
+        flavour = self._diskInfo.getOsInfo()[0]
+        minSize = int(self._session.getConfigWithoutLanguage(
+                        "diskinfo.root.minsize.mb." + flavour))
         size = self.getCorrectedSizeValue("size_root") / 1024
         error = False 
         progress = None
-        flavour = self.getFlavour()
+        shortname = self.buildShortName()
         if diskInfo == "":
             error = self.putError(None, "autopart.err_missing_partition")
-        elif self.calcAvailableSpace() / 1024 < minSize:
+        elif totalSize < minSize:
             error = self.putError(None, "autopart.err_too_small")
         elif (size < minSize):
             error = self.putError(None, "autopart.err_too_small")
         if vgInfo.startswith(":"):
             error = self.putError(None, "autopart.err_missing_vg")
         if not error:
-            lvInfo = "root:{:s}:{:d}M:ext4".format(flavour, size)
+            lvInfo = "root:{:s}:{:d}M:ext4".format(shortname, size)
             sizeHome = self.getCorrectedSizeValue("size_home") / 1024
             sizeSwap = self.getCorrectedSizeValue("size_swap") / 1024
             sumSize = size + sizeHome + sizeSwap
             # 6 extension must be reserved:
-            allUsed = sumSize * 1024 > availableSpace - 6 * extensionSize
+            allUsed = sumSize * 1024 > totalSize - 6 * extensionSize
             if sizeHome > 0:
                 if allUsed and sizeSwap == 0:
                     lvInfo += ";home:home:*:ext4" 
@@ -388,7 +462,7 @@ class AutoPartPage(Page):
 
             progress = self._session._shellClient.buildFileName("ap", ".progress")
         return (error, answer, progress, diskInfo, allowInit, partitions, 
-            vgInfo, lvInfo)
+            vgInfo, lvInfo, str(totalSize))
     
     def createStandardLVM(self):
         '''Realizes the standard LVM proposal.
@@ -396,11 +470,11 @@ class AutoPartPage(Page):
         '''
         pageResult = None
         (error, answer, progress, diskInfo, allowInit, partitions, 
-            vgInfo, lvInfo) = self.createCommon()
+            vgInfo, lvInfo, totalSize) = self.createCommon()
         if not error:
             program = "autopart"
-            params = ["stdlvm", progress, diskInfo, allowInit, partitions, 
-                      vgInfo, lvInfo]
+            params = ["lvm", progress, diskInfo, allowInit, partitions, 
+                      vgInfo, lvInfo, totalSize]
         
             self.execute(answer, SVOPT_DEFAULT, program, params, 0)
             
@@ -417,7 +491,7 @@ class AutoPartPage(Page):
         '''
         pageResult = None
         (error, answer, progress, diskInfo, allowInit, partitions, 
-            vgInfo, lvInfo) = self.createCommon()
+            vgInfo, lvInfo, totalSize) = self.createCommon()
         program = "autopart"
         if not error:
             value = self.getField("passphrase")
@@ -426,14 +500,35 @@ class AutoPartPage(Page):
             
         if not error:
             params = ["cryptlvm", progress, diskInfo, allowInit, partitions, 
-                      vgInfo, lvInfo, Util.scrambleText(value)]
+                      vgInfo, lvInfo, totalSize, Util.scrambleText(value)]
         
             self.execute(answer, SVOPT_DEFAULT, program, params, 0)
             
             self.putField("answer", answer)
             self.putField("progress", progress)
             self._session.trace("createStandardLVM(): answer set to" + answer)
-            pageResult = self._session.redirect("autopart", "createStdVG")
+            pageResult = self._session.redirect("autopart", "createCrypted")
+            self.setRefresh()
+        return pageResult
+
+    def createRawParitions(self):
+        '''Realizes the standard LVM proposal.
+        @return: None or the PageResult
+        '''
+        pageResult = None
+        (error, answer, progress, diskInfo, allowInit, partitions, 
+            vgInfo, lvInfo, totalSize) = self.createCommon()
+        program = "autopart"
+        if not error:
+            params = ["raw", progress, diskInfo, allowInit, partitions, 
+                      vgInfo, lvInfo, totalSize]
+        
+            self.execute(answer, SVOPT_DEFAULT, program, params, 0)
+            
+            self.putField("answer", answer)
+            self.putField("progress", progress)
+            self._session.trace("createRawParitions(): answer set to" + answer)
+            pageResult = self._session.redirect("autopart", "createRaw")
             self.setRefresh()
         return pageResult
 
@@ -443,7 +538,9 @@ class AutoPartPage(Page):
         '''
         pageResult = None
         templ = self.getField("template")
-        if templ == "std":
+        if templ == "raw":
+            pageResult = self.createRawParitions()
+        elif templ == "lvm":
             pageResult = self.createStandardLVM()
         elif templ == "encrypt":
             pageResult = self.createEncryptedLVM()
@@ -483,7 +580,7 @@ class AutoPartPage(Page):
             self.putField("size_root", "")
             self.putField("size_swap", "")
             self.putField("size_home", "")
-            self.checkStandardLVM()
+            self.check()
             pass
         elif button == "button_run1" or button == "button_run2":
             pageResult = self.createPartitons()

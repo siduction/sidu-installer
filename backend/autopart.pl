@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 #
-# Usage: autopart.pl "$CMD" "$PROGRESS" "$ANSWER" "$DISKS" "$ALLOW_INIT" \
-#                    "$PARTS" "$VG_INFO" "$LV_INFO" ["PASSPHRASE"]
+# Usage: autopart.pl CMD PROGRESS ANSWER DISKS ALLOW_INIT \
+#                    PARTS VG_INFO LV_INFO MAX_SIZE [PASSPHRASE]
 
 use strict;
 use sidu_basic;
@@ -23,6 +23,7 @@ my $s_partitions = shift;
 my $s_vgInfo = shift;
 # root:rider32:4G:ext4;home:home:2G:ext4;swap:swap:400M:swap
 my $s_lvInfo = shift;
+my $s_maxSize = shift;
 my $s_passPhrase = shift;
 
 # progress: max. number of steps (progress)
@@ -97,7 +98,10 @@ if ($s_testRun){
 system ("./automount-control.sh disabled");
 if ($s_cmd eq "-"){
 	&testSuite;
-} elsif ($s_cmd eq "stdlvm"){
+} elsif ($s_cmd eq "raw"){
+	&basic::Progress("creating partitions");
+	my ($boot, $lvm) = &CreateThreePartitions($s_partitions, $s_lvInfo);
+} elsif ($s_cmd eq "lvm"){
 	if (! VGExists($s_vgInfo)){
 		&basic::Progress("creating partitions");
 		&CreatePartitions($s_partitions);
@@ -108,7 +112,7 @@ if ($s_cmd eq "-"){
 			BuildLVs($s_lvInfo, $s_vgInfo);
 		}
 	}
-} elsif ($s_cmd eq "crypt"){
+} elsif ($s_cmd eq "cryptlvm"){
 	if (! VGExists($s_vgInfo)){
 		&basic::Progress("creating partitions");
 		my ($boot, $lvm) = &CreateTwoPartitions($s_partitions, $s_lvInfo);
@@ -268,7 +272,7 @@ sub BuildLV{
 		&basic::Error("LV $name not created");
 	} elsif ($fs eq "swap"){
 		&basic::Exec("mkswap -L $label /dev/mapper/$vg-$name", 1);
-		&basic::Log("LV $name created as swap device", 1);
+		&basic::Log("$vg/$name activated as swap", 1);
 	} else {
 	    # execute and return as string (list):
 		my $fsFull = join("", recorder::ReadStream("BuildLV", "<which mkfs.$fs"));
@@ -276,7 +280,7 @@ sub BuildLV{
 			&basic::Error("unknown filesystem: $fs");
 		} else {
 			&basic::Exec("mkfs.$fs -L $label $lvPath");
-			&basic::Log("LV $name formatted with $fs", 1);
+			&basic::Log("mapper/$vg-$name created as $name ($fs)", 1);
 		}
 	}
 }
@@ -385,6 +389,7 @@ sub BuildVG{
 	}
 	&basic::Exec("pvcreate --yes $pvList", 1);
 	&basic::Exec("vgcreate --physicalextentsize $extSize $vg $pvList", 1);
+	&basic::Log("VG $vg has been created", 1)
 }
 
 # ===
@@ -504,6 +509,7 @@ sub CreatePartitions{
 	}
 	&basic::Exec("partprobe");
 }
+
 # ===
 # Creates the two partitions boot + LVM (encrypted partitions)
 # @param parts      the partition, e.g. sdb1-2048-9999+sdb2-10000-2000 
@@ -580,6 +586,77 @@ sub CreateTwoPartitions{
     return ($rcBoot, $rcLvm);
 }
 
+# ===
+# Creates the two partitions boot + LVM (encrypted partitions)
+# @param part       the partition, e.g. sdb1-2048-9999 
+# @param lvInfo     e.g. root:rider32:4G:ext4;home:home:2G
+# @return           (<devBoot>, <devLvm>), e.g. ("sda6", "sda7")
+#                   ("", "") error occurred
+sub CreateThreePartitions{
+    my $part = shift;
+    my $lvInfo = shift;
+    my ($dev, $from, $maxTo) = split(/-/, $part);
+    
+    # until to 3 partitions in a single free space:
+    my $countParts = 1 + ($lvInfo =~ tr/;/;/);
+    die "unexpected device name: $dev" unless $dev =~ /(\D+)(\d+)/;
+    my ($disk, $no) = ($1, $2);
+    my $diskInfo = $s_diskInfo{$disk};
+
+    my $isExtended = 0;
+    my $createIt = 1;
+    if ($diskInfo =~ /ptype:$GPT/){
+        # we have enough partitions
+    } elsif ($diskInfo !~ / ext:/){
+        # there is no extended partition. We make it:  
+        CreateOnePartition("${disk}0", $from, $maxTo);
+        $isExtended = 1;
+    } elsif ($no <= 4) {
+        # the free space is not in the extended partition.
+        # we need N primaries:
+        my @nos = &getPartNosOfDisk($disk);
+        my $count = 0;
+        foreach(@nos){
+            $count++ if $_ < 5;
+        }
+        if ($count + $countParts > 4){
+            &basic::Error("too many primary partitions");
+            $createIt = 0;
+        }
+    }
+    if ($createIt){
+        my ($to, $records);
+        my @lv = split(/;/, $lvInfo);
+        foreach my $lv (@lv){
+            # root:rider32:4G:ext4
+            if ($isExtended){
+                # the logical partition needs one record, but we will be aligned:
+                $from += 2048;
+            }
+            my ($class, $label, $size, $fs) = split(/:/, $lv);
+            basic::Progress("creating $class...");
+            if ($size eq "*"){
+                $to = $maxTo;                    
+            } else {
+                my $records = 2 * sizeToKiByte($size);
+                # round up to the next MiByte:
+                $records = int(($records + 2047) / 2048) * 2048;
+                $to = $from + $records - 1;
+            }
+            $no = $isExtended ? 5 : 1;
+            $dev = CreateOnePartition("${disk}$no", $from, $to);
+            if ($fs eq "swap"){
+    			&basic::Exec("mkswap -L $label /dev/$dev");
+    			&basic::Log("swap activated on $dev", 1);
+            } else {
+    			&basic::Exec("mkfs.$fs -L $label /dev/$dev");
+    			&basic::Log("$dev created as $class ($fs)", 1);
+                
+            }
+            $from = $to + 1;
+        }    
+    }
+}
 
 # ===
 # Builds one PV of a LVM
@@ -599,7 +676,8 @@ sub CreateOnePartition{
 	my $newNo = -1;
 	
 	$name =~ /^(\D+)(\d+)/;
-	my ($disk, $no) = ($1, $2);
+	my $no;
+	($disk, $no) = ($1, $2);
 	
 	if (! SectorsOverlap($disk, $no, $from, $to)){
 		if ($partType eq $MBR || $partType eq $GPT){

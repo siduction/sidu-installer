@@ -1,3 +1,26 @@
+sidu-installer (2013.10.16.2) next; urgency=low
+
+  * fix: sidu-installer-control: following the link 
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 16 Oct 2013 23:59:45 +0200
+
+sidu-installer (2013.10.16) next; urgency=low
+
+  * autopart: new proposal: single partitions
+  * command "crypt" changed to "cryptlvm"
+  * autopart.py: new field "maximum size"
+  * autopart.py: destinations (LV or partitions) will be taken
+    from autopart.pl. This is useful for name corrections
+  * autopart.pl: added argument MAX_SIZE
+  * partinfo.pl: new !osinfo. Universal usage of firstLineOf()
+  * flavour specific minimum of space
+  * pageframe.html: XHTML syntax error if info was displayed
+  * sidu-installer-control: if x-www-browser is the chromium
+    iceweasel or midory will be taken. If no alternative is
+    available a warning is done
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 16 Oct 2013 09:15:51 +0200
+
 sidu-installer (2013.10.12) next; urgency=low
 
   * change to date based numbering
@@ -151,7 +174,7 @@ sidu-installer (1.7.17) unstable; urgency=low
 
   * remove override_dh_fixperms
   * install desktop file to /usr/share/applications
-  * ref #1175  
+  * ref #1175
 
  -- Alf Gaida <agaida@siduction.org>  Wed, 01 May 2013 14:53:11 +0200
 
@@ -159,16 +182,16 @@ sidu-installer (1.7.16) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
   * changes to rules to apply first dh_fixperms and after that
-    to chmod 755 sidu-installer.desktop 
-  
+    to chmod 755 sidu-installer.desktop
+
   [ Alf Gaida ]
-  * ./*desktop changed permission to 644 to prevent lintian whining 
+  * ./*desktop changed permission to 644 to prevent lintian whining
 
  -- Alf Gaida <agaida@siduction.org>  Wed, 01 May 2013 11:20:07 +0200
 
 sidu-installer (1.7.15) UNRELEASED; urgency=low
 
-  * changed sidu-installer mode to 755 
+  * changed sidu-installer mode to 755
 
  -- Ovidiu Angelescu <convbsd@siduction.net>  Mon, 29 April 2013 13:04:27 +0300
 
@@ -231,7 +254,7 @@ sidu-installer (1.7.8) unstable; urgency=low
   * garbage removed from English config
 
   [ Alf Gaida ]
-  * rebuild closes #1043 
+  * rebuild closes #1043
 
  -- Alf Gaida <agaida@siduction.org>  Mon, 10 Dec 2012 23:38:35 +0100
 
@@ -245,7 +268,7 @@ sidu-installer (1.7.7) unstable; urgency=low
   * sidu-installer_pt.conf mail hama 12/12/05
 
   [ Alf Gaida ]
-  * rebuild closes #1038 
+  * rebuild closes #1038
 
  -- Alf Gaida <agaida@siduction.org>  Sun, 09 Dec 2012 18:48:50 +0100
 
@@ -253,10 +276,10 @@ sidu-installer (1.7.6) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
   * fixed a bug that prevents in gnome umount of /tmp/partinfo-mount
-    when multiple partitions are on harddrive 
+    when multiple partitions are on harddrive
 
   [ Alf Gaida ]
-  * rebuild closes #1036 
+  * rebuild closes #1036
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 08 Dec 2012 23:01:30 +0100
 
@@ -266,7 +289,7 @@ sidu-installer (1.7.5) unstable; urgency=low
   * text improvements (Italian)
 
   [ Alf Gaida ]
-  * rebuild closes #1035 
+  * rebuild closes #1035
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 08 Dec 2012 20:44:08 +0100
 
@@ -289,7 +312,7 @@ sidu-installer (1.7.3) unstable; urgency=low
   * better texts for partitioning
 
   [ Alf Gaida ]
-  * rebuild closes #1029 
+  * rebuild closes #1029
 
  -- Alf Gaida <agaida@siduction.org>  Thu, 06 Dec 2012 00:28:49 +0100
 
@@ -315,16 +338,16 @@ sidu-installer (1.6.9) unstable; urgency=low
 sidu-installer (1.6.8) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
-  * added romanian translation 
+  * added romanian translation
 
   [ Alf Gaida ]
-  * rebuild closes #1016 
+  * rebuild closes #1016
 
  -- Alf Gaida <agaida@siduction.org>  Tue, 04 Dec 2012 00:17:43 +0100
 
 sidu-installer (1.6.7) unstable; urgency=low
 
-  * rebuild closes #990 
+  * rebuild closes #990
 
  -- Alf Gaida <agaida@siduction.org>  Tue, 27 Nov 2012 01:19:14 +0100
 
@@ -370,7 +393,7 @@ sidu-installer (1.6.2) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
   * Changed automount-control to automount-control.sh in install.sh
-  * Added a symlink under /usr/share/sidu-installer/backend for automount-control.sh 
+  * Added a symlink under /usr/share/sidu-installer/backend for automount-control.sh
   * Changed in shellserver.conf START_GUI_HOME=/home/aptosid to /home/siducer
 
   [ Alf Gaida ]
@@ -406,7 +429,7 @@ sidu-installer (1.5) unstable; urgency=low
   * dependency: siguibui 1.3
 
  -- J. Hamatoma <hama@siduction.net>  Sat, 25 Feb 2012 23:03:06 +0100
- 
+
 sidu-installer (1.3) unstable; urgency=low
 
   [ J. Hamatoma ]
@@ -420,7 +443,7 @@ sidu-installer (1.3) unstable; urgency=low
   * revised sidu_installer_pt.conf 29.06.
 
   [ Alf Gaida ]
-  * rebuild fixes #736 
+  * rebuild fixes #736
   * package released
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 23 Jun 2012 22:45:29 +0200
@@ -430,7 +453,7 @@ sidu-installer (1.2.1) unstable; urgency=low
   [ J. Hamatoma ]
   * Portuguese text improvements
   * Closes: #723
-  
+
   [ Alf Gaida ]
   * rebuild closes #728
 
@@ -453,7 +476,7 @@ sidu-installer (1.2) unstable; urgency=low
 sidu-installer (1.1.4) unstable; urgency=low
 
   * LV will not be added to the possible mount devices:
-  ** If a LV has no filesystem mounting is not meaningful. 
+  ** If a LV has no filesystem mounting is not meaningful.
   ** If there is a filesystem the partition is listed by blkid and therefore it arrives in the mount devices
   * Closes #711
 
@@ -520,7 +543,7 @@ sidu-installer (1.0.2) unstable; urgency=low
 
   * bump standards to 3.9.3
   * bump compat to 9
-  * .gitignore modified 
+  * .gitignore modified
 
  -- Alf Gaida <agaida@siduction.org>  Wed, 21 Mar 2012 14:07:11 +0100
 
@@ -533,7 +556,7 @@ sidu-installer (1.0.1) unstable; urgency=low
 
 sidu-installer (1.0.0) unstable; urgency=low
 
-  * email adress changed 
+  * email adress changed
 
  -- J. Hamatoma <hama@siduction.net>  Sat, 31 Dec 2011 00:25:31 +0100
 
@@ -543,7 +566,7 @@ sidu-installer (0.9.28) unstable; urgency=low
   * Removed: unneeded deinstallation (will be done in the backend)
 
   [ Alf Gaida ]
-  * rebuild fixes #523 und #526 
+  * rebuild fixes #523 und #526
 
  -- Alf Gaida <agaida@siduction.org>  Fri, 30 Dec 2011 00:51:36 +0100
 
@@ -613,7 +636,7 @@ sidu-installer (0.9.20) unstable; urgency=low
 sidu-installer (0.9.19+nmu1) unstable; urgency=low
 
   * Non-maintainer upload.
-  * fixes #457 
+  * fixes #457
 
  -- Alf Gaida <info@g-com.eu>  Wed, 21 Dec 2011 01:29:12 +0100
 
@@ -673,7 +696,7 @@ sidu-installer (0.9.14) unstable; urgency=low
 sidu-installer (0.9.13) unstable; urgency=low
 
   * New page "partition" which takes some parts of the page "rootfs".
-  * Fix: Uppercase letters are allowed for the hostname. 
+  * Fix: Uppercase letters are allowed for the hostname.
 
  -- J. Hamatoma <hama@siduction.net>  Sun, 18 Dec 2011 13:47:34 +0100
 
@@ -693,7 +716,7 @@ sidu-installer (0.9.11) unstable; urgency=low
   * LVM partitions can be used as rootfs or mountpoints (closes #391)
 
   [ Alf Gaida ]
-  * Rebuild (close #396) 
+  * Rebuild (close #396)
 
  -- Alf Gaida <agaida@siduction.org>  Wed, 14 Dec 2011 01:14:16 +0100
 
@@ -707,7 +730,7 @@ sidu-installer (0.9.9) unstable; urgency=low
 
   * Fix: Handling of disks without partitions
   * Fix: Exclude of the live cd from disk/partition list (closes #370)
-  * The rootfs will be shown in the mountpoint table (closes #378) 
+  * The rootfs will be shown in the mountpoint table (closes #378)
   * The rootfs will be excluded from the mountpoint devices (closes #380)
   * CSS: 5-col-tables: width 100%
   * Button text: "add the partition" -> "add"
@@ -740,7 +763,7 @@ sidu-installer (0.9.5) unstable; urgency=low
  -- J. Hamatoma <hama@siduction.net>  Sat, 03 Dec 2011 18:01:34 +0100
 
 sidu-installer (0.9.4) unstable; urgency=low
-  * merge se7ens css manual to changelog, probally my fault 
+  * merge se7ens css manual to changelog, probally my fault
 
  -- Alf Gaida <agaida@siduction.org>  Sat, 03 Dec 2011 01:08:47 +0100
 
@@ -762,7 +785,7 @@ sidu-installer (0.9.2) unstable; urgency=low
 
 sidu-installer (0.9.1) unstable; urgency=low
 
-  * nome css-fixes by se7en 
+  * nome css-fixes by se7en
   * fix lintian warning - native-package-with-dash-version
 
  -- Alf Gaida <agaida@siduction.org>  Fri, 02 Dec 2011 08:36:16 +0100
@@ -784,7 +807,7 @@ sidu-installer (0.8-4) unstable; urgency=low
   [ J. Hamatoma ]
   * Added dependencies whois (mkpasswd) and tzdata (timezone)
   * Fix: timezone info: new directory structure
-  * Fix: prerm: syntax error on removing virtual host 
+  * Fix: prerm: syntax error on removing virtual host
 
   [ Ferdinand Thommes ]
   * added infrastructure to /icons file
@@ -859,7 +882,7 @@ sidu-installer (0.7-1.1) unstable; urgency=low
 
   * Non-maintainer upload.
   * doc-base.Ex deleted
-  * FTBFS: sudoers.d in debian/install outcommented 
+  * FTBFS: sudoers.d in debian/install outcommented
 
  -- Alf Gaida <info@g-com.eu>  Thu, 24 Nov 2011 01:42:37 +0100
 
@@ -912,7 +935,7 @@ sidu-installer (0.4-1) unstable; urgency=low
 
   * New frontend plugin: readypage.php
   * New backend plugin: reboot.sh
-  * New positions of the buttons "back" and "next" 
+  * New positions of the buttons "back" and "next"
 
  -- J. Hamatoma <hama@siduction.net>  Sun, 13 Nov 2011 11:28:56 +0100
 
@@ -925,7 +948,7 @@ sidu-installer (0.3-1.1) unstable; urgency=low
 
 sidu-installer (0.3-1) unstable; urgency=low
 
-  * Root partitions will be filtered (size, no swap). 
+  * Root partitions will be filtered (size, no swap).
   * Fix: index access on default values, if none is defined.
   * No default root partition (too dangerous). Error message if not choosen.
 
