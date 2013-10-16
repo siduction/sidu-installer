@@ -1,9 +1,3 @@
-sidu-installer (2013.10.16.2) next; urgency=low
-
-  * fix: sidu-installer-control: following the link 
-
- -- J. Hamatoma <hama@siduction.net>  Wed, 16 Oct 2013 23:59:45 +0200
-
 sidu-installer (2013.10.16) next; urgency=low
 
   * autopart: new proposal: single partitions
