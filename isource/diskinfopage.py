@@ -185,16 +185,20 @@ class DiskInfoPage(Page):
                 if line.startswith("!GPT="):
                     self._gptDisks = line[5:]
                 elif line.startswith("!VG="):
-                    self._lvmVGs = line[4:]
+                    line = line[4:]
+                    if line.find(":") > 0:
+                        self._lvmVGs =  self.autoSplit(line, True);
+                        for vg in self._lvmVGs:
+                            (name, size) = vg.split(":")
+                            # size is in MiByte. Convert to KiByte:
+                            self._disks[name] = DiskInfo(name, int(size),
+                                 "LVM-VG")
                 elif line.startswith("!damaged="):
                     self._dmaged = line[9:]
                 elif line.startswith("!osinfo="):
                     self._osInfo = line[8:].split(";")
                 elif line.startswith("!LV="):
                     self._lvmLVs = line[4:]
-                    for lvm in self._lvmVGs.split(";"):
-                        lvm += "/"
-                        self._disks[lvm] = DiskInfo(lvm, -1, "LVM-VG")
                 elif line.startswith("!GapPart="):
                     self._emptyPartitions = self.autoSplit(line[9:], True)
                 else:
@@ -362,7 +366,7 @@ class DiskInfoPage(Page):
         for name in disks:
             disk = self._disks[name]
             self._currentRows.append((disk._device, 
-                    self.humanReadableSize(disk._size*1024) if disk._size > 0 else "",
+                    self.humanReadableSize(disk._size*1024*1024) if disk._size > 0 else "",
                     disk._info if disk._info != None else ""))
         try:
             table = self.buildTable(self, disk)

@@ -75,9 +75,9 @@ class AutoPartPage(Page):
         sizeUsed = self.getCorrectedUsedSpace()
         sizeFree = self.humanReadableSize((sizeAvailable-sizeUsed))
         sizeAvailable = self.humanReadableSize(sizeAvailable*1024)
-        text = self._session.getConfig("autopart.txt_size_total")
+        text = self._session.getConfig("autopart.txt_descr_total")
         text = text.replace("{{size_total}}", sizeAvailable)
-        body = body.replace("{{autopart.txt_size_total}}", text)
+        body = body.replace("{{autopart.txt_descr_total}}", text)
         body = body.replace("{{size_free}}", sizeFree)
         return body
         

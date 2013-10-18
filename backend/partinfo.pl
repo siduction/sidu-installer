@@ -42,6 +42,7 @@ my %months = (
 );
 my $s_gptDisks;
 my @s_vg;
+my @s_vgSize;
 my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
@@ -120,7 +121,11 @@ sub main{
 		push(@s_output, "$key\t$s_disks{$key}");
 	}
 	push(@s_output, "!GPT=$s_gptDisks;");
-	push(@s_output, '!VG=' . join(';', @s_vg));
+	my $val = "!VG=";
+	foreach my $ix (0..$#s_vg){
+	    $val .= ";" . $s_vg[$ix] . ":" . $s_vgSize[$ix];
+	}
+	push(@s_output, $val);
 	push(@s_output, '!LV=' . join(';', @s_lv));
 	push(@s_output, "!GapPart=$s_gapPart");
 	push(@s_output, "!damaged=" . join(';', sort keys %s_damagedDisks));
@@ -260,7 +265,24 @@ sub firstLineOf{
 	}
 	return $rc;
 }
-
+# ===
+# Returns the factor associated to the unit, e.g. 1024 belongs to Ki
+# @param unit   K(i), M(i), G(i), T(i)
+# @return       1024**N with N in (0..4)
+sub UnitToFactor{
+    my $rc = 1;
+    my $unit = shift;
+    if ($unit =~ /^k/i){
+        $rc = 1024;
+    } elsif ($unit =~ /^m/i){
+        $rc = 1024*1024;
+    } elsif ($unit =~ /^g/i){
+        $rc = 1024*1024*1024;
+    } elsif ($unit =~ /^t/i){
+        $rc = 1024*1024*1024*1024;
+    }
+    return $rc;
+}
 # ===
 # Gets the volume group info
 # The info will be stored in @lvs
@@ -270,6 +292,12 @@ sub getVG{
 	foreach(@lines){
 		if (/VG Name\s+(\S+)/){
 			push(@s_vg, $1);
+		} elsif (/VG Size\s+(\d+)([.,](\d+))? (\w+)/){
+			# VG Size   14,71 GiB
+			my ($val, $val2, $unit) = ($1, $2, $3);
+			$val2 .= "0" x (3 - length($val2));
+			$val = int(1000*$val + $val2 * &UnitToFactor($unit) / 1024); 
+            push(@s_vgSize, $val);
 		}
 	}
 
