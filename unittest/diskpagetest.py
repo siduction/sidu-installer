@@ -5,7 +5,7 @@ Created on 13.04.2013
 '''
 import unittest, os.path
 
-from source.diskinfopage import DiskInfoPage
+from isource.diskinfopage import DiskInfoPage
 from pyunit.aux import Aux
 from util.util import Util;
 
@@ -45,7 +45,7 @@ sdb\t3956736
 
     def testPartitions(self):
         page = DiskInfoPage(self._parent)
-        self.assertEquals(9, len(page._partitions))
+        self.assertEquals(19, len(page._partitions))
         # /dev/sda1	label:System-reserviert	fs:ntfs	uuid:2CEAB44DEAB41554	
         #    size:102400	pinfo:Microsoft basic data
 
@@ -80,8 +80,8 @@ sdb\t3956736
         
     def testHasGPT(self):
         page = DiskInfoPage(self._parent)
-        self.assertTrue(page.hasGPT('sda'))
-        self.assertFalse(page.hasGPT('sdb'))
+        self.assertTrue(page.hasGPT('sda1'))
+        self.assertFalse(page.hasGPT('sdb2'))
 
     def testGetPartitionsOfDisk(self):
         page = DiskInfoPage(self._parent)
@@ -107,17 +107,29 @@ sdb\t3956736
  </tr>
  <tr>
 <td>sdb1</td>
-<td>usb-store</td>
-<td>3955MB</td>
 <td></td>
-<td>vfat</td>
+<td>100MiB</td>
+<td>EF02</td>
+<td></td>
 <td></td></tr><tr>
 <td>sdb2</td>
-<td>ubuntu</td>
-<td>4321MB</td>
+<td>sidu-11.1-64-kde</td>
+<td>7435MiB</td>
 <td></td>
 <td>ext4</td>
-<td>ubuntuErzeugt: 2012.11.13 Ge&auml;ndert: 2013.01.26</td></tr>
+<td> Erzeugt: 2013.10.23 Geändert: 2013.10.23</td></tr><tr>
+<td>sdb3</td>
+<td>home</td>
+<td>6284MiB</td>
+<td></td>
+<td>ext4</td>
+<td> Erzeugt: 2013.10.23 Geändert: 2013.10.23</td></tr><tr>
+<td>sdb4</td>
+<td>swap</td>
+<td>1252MiB</td>
+<td></td>
+<td>swap</td>
+<td></td></tr>
 </table>
 ''',        table)
         self.assertEquals(None, diff)

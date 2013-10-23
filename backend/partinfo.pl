@@ -23,6 +23,8 @@ my $gv_log = "/tmp/partinfo_err.log";
 my $gv_mount_no = 0;
 my %s_lvm;
 my @s_output;
+my @s_labels;
+my %s_physicalDisks;
 
 # minimal size of a partition in bytes:
 my $s_minPartSize = 10*1024*1024;
@@ -117,10 +119,8 @@ sub main{
 	foreach $dev (sort keys %s_lvDevs){
 		push(@s_output, "$dev\t$s_lvDevs{$dev}");
 	}
-	foreach $key (sort keys %s_disks){
-		push(@s_output, "$key\t$s_disks{$key}");
-	}
-	push(@s_output, "!GPT=$s_gptDisks;");
+	push(@s_output, "!phDisk=" . JoinPhysicalDiskInfo());
+	push(@s_output, "!labels=;" . join(";", @s_labels));
 	my $val = "!VG=";
 	foreach my $ix (0..$#s_vg){
 	    $val .= ";" . $s_vg[$ix] . ":" . $s_vgSize[$ix];
@@ -128,7 +128,6 @@ sub main{
 	push(@s_output, $val);
 	push(@s_output, '!LV=' . join(';', @s_lv));
 	push(@s_output, "!GapPart=$s_gapPart");
-	push(@s_output, "!damaged=" . join(';', sort keys %s_damagedDisks));
     push(@s_output, "!osinfo=" . &GetSiduInfo());
 	&basic::Progress("writing info", 1);
 	recorder::Put("partition_info", \@s_output);
@@ -138,6 +137,22 @@ sub main{
 	unlink($s_answer) if -e $s_answer;
 	print STDERR "cannot rename: $temp -> $s_answer $!" unless rename($temp, $s_answer);
 	&UnmountAll();
+}
+
+# ===
+# Joins the info about the physical disks.
+# @return   e.g "\tsda;12345;msdos;1;2;;WD Green 17383UI\tsdb;45689;gpt;3;0;efiboot damaged;USB"
+sub JoinPhysicalDiskInfo{
+    my $rc;
+    foreach my $dev (sort keys %s_physicalDisks){
+        my @vals = split(/\t/, $s_physicalDisks{$dev});
+        if ($s_damagedDisks{$dev} ne ""){
+            # size pType primaries extendeds attr model
+            $vals[4] .= " damaged";
+        }
+        $rc .= "\t$dev;" . join(";", @vals);
+    }
+    return $rc;
 }
 
 # ===
@@ -272,12 +287,20 @@ sub firstLineOf{
 sub UnitToFactor{
     my $rc = 1;
     my $unit = shift;
-    if ($unit =~ /^k/i){
+    if ($unit =~ /^kb/i){
+        $rc = 1000;
+    } elsif ($unit =~ /^k/i){
         $rc = 1024;
+    } elsif ($unit =~ /^mb/i){
+        $rc = 1000*1000;
     } elsif ($unit =~ /^m/i){
         $rc = 1024*1024;
+    } elsif ($unit =~ /^gb/i){
+        $rc = 1000*1000*1000;
     } elsif ($unit =~ /^g/i){
         $rc = 1024*1024*1024;
+    } elsif ($unit =~ /^tb/i){
+        $rc = 1000*1000*1000*1000;
     } elsif ($unit =~ /^t/i){
         $rc = 1024*1024*1024*1024;
     }
@@ -343,7 +366,10 @@ sub getDiskDev{
 				&Progress("gdisk");
 				&getGdiskInfo($dev);
 			}
-		}                                                                                                 
+		}
+        if (m!/dev/(\w+):\s+(\w+)!){                                                                                                
+			GetPhysicalDiskInfo($1, $2);
+        }
 	}
 	my @disks = getEmptyDisks();
 	foreach (@disks){
@@ -354,6 +380,38 @@ sub getDiskDev{
 	return @rc;
 }
 
+# ===
+# Gets the basic info about a disk.
+# @param dev    disk name, e.g. sda
+# @param class  "gpt"or "msdos""
+sub GetPhysicalDiskInfo {
+    my $disk = shift;
+    my $class = shift;
+    
+    my @lines = recorder::ReadStream("GetPhysicalDiskInfo", "parted -s /dev/$disk print|");
+    my ($model, $primaries, $extendeds) = (0, 0, "");
+    my ($pType, $size, $unit, $info);
+    foreach(@lines){
+        if (/Model: (.*)/){ 
+            $model = $1;
+            $model =~ s/;/ /;
+        } elsif (/Partition Table: (\S+)/){
+            $pType = $1;
+        } elsif (/Disk.*:\s+([\d,.]+)(\S+)/){
+            ($size, $unit) = ($1, $2);
+            $size =~ s/,/./;
+            $size = int($size / 1024 / 1024 * UnitToFactor($unit));
+        } elsif (/\s*(\d+)/){
+            if ($1 <= 4 && $class ne "gpt"){
+                $primaries++;
+            } else {
+                $extendeds++;
+            }
+        }
+        $info = "efiboot" if /bios_grub/;
+    }  
+    $s_physicalDisks{$disk} = "$size\t$pType\t$primaries\t$extendeds\t$info\t$model";
+}
 # ===
 # Finds an unused primary partition number
 # Fills: $s_hints
@@ -581,16 +639,16 @@ sub getGdiskInfo{
 	}
 }
 sub getBlockId{
-	my ($label, $uuid, $fs, $info2);
-	my ($dev, $info);
+	my ($label, $uuid, $fs, $info2, $dev);
 	my %blkids;
 	my @lines = recorder::ReadStream("getBlockId", "/sbin/blkid -c /dev/null|");
 	foreach(@lines){
 		if (/^(\S+):/){
 			my $dev = $1;
-			my ($info, $label, $uuid, $fs, $size, $info);
+			my ($info, $label, $uuid, $fs, $size);
 			if (/LABEL="([^"]+)"/){
 				$label = "\tlabel:$1";
+				push(@s_labels, $1);
 			}
 			if (/TYPE="([^"]+)"/){
 				$fs = "\tfs:$1";

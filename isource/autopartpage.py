@@ -118,11 +118,11 @@ class AutoPartPage(Page):
     def extractDevs(self, fileContent):
         '''Extracts devices from the answer file.
         @param fileContent:    the answer file
-        @return:                (boot, root, home, vg)
+        @return:                (boot, root, home, efi, vg)
         '''
-        (boot, root, home, vg) = ("", "", "", "")
+        (boot, root, home, efi, vg) = ("", "", "", "", "")
         lines = fileContent.split("\n")
-        rexpr = re.compile(r'\s*(\S+) created as (\w+)')
+        rexpr = re.compile(r'\s*(\S+) created as (\S+)')
         rexpr2 = re.compile(r'\s*VG (\S+) has been created')
         for line in lines:
             matcher = rexpr.match(line)
@@ -134,11 +134,13 @@ class AutoPartPage(Page):
                     home = dev
                 elif name == "boot":
                     boot = dev
+                elif name == "(U)EFI":
+                    efi = dev
             else:
                 matcher = rexpr2.match(line)
                 if matcher != None:
                     vg = matcher.group(1)
-        return (boot, root, home, vg)
+        return (boot, root, home, efi, vg)
     
     def buildReady(self, answer):
         '''Builds the content if the automatic partitioning has been done.
@@ -153,7 +155,7 @@ class AutoPartPage(Page):
             message = self._session.getConfig("autopart.txt_failed")
         else:
             message = self._session.getConfig("autopart.txt_successful")
-            (boot, root, home, vg) = self.extractDevs(fileContent)
+            (boot, root, home, efi, vg) = self.extractDevs(fileContent)
             self._globalPage.putField("root", root)
             self._session.putUserData("rootfs", "root", root)
             self._globalPage.putField("rootfs", "-")

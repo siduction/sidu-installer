@@ -13,7 +13,7 @@ class PartitionInfo:
     '''
     def __init__(self, parent, dev, label, size, size2, ptype, pinfo, fs, info):
         '''Constructor.
-        @param parent: an instance of DiskInfo 
+        @param parent: an instance of VirtualDisk 
         '''
         self._parent = parent
         # e.g. sda1
@@ -55,17 +55,27 @@ class PartitionInfo:
                 rc = False    
         return rc
 
-class DiskInfo:
-    '''Stores the info about a disk (a container of partitions)
+class VirtualDisk:
+    '''Stores the info about a container of partitions.
+    This can be a physical disk or a logical volume.
     '''
-    def __init__(self, dev, size, info = None):
+    def __init__(self, dev, size, info = None, attr = None,
+                 primaries = 0, nonPrimaries = 0, pType = None):
         '''Constructor.
-        @param dev: the device name
-        @param size: the size in kiByte
+        @param dev:          the device name
+        @param size:         the size in kiByte
+        @param label:        the label of the disk
+        @param primaries:    count of primary partitions
+        @param nonPrimaries: count of non primary partitions
+        @param pType:        gpt or msdos
         '''
         self._device = dev
-        self._size = size
+        self._size = int(size)
         self._info = info
+        self._attr = attr
+        self._primaries = primaries
+        self._nonPrimaries = nonPrimaries
+        self._class = pType
         
 class DiskInfoPage(Page):
     '''
@@ -85,7 +95,6 @@ class DiskInfoPage(Page):
         self._hasInfo = False
         self._parentPage = parentPage
         self._parentName = parentPage._name
-        self._gptDisks = ''
         self._partitions = {}
         self._partitionList = []
         self._disks = {}
@@ -173,7 +182,7 @@ class DiskInfoPage(Page):
     def importPartitionInfo(self):
         '''Gets the data of the partition info and put it into into the user data.
         '''
-        self._session.trace('DiskInfo.importPartitionInfo()')
+        self._session.trace('diskinfo.importPartitionInfo()')
         excludes = self._session.getConfigWithoutLanguage('diskinfo.excluded.dev')
         rexprExcludes = re.compile(excludes)
         diskList = ''
@@ -182,8 +191,8 @@ class DiskInfoPage(Page):
             for line in fp:
                 no += 1
                 line = line.strip()
-                if line.startswith("!GPT="):
-                    self._gptDisks = line[5:]
+                if line.startswith("!labels="):
+                    self._labels = self.autoSplit(line[8:])
                 elif line.startswith("!VG="):
                     line = line[4:]
                     if line.find(":") > 0:
@@ -191,26 +200,24 @@ class DiskInfoPage(Page):
                         for vg in self._lvmVGs:
                             (name, size) = vg.split(":")
                             # size is in MiByte. Convert to KiByte:
-                            self._disks[name] = DiskInfo(name, int(size),
-                                 "LVM-VG")
-                elif line.startswith("!damaged="):
-                    self._dmaged = line[9:]
+                            self._disks[name] = VirtualDisk(name, int(size),
+                                 "", "LVM-VG")
                 elif line.startswith("!osinfo="):
                     self._osInfo = line[8:].split(";")
                 elif line.startswith("!LV="):
                     self._lvmLVs = line[4:]
                 elif line.startswith("!GapPart="):
                     self._emptyPartitions = self.autoSplit(line[9:], True)
+                elif line.startswith("!phDisk="):
+                    disks = self.autoSplit(line[8:], True)
+                    for info in disks:
+                        (dev, size, pType, prim, ext, attr, model) = info.split(";");
+                        self._disks[dev] = VirtualDisk(dev, size, model, attr,
+                            prim, ext, pType)
                 else:
                     cols = line.split('\t')
                     dev = cols[0].replace('/dev/', '')
                     if line == "" or rexprExcludes.search(dev):
-                        continue
-                    if len(cols) == 2:
-                        # Disks
-                        kByte = cols[1]
-                        self._disks[dev] = DiskInfo(dev, int(kByte))
-                        diskList += '/dev/' + dev + " (MBR)"
                         continue
                     infos = {}
                     for ix in xrange(len(cols)):
@@ -296,12 +303,12 @@ class DiskInfoPage(Page):
               
     def hasGPT(self, partition):
         '''Returns whether a given partition lies on a GPT disk.
-         @param partition: partition to test, e.g. sda
+         @param partition: partition to test, e.g. sda2
          @return True: the partition is on a GPT disk<br>
              False: otherwise
         '''
-        disk = self.getDiskOfPartition(partition)
-        rc = disk == False if disk == None else self._gptDisks.find(disk) >= 0
+        disk = self._disks[self.getDiskOfPartition(partition)]
+        rc = disk._attr.find("gpt") >= 0
         return rc
 
     def buildPartOfTable(self, info, what, ixRow = None):
@@ -365,8 +372,12 @@ class DiskInfoPage(Page):
         disks.sort()
         for name in disks:
             disk = self._disks[name]
+            attr = disk._class if disk._class != None else ""
+            if disk._attr != None:
+                attr += " " + disk._attr
             self._currentRows.append((disk._device, 
                     self.humanReadableSize(disk._size*1024*1024) if disk._size > 0 else "",
+                    attr,
                     disk._info if disk._info != None else ""))
         try:
             table = self.buildTable(self, disk)
