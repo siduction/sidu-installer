@@ -64,8 +64,21 @@ class DiskInfo:
         @param size: the size in kiByte
         '''
         self._device = dev
-        self._size = size
+        self._size = int(size)
         self._info = info
+        self._primaries = 0
+        self._nonPrimaries = 0
+        self._class = ""
+        
+    def addInfo(self, primaries, nonPrimaries, aClass ):
+        '''Adds additional infos.
+        @param primaries:    count of primary partitions
+        @param nonPrimaries: count of non primary partitions
+        @param aClass:       gpt or msdos
+        '''
+        self._primaries = primaries
+        self._nonPrimaries = nonPrimaries
+        self._class = aClass
         
 class DiskInfoPage(Page):
     '''
@@ -184,6 +197,8 @@ class DiskInfoPage(Page):
                 line = line.strip()
                 if line.startswith("!GPT="):
                     self._gptDisks = line[5:]
+                elif line.startswith("!labels="):
+                    self._labels = self.autoSplit(line[8:])
                 elif line.startswith("!VG="):
                     line = line[4:]
                     if line.find(":") > 0:
@@ -201,16 +216,18 @@ class DiskInfoPage(Page):
                     self._lvmLVs = line[4:]
                 elif line.startswith("!GapPart="):
                     self._emptyPartitions = self.autoSplit(line[9:], True)
+                elif line.startswith("!phDisk="):
+                    disks = self.autoSplit(line[8:], True)
+                    for info in disks:
+                        (dev, size, pType, prim, ext, model) = info.split(";");
+                        if pType.lower() ==  "gpt":
+                            model = "[GPT] " + model
+                        self._disks[dev] = DiskInfo(dev, size, model)
+                        self._disks[dev].addInfo(prim, ext, pType)
                 else:
                     cols = line.split('\t')
                     dev = cols[0].replace('/dev/', '')
                     if line == "" or rexprExcludes.search(dev):
-                        continue
-                    if len(cols) == 2:
-                        # Disks
-                        kByte = cols[1]
-                        self._disks[dev] = DiskInfo(dev, int(kByte))
-                        diskList += '/dev/' + dev + " (MBR)"
                         continue
                     infos = {}
                     for ix in xrange(len(cols)):

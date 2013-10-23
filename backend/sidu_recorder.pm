@@ -14,6 +14,7 @@ hamatoma (C) 2013
 =cut
 
 use strict;
+use sidu_basic;
 
 my $MODE_NONE = 0;
 my $MODE_RECORDING = 1;
@@ -198,6 +199,20 @@ sub WriteStream{
 		push(@s_outputStreamLines, "== id: $id device: $device");
 		push(@s_outputStreamLines, $content);
 	}
+}
+# ===
+# Execute a command.
+# @param id         identifies the caller
+# @param cmd        command to execute
+# @param important	true: the logging will be prefixed
+# @return           the output of the command
+sub Exec{
+    my $id = shift;
+    my $cmd = shift;
+    my $important = shift;
+    my @rc = ReadStream($id, "$cmd |");
+    basic::Log(\@rc, $important);
+    return @rc;
 }
 
 

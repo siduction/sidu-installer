@@ -63,6 +63,11 @@ sub Exec{
 # @param important	true: a prefix will be added
 sub Log{
 	my $msg = shift;
+	if (ref $msg eq "ARRAY"){
+	    my $sep;
+	    $sep = "\n" if $$msg[0] !~ /\n/;
+	    $msg = join($sep, @$msg);
+	}
 	my $important = shift;
 	if ($important){
 	    $msg = $s_logPrefixImportant . $msg;

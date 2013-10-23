@@ -1,3 +1,17 @@
+sidu-installer (2013.10.18) next; urgency=low
+
+  * disk info: showing disk label
+  * recorder::Exec(): makes the tests independent from the environment
+  * autopart.pl:
+  * reserving 34 sectors at the end (for GPT shadow) because of parted
+  * GPT: setting names and flags
+  * GPT: creating EFI boot partition (EPS)
+  * Refactoring: functions starts with uppercase. removed unused functions
+  * partinfo.pl: new: !phDisk, !labels
+  * basic::Log(): handling of ref array
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 23 Oct 2013 20:50:49 +0200
+
 sidu-installer (2013.10.17) next; urgency=low
 
   * layout in autopart: total size now aligned
