@@ -1,3 +1,11 @@
+sidu-installer (2013.11.20) unstable; urgency=low
+
+  * perl modules moved to sidu-base
+  * template "encrypted" deactivated
+  * dependency from sidu-base: 2013.11.20
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 01 Nov 2013 08:35:53 +0100
+
 sidu-installer (2013.10.24) next; urgency=low
 
   * disk info: showing disk label and attributes

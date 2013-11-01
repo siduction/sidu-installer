@@ -42,13 +42,6 @@ MkLink nonfree.sh $MY_BACKEND
 MkLink autopart.sh $MY_BACKEND
 MkLink autopart.pl $MY_BACKEND
 
-DIR_PERL=/usr/local/lib/site_perl
-DIR_BACKEND=/usr/share/sidu-installer/backend
-test -d $DIR_PERL || mkdir -p $DIR_PERL
-MkLink2 $DIR_BACKEND/sidu_basic.pm $DIR_PERL
-MkLink2 $DIR_BACKEND/sidu_test.pm $DIR_PERL
-MkLink2 $DIR_BACKEND/sidu_recorder.pm $DIR_PERL
-
 MkLink2 $BASE_BACKEND/automount-control.sh $MY_BACKEND
 MkLink2 /var/cache/sidu-base/public $MY_DIR/installer/static/
 

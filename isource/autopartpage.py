@@ -75,10 +75,8 @@ class AutoPartPage(Page):
         sizeUsed = self.getCorrectedUsedSpace()
         sizeFree = self.humanReadableSize((sizeAvailable-sizeUsed))
         sizeAvailable = self.humanReadableSize(sizeAvailable*1024)
-        text = self._session.getConfig("autopart.txt_descr_total")
-        text = text.replace("{{size_total}}", sizeAvailable)
-        body = body.replace("{{autopart.txt_descr_total}}", text)
-        body = body.replace("{{size_free}}", sizeFree)
+        self._session.setLocalVar("size_total", sizeAvailable)
+        self._session.setLocalVar("size_free", sizeFree)
         return body
         
     def buildLVM(self):

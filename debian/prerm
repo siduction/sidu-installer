@@ -29,11 +29,6 @@ RmLink nonfree.sh
 RmLink autopart.sh
 RmLink autopart.pl
 
-test -d /usr/local/lib/site_perl && cd /usr/local/lib/site_perl
-RmLink sidu_test.pm 
-RmLink sidu_basic.pm 
-RmLink sidu_recorder.pm 
-
 popd >/dev/null
 
 # Debhelpertoken added, review needed

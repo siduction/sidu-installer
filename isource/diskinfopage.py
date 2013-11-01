@@ -100,6 +100,10 @@ class DiskInfoPage(Page):
         self._disks = {}
         # not existing partitions, e.g. "sdc!3-2048-18000"
         self._emptyPartitions = []
+        self._markedLVM = []
+        self._physicalVolumes = []
+        self._freePV = []
+        self._volumeGroups = []
         self._filePartInfo = session.getConfigWithoutLanguage(
                 'diskinfo.file.demo.partinfo')
         if self._filePartInfo == "" or not os.path.exists(self._filePartInfo):
@@ -202,8 +206,19 @@ class DiskInfoPage(Page):
                             # size is in MiByte. Convert to KiByte:
                             self._disks[name] = VirtualDisk(name, int(size),
                                  "", "LVM-VG")
-                elif line.startswith("!osinfo="):
-                    self._osInfo = line[8:].split(";")
+                elif line.startswith("PhLVM:"):
+                    self._physicalVolumes = self.autoSplit(line[6:], True)
+                elif line.startswith("FreeLVM:"):
+                    self._freePV = self.autoSplit(line[8:], True)
+                elif line.startswith("MarkedLVM:"):
+                    self._markedLVM = self.autoSplit(line[10:], True)
+                elif line.startswith("LogLVM:"):
+                    pass
+                elif line.startswith("VgLVM:"):
+                    self._volumeGroups = self.autoSplit(line[6:], True)
+                    for lvm in self._lvmVGs.split(";"):
+                        lvm += "/"
+                        self._disks[lvm] = VirtualDisk(lvm, -1, "", "LVM-VG")
                 elif line.startswith("!LV="):
                     self._lvmLVs = line[4:]
                 elif line.startswith("!GapPart="):
@@ -214,6 +229,8 @@ class DiskInfoPage(Page):
                         (dev, size, pType, prim, ext, attr, model) = info.split(";");
                         self._disks[dev] = VirtualDisk(dev, size, model, attr,
                             prim, ext, pType)
+                elif line.startswith("!osinfo="):
+                    self._osInfo = line[8:].split(";")
                 else:
                     cols = line.split('\t')
                     dev = cols[0].replace('/dev/', '')
@@ -273,6 +290,8 @@ class DiskInfoPage(Page):
         @return:      a list of partitions (type PartitionInfo)
         '''
         rc = []
+        if disk.endswith("/"):
+            disk = "mapper/" + disk[0:-1] + "-"
         for partition in self._partitionList:
             if partition._device.startswith(disk):
                 rc.append(partition)
@@ -419,7 +438,6 @@ class DiskInfoPage(Page):
         @return: a list of device names starting with '-'
         '''
         rc = ["-"]
-        
         minSize = int(self._session.getConfigWithoutLanguage(
             "diskinfo.root.minsize.mb." 
             + self._osInfo[0]))
@@ -600,8 +618,80 @@ class DiskInfoPage(Page):
         body = body.replace("{{count}}", unicode(count))
         return body
     
+    def listOfFirst(self, source):
+        '''Returns a list built from a list of autosplit strings.
+        The first item of each source element will be taken.
+        @param source: the source list
+        @return: a list with the first items of source
+        '''
+        rc = []
+        for dev in source:
+            names = self.autoSplit(dev)
+            rc.append(names[0].replace("/dev/", ""))
+        return rc
+    
+    def listOfFull(self, source):
+        '''Returns a list built from a list of autosplit strings.
+        The first item of each source element will be taken.
+        @param source: the source list
+        @return: a list with the first items of source
+        '''
+        rc = []
+        for dev in source:
+            cols = self.autoSplit(dev)
+            if len(cols) > 0:
+                cols[0] = cols[0].replace("/dev/", "")
+            rc.append(cols)
+        return rc
+    
+    def getMarkedPV(self, fullInfo = False):
+        '''Returns the names of the partitions with partition type 0x8e.
+        @param fullInfo:    False: only the name will be returned
+                            True: all columns will be returned
+        @return: a list of names, e.g. [sdc1, sdc2]
+        '''
+        if not fullInfo:
+            rc = self.listOfFirst(self._markedLVM)
+        else:
+            rc = self.listOfFull(self._markedLVM)
+        return rc
+
+    def getFreePV(self, fullInfo = False):
+        '''Returns the names of the unasigned physical volumes.
+        @param fullInfo:    False: only the name will be returned
+                            True: all columns will be returned
+        @return: a list of names, e.g. [sdc1, sdc2]
+                 or a list of tuples: [("sdc1", "4G"), ("sdc3", "2G")]
+        '''
+        if not fullInfo:
+            rc = self.listOfFirst(self._freePV)
+        else:
+            rc = self.listOfFull(self._freePV)
+        return rc
+
+    def getVolumeGroups(self):
+        '''Returns a list of the names of the volume groups.
+        @return: a list of the names of the volume groups
+        '''
+        rc = self.listOfFirst(self._volumeGroups)
+        return rc
+    
+    def listOfFirstOfVG(self, vg, source):
+        rc = []
+        for dev in self._freePV:
+            names = self.autoSplit(dev)
+            rc.append(names[0].replace("/dev/", ""))
+        return rc
+      
+    def getPhysLVM(self):
+        '''Returns the list of infos about the VGs.
+        @return a list of the VGs
+        '''
+        return self._physicalVolumes
+            
     def getOsInfo(self):
         '''Returns info about the current os.
         @return: (<flavour>, <arch>, <version>)
         '''
         return self._osInfo;
+            
