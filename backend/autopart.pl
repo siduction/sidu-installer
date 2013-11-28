@@ -386,6 +386,8 @@ sub ReadMsdosDisk{
 			$parts .= ":$1-$2-$3";		
 		} elsif (/total\s+(\d+)\s+sectors/){
 		    $total = $1;
+		} elsif (m!Disk\s+\S+:\s+(\d+)!){
+		    $total = $1;
 		}
 		if (m!extended!){
 			$info .= " ext:$1";
@@ -854,7 +856,7 @@ sub FindDiskType{
 sub GetPartNosOfDisk{
     my $disk = shift;
     
-    my $parts = getDiskInfo($disk);
+    my $parts = GetDiskInfo($disk);
     my @cols = split(/:/, $parts);
     my @rc;
     foreach(@cols){

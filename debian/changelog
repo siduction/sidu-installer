@@ -1,3 +1,9 @@
+sidu-installer (2013.11.28) unstable; urgency=low
+
+  * fix: autopart.pl: detection of the last sector
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 28 Nov 2013 23:52:15 +0100
+
 sidu-installer (2013.11.20) unstable; urgency=low
 
   * perl modules moved to sidu-base
