@@ -1,3 +1,9 @@
+sidu-installer (2013.11.28) unstable; urgency=low
+
+  * new build  
+
+ -- Alf Gaida <agaida@siduction.org>  Thu, 28 Nov 2013 03:14:07 +0100
+
 sidu-installer (2013.11.20) unstable; urgency=low
 
   * perl modules moved to sidu-base
@@ -17,7 +23,6 @@ sidu-installer (2013.10.24) next; urgency=low
   * Refactoring: functions starts with uppercase. removed unused functions
   * partinfo.pl: new: !phDisk, !labels. Removed: !GPT, !damaged
   * basic::Log(): handling of ref array
-
 
  -- J. Hamatoma <hama@siduction.net>  Wed, 23 Oct 2013 20:50:49 +0200
 
