@@ -15,11 +15,11 @@ Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
 
 Package: sidu-installer
 Architecture: all
-Depends: ${misc:Depends},
- python (>= 2.7),
- python-support (>= 0.90),
+Pre-Depends:
  pywwetha (>= 1.1.1),
- sidu-base(>= 2013.11.20)
+ sidu-base(>= 2013.11.20),
+Depends:
+ ${misc:Depends},
 Description: installer for siduction
  The main content is a set of HTML files describing features, handling
  and tips for siduction.
