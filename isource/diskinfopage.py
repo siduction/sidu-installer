@@ -72,10 +72,26 @@ class VirtualDisk:
         self._device = dev
         self._size = int(size)
         self._info = info
+<<<<<<< HEAD
         self._attr = attr
         self._primaries = primaries
         self._nonPrimaries = nonPrimaries
         self._class = pType
+=======
+        self._primaries = 0
+        self._nonPrimaries = 0
+        self._class = ""
+        
+    def addInfo(self, primaries, nonPrimaries, aClass ):
+        '''Adds additional infos.
+        @param primaries:    count of primary partitions
+        @param nonPrimaries: count of non primary partitions
+        @param aClass:       gpt or msdos
+        '''
+        self._primaries = primaries
+        self._nonPrimaries = nonPrimaries
+        self._class = aClass
+>>>>>>> refs/remotes/origin/next
         
 class DiskInfoPage(Page):
     '''
@@ -195,7 +211,13 @@ class DiskInfoPage(Page):
             for line in fp:
                 no += 1
                 line = line.strip()
+<<<<<<< HEAD
                 if line.startswith("!labels="):
+=======
+                if line.startswith("!GPT="):
+                    self._gptDisks = line[5:]
+                elif line.startswith("!labels="):
+>>>>>>> refs/remotes/origin/next
                     self._labels = self.autoSplit(line[8:])
                 elif line.startswith("!VG="):
                     line = line[4:]
@@ -226,11 +248,19 @@ class DiskInfoPage(Page):
                 elif line.startswith("!phDisk="):
                     disks = self.autoSplit(line[8:], True)
                     for info in disks:
+<<<<<<< HEAD
                         (dev, size, pType, prim, ext, attr, model) = info.split(";");
                         self._disks[dev] = VirtualDisk(dev, size, model, attr,
                             prim, ext, pType)
                 elif line.startswith("!osinfo="):
                     self._osInfo = line[8:].split(";")
+=======
+                        (dev, size, pType, prim, ext, model) = info.split(";");
+                        if pType.lower() ==  "gpt":
+                            model = "[GPT] " + model
+                        self._disks[dev] = DiskInfo(dev, size, model)
+                        self._disks[dev].addInfo(prim, ext, pType)
+>>>>>>> refs/remotes/origin/next
                 else:
                     cols = line.split('\t')
                     dev = cols[0].replace('/dev/', '')

@@ -25,6 +25,7 @@ my %s_lvm;
 my @s_output;
 my @s_labels;
 my %s_physicalDisks;
+my $s_diskInfoEx = "";
 
 # minimal size of a partition in bytes:
 my $s_minPartSize = 10*1024*1024;
@@ -119,7 +120,8 @@ sub main{
 	foreach $dev (sort keys %s_lvDevs){
 		push(@s_output, "$dev\t$s_lvDevs{$dev}");
 	}
-	push(@s_output, "!phDisk=" . JoinPhysicalDiskInfo());
+	push(@s_output, "!phDisk=$s_diskInfoEx");
+	push(@s_output, "!GPT=$s_gptDisks;");
 	push(@s_output, "!labels=;" . join(";", @s_labels));
 	my $val = "!VG=";
 	foreach my $ix (0..$#s_vg){
@@ -390,7 +392,7 @@ sub GetPhysicalDiskInfo {
     
     my @lines = recorder::ReadStream("GetPhysicalDiskInfo", "parted -s /dev/$disk print|");
     my ($model, $primaries, $extendeds) = (0, 0, "");
-    my ($pType, $size, $unit, $info);
+    my ($pType, $size, $unit);
     foreach(@lines){
         if (/Model: (.*)/){ 
             $model = $1;
@@ -408,9 +410,8 @@ sub GetPhysicalDiskInfo {
                 $extendeds++;
             }
         }
-        $info = "efiboot" if /bios_grub/;
     }  
-    $s_physicalDisks{$disk} = "$size\t$pType\t$primaries\t$extendeds\t$info\t$model";
+    $s_diskInfoEx .= "\t$disk;$size;$pType;$primaries;$extendeds;$model";
 }
 # ===
 # Finds an unused primary partition number

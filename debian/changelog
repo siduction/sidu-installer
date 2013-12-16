@@ -1,3 +1,9 @@
+sidu-installer (2013.12.16) unstable; urgency=low
+
+  * merged with next 
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 16 Dec 2013 23:49:18 +0100
+
 sidu-installer (2013.12.15) unstable; urgency=medium
 
   * sidu-base and pywwetha as predepends 
