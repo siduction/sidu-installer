@@ -120,7 +120,7 @@ sub main{
 	foreach $dev (sort keys %s_lvDevs){
 		push(@s_output, "$dev\t$s_lvDevs{$dev}");
 	}
-	push(@s_output, "!phDisk=$s_diskInfoEx");
+	push(@s_output, "!phDisk=" . JoinPhysicalDiskInfo());
 	push(@s_output, "!GPT=$s_gptDisks;");
 	push(@s_output, "!labels=;" . join(";", @s_labels));
 	my $val = "!VG=";
@@ -130,6 +130,7 @@ sub main{
 	push(@s_output, $val);
 	push(@s_output, '!LV=' . join(';', @s_lv));
 	push(@s_output, "!GapPart=$s_gapPart");
+	push(@s_output, "!damaged=" . join(';', sort keys %s_damagedDisks));
     push(@s_output, "!osinfo=" . &GetSiduInfo());
 	&basic::Progress("writing info", 1);
 	recorder::Put("partition_info", \@s_output);
