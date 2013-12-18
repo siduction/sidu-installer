@@ -1,4 +1,4 @@
-sidu-installer (2013.12.19) UNRELEASED; urgency=low
+sidu-installer (2013.12.19) unstable; urgency=low
 
   * partinfo.pl: version in /etc/siduction-version can contain rc
 
@@ -6,19 +6,19 @@ sidu-installer (2013.12.19) UNRELEASED; urgency=low
 
 sidu-installer (2013.12.18) unstable; urgency=medium
 
-  * rebuild 
+  * rebuild
 
  -- Alf Gaida <agaida@siduction.org>  Wed, 18 Dec 2013 16:51:10 +0100
 
 sidu-installer (2013.12.16) unstable; urgency=low
 
-  * merged with next 
+  * merged with next
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 16 Dec 2013 23:49:18 +0100
 
 sidu-installer (2013.12.15) unstable; urgency=medium
 
-  * sidu-base and pywwetha as predepends 
+  * sidu-base and pywwetha as predepends
 
  -- Alf Gaida <agaida@siduction.org>  Sun, 15 Dec 2013 23:27:20 +0100
 
