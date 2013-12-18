@@ -1,3 +1,9 @@
+sidu-installer (2013.12.19) UNRELEASED; urgency=low
+
+  * partinfo.pl: version in /etc/siduction-version can contain rc
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 18 Dec 2013 23:00:06 +0100
+
 sidu-installer (2013.12.18) unstable; urgency=medium
 
   * rebuild 
