@@ -21,11 +21,10 @@ my $verbose = 0;
 my $gv_mount_base = "/tmp/partinfo-mount";
 my $gv_log = "/tmp/partinfo_err.log";
 my $gv_mount_no = 0;
-my %s_lvm;
+my %s_hasLVMFlag;
 my @s_output;
 my @s_labels;
 my %s_physicalDisks;
-my $s_diskInfoEx = "";
 
 # minimal size of a partition in bytes:
 my $s_minPartSize = 10*1024*1024;
@@ -50,9 +49,7 @@ my @s_lv;
 my @s_fdFree;
 my @s_fdEmpty;
 my %s_devs;
-my %s_lvDevs;
-my %blkids;	
-my (%sorted, $key, $dev);
+my %s_blkids;	
 my $s_gapPart;
 my $s_maxTasks = 10;
 my $s_currTask = 0;
@@ -73,7 +70,7 @@ if ($s_testRun){
 # we need no arg saving/restoring
 basic::Init($s_fnProgress, $s_testRun ne "");
 system ("./automount-control.sh disabled");
-&main();
+&Main();
 system ("./automount-control.sh enabled");
 
 my ($refExecs, $refLogs) = basic::GetVars();
@@ -85,53 +82,44 @@ exit 0;
 
 # ===
 # main routine.
-sub main{
+sub Main{
 	if (! -d $gv_mount_base){
 		mkdir $gv_mount_base;
 		print STDERR $gv_mount_base, " created\n" if $verbose;
 	}
 	&Progress("disk info (partprobe)");
-	my @diskDevs = &getDiskDev;
+	my @diskDevs = &GetDiskDev;
 	
 	&Progress("volume group info");
-	&getVG;
+	&GetVG;
 	# get the info from blkid
 	
 	&Progress("block id info");
-	%blkids = &getBlockId;
+	&GetBlockId;
 	&Progress("-merging infos");
-	&mergeDevs;
+	&MergeDevs;
 	&Progress("logical volume info");
-	&getLvmPartitions;
+	&GetLvmPartitions;
+	&LogicalView;
 	
 	&Progress("-writing info");
-	foreach $dev (keys %blkids){
-		if ($dev =~ /(\D+)(\d+)/){
-			$key = $1 . sprintf ("%03d", $2);
-		} else {
-			$key = $dev;
-		}
-		$sorted{$key} = $dev;
+	my $dev;
+	my @sorted = &SortDevNames(keys %s_blkids);
+	foreach $dev (@sorted){
+		&Out("$dev\t$s_blkids{$dev}");
 	}
-	foreach $key (sort keys %sorted){
-		$dev = $sorted{$key};
-		push(@s_output, "$dev\t$blkids{$dev}");
-	}
-	foreach $dev (sort keys %s_lvDevs){
-		push(@s_output, "$dev\t$s_lvDevs{$dev}");
-	}
-	push(@s_output, "!phDisk=" . JoinPhysicalDiskInfo());
-	push(@s_output, "!GPT=$s_gptDisks;");
-	push(@s_output, "!labels=;" . join(";", @s_labels));
+	&Out("!phDisk=" . JoinPhysicalDiskInfo());
+	&Out("!labels=;" . join(";", @s_labels));
 	my $val = "!VG=";
 	foreach my $ix (0..$#s_vg){
 	    $val .= ";" . $s_vg[$ix] . ":" . $s_vgSize[$ix];
 	}
-	push(@s_output, $val);
-	push(@s_output, '!LV=' . join(';', @s_lv));
-	push(@s_output, "!GapPart=$s_gapPart");
-	push(@s_output, "!damaged=" . join(';', sort keys %s_damagedDisks));
-    push(@s_output, "!osinfo=" . &GetSiduInfo());
+	&Out($val);
+	&Out('!LV=' . join(';', @s_lv));
+	&Out("!GapPart=$s_gapPart");
+    &Out("!osinfo=" . &GetSiduInfo());
+	&PhysicalView;
+	&VgInfo;
 	&basic::Progress("writing info", 1);
 	recorder::Put("partition_info", \@s_output);
 
@@ -141,13 +129,47 @@ sub main{
 	print STDERR "cannot rename: $temp -> $s_answer $!" unless rename($temp, $s_answer);
 	&UnmountAll();
 }
-
+# ===
+# Normalizes a number to N digits.
+# Example: sda, 1, 3 -> sda001
+# @param prefix     non number part
+# @param number     number part
+# @param width      count of digits of the result
+# @return           <prefix><<>width>-digit-number>
+sub NormNumber{
+    my $prefix = shift;
+    my $number = shift;
+    my $width = shift;
+    $width = 3 unless $width;
+    my $rc = sprintf ("$prefix%0${width}d", $number);
+    return $rc;
+}
+# ===
+# Sorts device names.
+# e.g. (sda1, sda2, sda10) instead of (sda1, sda10, sda2)
+# @param names  names to sort
+# @return       all names but sorted
+sub SortDevNames{
+    my @names = @_;
+	my ($key, $name, %sorted);
+    foreach $name (@names){
+		$key = $name;
+		$key =~ s/(\D+)(\d+)/&NormNumber($1,$2)/ge;
+		$sorted{$key} = $name;
+	}
+	my @rc;
+	foreach $key (sort keys %sorted){
+		push(@rc, $sorted{$key});
+	}
+    return @rc;    
+}
 # ===
 # Joins the info about the physical disks.
 # @return   e.g "\tsda;12345;msdos;1;2;;WD Green 17383UI\tsdb;45689;gpt;3;0;efiboot damaged;USB"
 sub JoinPhysicalDiskInfo{
     my $rc;
-    foreach my $dev (sort keys %s_physicalDisks){
+    my @sorted =  keys %s_physicalDisks;
+    foreach my $dev (@sorted){
         my @vals = split(/\t/, $s_physicalDisks{$dev});
         if ($s_damagedDisks{$dev} ne ""){
             # size pType primaries extendeds attr model
@@ -162,14 +184,14 @@ sub JoinPhysicalDiskInfo{
 # Gets info about the current os
 # @return:  <flavour>;<arch>,<version> e.g. kde;32;11.1
 sub GetSiduInfo{
-    my $info = &firstLineOf("/etc/siduction-version");
+    my $info = &recorder::FirstLineOf("/etc/siduction-version");
     # siduction 11.1 One Step Beyond - kde - 
     my ($version, $flavour) = ("x.y", "z");
     if ($info =~ /^\S+\s+([.\drc]+)\s.*-\s+(\w+) -/){
         ($version, $flavour) = ($1, $2);
     }
     # Linux version 3.7-8.towo-siduction-amd64 (Debian 3.7-14)...
-    $info = &firstLineOf("/proc/version");
+    $info = &recorder::FirstLineOf("/proc/version");
     my $arch = $info =~ /amd64/ ? "64" : "32";
     return "$flavour;$arch;$version";
 }
@@ -202,11 +224,11 @@ sub UnmountAll{
 # searches for extended info of a partition
 # @param dev	e.g. /dev/sda2
 # @param fs		file system, e.g. ext4
-sub detective{
+sub Detective{
 	my $dev = shift;
 	my $fs = shift;
 	my $info = "";
-	my $dirMount = &getMountPoint($dev);
+	my $dirMount = &GetMountPoint($dev);
 	if ($dirMount eq ""){
 		$dirMount = sprintf("$gv_mount_base/p%03d", ++$gv_mount_no);
 		mkdir $dirMount;
@@ -218,10 +240,10 @@ sub detective{
 		}
 	}
 	if (-d "$dirMount/etc"){
-		$info .= &firstLineOf("$dirMount/etc/debian_version", "distro");
-		$info .= &firstLineOf("$dirMount/etc/aptosid-version", "subdistro");
-		$info .= &firstLineOf("$dirMount/etc/sidux-version", "subdistro");
-		$info .= &firstLineOf("$dirMount/etc/siduction-version", "subdistro");
+		$info .= &recorder::FirstLineOf("$dirMount/etc/debian_version", "distro");
+		$info .= &recorder::FirstLineOf("$dirMount/etc/aptosid-version", "subdistro");
+		$info .= &recorder::FirstLineOf("$dirMount/etc/sidux-version", "subdistro");
+		$info .= &recorder::FirstLineOf("$dirMount/etc/siduction-version", "subdistro");
 		$info .= "\tos:unix" if $info eq "" && -d "$dirMount/etc/passwd";
 	}
 	if ($dirMount =~ /^$gv_mount_base/){
@@ -230,7 +252,7 @@ sub detective{
 	}
 
 	if ($dev !~ /swap/ && ($fs =~ /fs:ext\d/ || $fs eq "auto")){
-		my @lines = recorder::ReadStream("detective", "tune2fs -l $dev|");
+		my @lines = recorder::ReadStream("Detective", "tune2fs -l $dev|");
 		my $date;
 		foreach(@lines){
 			#Filesystem created:       Sun May  1 07:53:47 2011
@@ -255,10 +277,10 @@ my $s_mounts;
 # @param dev	e.g. /dev/sda
 # @return 		"": not found
 #				otherwise: the mountpoint
-sub getMountPoint{
+sub GetMountPoint{
 	my $dev = shift;
 	if ($s_mounts eq ""){
-		my @lines = recorder::ReadStream("getMountPoint", "mount|");
+		my @lines = recorder::ReadStream("GetMountPoint", "mount|");
 		foreach(@lines){
 			if (/^(\S+)\s+on\s+(\S+)/){
 				$s_mounts{$1} = $2;
@@ -267,23 +289,6 @@ sub getMountPoint{
 		$s_mounts = 1;
 	}
 	return $s_mounts{$dev};
-}
-# ===
-# Gets the first line of a file
-# @param 	file	the filename, e.g. /etc/siduction-version
-# @param 	prefix	this string will be put in front of the result
-# @return	"\t$prefix:<first_line> 
-sub firstLineOf{
-	my $file = shift;
-	my $prefix = shift;
-	my $rc = "";
-	if (-f $file){
-		my @lines = recorder::ReadStream("firstOfLine", $file);
-		$prefix = "\t$prefix:" if $prefix;
-		$rc = $prefix . $lines[0];
-		chomp $rc;
-	}
-	return $rc;
 }
 # ===
 # Returns the factor associated to the unit, e.g. 1024 belongs to Ki
@@ -314,8 +319,8 @@ sub UnitToFactor{
 # ===
 # Gets the volume group info
 # The info will be stored in @lvs
-sub getVG{
-	my @lines = recorder::ReadStream("getVG", "vgdisplay|");
+sub GetVG{
+	my @lines = recorder::ReadStream("GetVG", "vgdisplay|");
 	my $vgs = "";
 	foreach(@lines){
 		if (/VG Name\s+(\S+)/){
@@ -331,7 +336,7 @@ sub getVG{
 
 	my ($vg, @lvs, $lv);
 	foreach $vg (@s_vg){
-		@lvs = findFiles("getVG", "/dev/$vg");
+		@lvs = recorder::ReadStream("GetVG-2", "/dev/$vg");
 		foreach $lv(@lvs){		
 			next if $lv =~ /^\.{1,2}$/;
 			push(@s_lv, "$vg/$lv");
@@ -343,9 +348,9 @@ sub getVG{
 # Gets the disk device info
 # fills: %s_damagedDisks
 # @return 	e.g. ("sda", "sdc")
-sub getDiskDev{
+sub GetDiskDev{
 	&Progress("partprobe");
-	my @lines = recorder::ReadStream("getDiskDev", "partprobe -s|");
+	my @lines = recorder::ReadStream("GetDiskDev", "partprobe -s|");
 	my @rc;
 	
 	# count the interesting disks:
@@ -366,21 +371,21 @@ sub getDiskDev{
 			push(@rc, $dev);
 			if ($class eq "msdos"){
 				&Progress("fdisk");
-				&getFdiskInfo($dev);
+				&GetFdiskInfo($dev);
 			} else {
 				&Progress("gdisk");
-				&getGdiskInfo($dev);
+				&GetGdiskInfo($dev);
 			}
 		}
         if (m!/dev/(\w+):\s+(\w+)!){                                                                                                
 			GetPhysicalDiskInfo($1, $2);
         }
 	}
-	my @disks = getEmptyDisks();
+	my @disks = GetEmptyDisks();
 	foreach (@disks){
 		&Progress("empty disk");
 		# fdisk calculates the partition gaps (here the whole disk)
-		getFdiskInfo($_);
+		GetFdiskInfo($_);
 	}
 	return @rc;
 }
@@ -395,7 +400,7 @@ sub GetPhysicalDiskInfo {
     
     my @lines = recorder::ReadStream("GetPhysicalDiskInfo", "parted -s /dev/$disk print|");
     my ($model, $primaries, $extendeds) = (0, 0, "");
-    my ($pType, $size, $unit);
+    my ($pType, $size, $unit, $info);
     foreach(@lines){
         if (/Model: (.*)/){ 
             $model = $1;
@@ -413,8 +418,9 @@ sub GetPhysicalDiskInfo {
                 $extendeds++;
             }
         }
+        $info = "efiboot" if /bios_grub/;
     }  
-    $s_diskInfoEx .= "\t$disk;$size;$pType;$primaries;$extendeds;$model";
+    $s_physicalDisks{$disk} = "$size\t$pType\t$primaries\t$extendeds\t$info\t$model";
 }
 # ===
 # Finds an unused primary partition number
@@ -422,7 +428,7 @@ sub GetPhysicalDiskInfo {
 # @param ref_partList	In/Out: e.g. " 1 4 "
 # @return				0: no unused number
 #						otherwise: an unused number
-sub findFreePrimary{
+sub FindFreePrimary{
 	my $refPartList = shift;
 	my $rc = 0;
 	if ($$refPartList != /\S/){
@@ -451,8 +457,8 @@ sub findFreePrimary{
 # ===
 # Gets the disks without a partition table.
 # @return	e.g ("sdc", "sdx")
-sub getEmptyDisks{
-	my @files = findFiles("getEmptyDisk", "/sys/block");
+sub GetEmptyDisks{
+	my @files = recorder::ReadStream("getEmptyDisk", "/sys/block");
 	my @rc;
 	my $dev;
 	foreach $dev (@files){
@@ -471,9 +477,9 @@ sub getEmptyDisks{
 # Gets the info from fdisk.
 # @param disk		partition device, e.g. sda
 # Fills: %s_devs, %s_disks, %s_extParts, $s_hints, $s_gapPart
-sub getFdiskInfo{
+sub GetFdiskInfo{
 	my $disk = shift;
-	my @lines = recorder::ReadStream("getFdiskInfo", "fdisk -l /dev/$disk|");
+	my @lines = recorder::ReadStream("GetFdiskInfo", "fdisk -l /dev/$disk|");
 	my ($dev, $size, $ptype, $info, $min, $max);
 	my $sectorSize = 512;
 	my $sectorCount = -1;
@@ -482,7 +488,7 @@ sub getFdiskInfo{
 	my ($extMin, $extMax) = (-1, -1);
 	foreach(@lines){
 #/dev/sda6       118061056  1000215215   441077080   8e  Linux LVM
-		if (m!^(/dev/[a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)!){
+		if (m!^/dev/([a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)!){
 			my ($dev, $partno, $min, $max, $size, $ptype, $info)  = ($1, $2, $3, $4, $5, $6, $7);
 			# extended partition?
 			if ($ptype == 5){
@@ -494,6 +500,7 @@ sub getFdiskInfo{
 				push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
 				push(@partNos, $partno);
 			}
+		    $s_hasLVMFlag{"$disk$partno"} = $size if $ptype =~ /8e/i;
 		} elsif (/total\s+(\d+)\s+sectors/){
 			$sectorCount = $1;
 		} elsif (m!logical/physical\): (\d+) bytes!){
@@ -501,7 +508,7 @@ sub getFdiskInfo{
 		} elsif (/^Disk\s+([^:]+):.*\s(\d+)\s+bytes/){
 			my ($dev, $bytes) = ($1, $2);
 			my $mb = length($bytes) <= 6 ? 1 : substr($bytes, 0, length($bytes) - 6);
-			$s_disks{$disk} = $mb;
+			$s_disks{$dev} = $mb;
 		}
 	}
 	@sectors = sort(@sectors);
@@ -528,7 +535,7 @@ sub getFdiskInfo{
 					if ($lastMax < $extMin - $s_minPartSize / $sectorSize){
 						$lbound = $lastMax + 1;
 						$ubound = $extMin - 1;
-						$noGap = findFreePrimary(\$partList);
+						$noGap = FindFreePrimary(\$partList);
 						$s_gapPart .= ";$disk!$noGap-$lbound-$ubound";
 					}
 					$noGap = $maxPartNo <= 4 ? 5 : $maxPartNo + 1;
@@ -552,7 +559,7 @@ sub getFdiskInfo{
 					}
 					$lastMax = $extMax if $min > $extMin && $lastMax < $extMax;
 					next if ($min - $lastMax) * $sectorSize < $s_minPartSize;
-					$noGap = findFreePrimary(\$partList);
+					$noGap = FindFreePrimary(\$partList);
 					next if $noGap <= 0;
 				}
 				$s_gapPart .= ";$disk!$noGap-" . ($lastMax + 1) . "-" . ($min - 1);
@@ -570,7 +577,7 @@ sub getFdiskInfo{
 				$lbound = $extMin + 48 if $lbound < $extMin + 48;
 				$ubound = $extMax if $ubound > $extMax;
 			} else {
-				$noGap = findFreePrimary(\$partList);
+				$noGap = FindFreePrimary(\$partList);
 			}
 			if ($noGap > 0){
 				$s_gapPart .= ";$disk!$noGap-$lbound-$ubound";
@@ -585,9 +592,9 @@ sub getFdiskInfo{
 # Fills: %s_devs, $s_disks, $s_gapPart, s_gptDisks
 # @param disk	e.g. sda
 # @param cmd	the call of gdisk, e.g. sdc
-sub getGdiskInfo{
+sub GetGdiskInfo{
 	my $disk = shift;
-	my @lines = recorder::ReadStream("getGdiskInfo", "echo 1 | gdisk -l /dev/$disk|");
+	my @lines = recorder::ReadStream("GetGdiskInfo", "echo 1 | gdisk -l /dev/$disk|");
 	my $sectorSize = 512;
 	my $lastSector = -1;
 	my @sectors;
@@ -601,8 +608,9 @@ sub getGdiskInfo{
 			my ($partno, $min, $max, $ptype, $info) = ($1, $2, $3, $4, $5);
 			push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
 			push(@partNos, $partno);
-			my $dev = "/dev/$disk$partno";
+			my $dev = "$disk$partno";
 			my $size = int(($max - $min + 1) * 1.0 * $sectorSize / 1024);
+			$s_hasLVMFlag{$dev} = $size if $ptype =~ /8e00/i;
 			$s_devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 #Disk /dev/sda: 3907029168 sectors, 1.8 TiB
 		} elsif (m!Logical sector size: (\d+) bytes!){
@@ -642,13 +650,31 @@ sub getGdiskInfo{
 		$s_gapPart .= ";$disk!$maxPartNo-$lastMax-$lastSector";
 	}
 }
-sub getBlockId{
+# ===
+# Normalizes a LV device name
+# @param dev    device name with the format /dev/mapper/<vg>-<lv>
+# @return       the device name with the format <vg>/<lv>
+sub NormalizeLvmDevname{
+    my $dev = shift;
+    # the '-' in the VG or LV parts are doublicated to distinct from 
+    # the separator between VG and LV part.
+    $dev =~ s!mapper/!!;
+    $dev =~ s/--/\t/g;
+    my ($vg, $lv) = split(/-/, $dev);
+    my $rc = "$vg/$lv";
+    $rc =~ s/\t/-/g;
+    return $rc;
+}
+# ===
+# Evaluates the output of the command blkid.
+# Fills: %s_blkids
+sub GetBlockId{
 	my ($label, $uuid, $fs, $info2, $dev);
-	my %blkids;
-	my @lines = recorder::ReadStream("getBlockId", "/sbin/blkid -c /dev/null|");
+	my @lines = recorder::ReadStream("GetBlockId", "/sbin/blkid -c /dev/null|");
 	foreach(@lines){
 		if (/^(\S+):/){
 			my $dev = $1;
+			$dev =~ s!/dev/!!;
 			my ($info, $label, $uuid, $fs, $size);
 			if (/LABEL="([^"]+)"/){
 				$label = "\tlabel:$1";
@@ -663,79 +689,100 @@ sub getBlockId{
 			if ($s_devs{$dev} ne ""){
 				$info=$s_devs{$info}
 			}
-			if (/mapper/){
-				$size = getSizeOfLvmPartition($dev);
-				$size = $size == 0 ? "" : "\tsize:$size";
+			$info .= &Detective("/dev/$dev", $fs);
+			if ($dev =~ /mapper/){
+			    $dev = NormalizeLvmDevname($dev);
 			}
-			$info .= &detective($dev, $fs);
-			$blkids{$dev} = "$label$fs$uuid$info$size";
-		}
-	}
-	return %blkids;
-}
-sub getLvmPartitions{
-	my ($lv, $size, $info, $fs);
-	for $lv(@s_lv){
-		$dev = "/dev/$lv";
-		$size = getSizeOfLvmPartition($dev);
-		$fs = "auto";
-		$info = &detective($dev, $fs);
-		$s_lvDevs{$lv} = "size:$size\tpinfo:$info";
-	}
-}
-sub mergeDevs{
-	# merge the two fields:
-	foreach $dev (keys %s_devs){
-		my $info = $blkids{$dev};
-		my $val = $s_devs{$dev};
-		if ($info eq ""){
-			$blkids{$dev} = $val;
-		} else {
-			my $size = "\t$1" if $val =~ /(size:\d+)/;
-			my $ptype = "\t$1" if $val =~ /(id:\w+)/;
-			my $info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
-			$blkids{$dev} = "$info$size$ptype$info2";
+			$s_blkids{$dev} = "$label$fs$uuid$info$size";
 		}
 	}
 }
 
-sub getSizeOfLvmPartition{
-	my $dev = shift;
-	my ($sectors, $size);
-	open my $INP, "gdisk -l $dev|" || die "gdisk: $!";
-	while(<$INP>){
-		if (/(\d+)\s+sectors/){
-			$sectors = $1;
-		} elsif (/sector\s+size:\s+(\d+)/){
-			$size = int($1 * 1.0 * $sectors / 1024);
-			last;
+# ===
+# Moves info from @s_lv to %s_blkids
+sub GetLvmPartitions{
+	my ($dev, $info, $fs);
+	for $dev (@s_lv){
+		$fs = "auto";
+		if ($s_blkids{$dev} eq ""){
+    		$info = &Detective("/dev/$dev", $fs);
+    		$s_blkids{$dev} = $info;
 		}
 	}
-	close $INP;
-	return $size;
 }
-sub prettySize{
-	my $kbyte = shift;
-	my $rc;
-	if ($kbyte >= 9*1024*1024){
-		$rc = int($kbyte / 1024 / 1024) . ' GiB';
-	} elsif ($kbyte >= 1024*1024){
-		$rc = sprintf("%.2f", $kbyte / 1024.0 / 1024) . ' GiB';
-	} elsif ($kbyte >= 1024){
-		$rc = int($kbyte / 1024) . ' MiB';
-	} else{
-		$rc = sprintf("%.2f", $kbyte / 1024.0) . ' MiB';
+# ===
+# Replaces a property of a partition with another value.
+# If the property is not available it will be added.
+# @param name   property name, e.g. "size"
+# @param value  new value, e.g. "1234"
+# @param info   summary of properties "size:0 ptype:0"
+# @return       info with replaced property, e.g. "size:1234 ptype:0"
+sub ReplaceProperty{
+    my $name = shift;
+    my $value = shift;
+    my $info = shift;
+    my $found = 0;
+    my @cols = split(/\t/, $info);
+    for my $ix (0..$#cols){
+        if (index($cols[$ix], $name) == 0){
+            $cols[$ix] = "$name:$value";
+            $found = 1;
+            last;
+        }
+    }
+    push(@cols, "$name:$value") unless $found;
+    $info = join("\t", @cols);
+    return $info;
+}
+# ===
+# Merge the info about the devices
+# Enrichs %s_blkids with info from %s_devs
+sub MergeDevs{
+	# merge the two fields:
+	foreach my $dev (keys %s_devs){
+		my $info = $s_blkids{$dev};
+		my $val = $s_devs{$dev};
+		if ($info eq ""){
+			$s_blkids{$dev} = $val;
+		} else {
+			my $size = "\t$1" if $val =~ /(size:\d+)/;
+			my $ptype = "\t$1" if $val =~ /(id:\w+)/;
+			my $info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
+			$s_blkids{$dev} = "$info$size$ptype$info2";
+		}
 	}
-	return $rc;
 }
-	
-sub physicalView{
-	my @lines = recorder::ReadStream("physicalView", "pvdisplay|");
+# ===
+# Converts a size (number + unit) into an amount of KiBytes.
+# @param size		e.g. 4M or 243,3K or "22.7 GiByte"
+# @return			amount in KiBytes
+sub SizeToKiByte{
+	my $size = shift;
+	die "not a size (number+unit): $size" unless $size =~ /^([\d+.,]+)\s*([TGMK])?/i;
+	my ($rc, $unit) = ($1, $2);
+	$rc =~ s/,/./;
+	$unit =~ tr/a-z/A-Z/;
+	if ($unit eq "M"){
+	    $rc *= 1024;
+	} elsif ($unit eq "G"){
+	    $rc *= 1024 * 1024;
+	} elsif ($unit eq "T"){
+	    $rc *= 1024 * 1024 * 1024;
+	}
+	return int($rc);
+}
+# ===
+# Prepares the data for the physical view
+sub PhysicalView{
+	my @lines = recorder::ReadStream("PhysicalView", "pvdisplay|");
+	# Put an end marker:
+	push(@lines, "  --- Physical volume ---");
 	my ($pvName, $vgName, $size, %devs, %unassigned, %assigned);
 	foreach(@lines){
 		chomp;
 		if (/PV Name\s+(\S+)/){
 			$pvName = $1;
+			$pvName =~ s!/dev/!!;
 		} elsif (/VG Name\s+(\S+)/){
 			$vgName = $1;
 		} elsif (/VG Name\s*$/){
@@ -748,47 +795,35 @@ sub physicalView{
 				if ($vgName eq '?'){
 					$unassigned{$pvName} = "|$pvName|$size";
 				} else {
-					$s_devs{$vgName} .= "\t|$pvName|$size";
+					$devs{$pvName} .= "\t|$pvName|$size";
 					$assigned{$pvName} = 1;
 				}
 				$vgName = "";
 			}
 		}
-		if ($vgName eq '?'){
-			$unassigned{$pvName} = "|$pvName|$size";
-		} elsif ($pvName ne ""){
-			$s_devs{$vgName} .= "\t|$pvName|$size";
-			$assigned{$pvName} = 1;
-		}
-		my ($key, $out);
-		foreach $key (sort keys %devs){
-			$out .= "\f\t$key" . $s_devs{$key};
-		}
-		foreach $key (%assigned){
-			if ($s_lvm{$key}){ 
-				delete($s_lvm{$key});
-			}
-		}
-		push(@s_output, "PhLVM:$out");
-		$out = '';
-		for $key (sort keys %unassigned){
-			delete($s_lvm{$key}) if $unassigned{$key};
-			$out .= "\t" . $unassigned{$key}; 
-		} 
-		push(@s_output, "FreeLVM:$out");
-		$out = '';
-		for $key (sort keys %s_lvm){
-			$out .= "\t|$key|" . &prettySize($s_lvm{$key}); 
-		} 
-		push(@s_output, "MarkedLVM:$out");
-		close INP;
 	}
+	my ($key, $out);
+	my @sorted = SortDevNames(keys %unassigned);
+	for $key (@sorted){
+		$out .= ";$key"; 
+	} 
+	&Out("!FreeLVM:$out");
+	$out = '';
+	my @sorted = SortDevNames(keys %s_hasLVMFlag);
+	for $key (@sorted){
+	    next if $assigned{$key} || $unassigned{$key};
+		$out .= ";$key"; 
+	} 
+	&Out("!MarkedLVM:$out");
 }
 
-
-sub logicalView{
-	my @lines = recorder::ReadStream("logicalView", "lvdisplay|");
+# ===
+# Prepares the data for the logical view
+sub LogicalView{
+	my @lines = recorder::ReadStream("LogicalView", "lvdisplay|");
 	my ($lvName, $vgName, $size, $access, %devs, %snaps, $parent);
+	# set end marker:
+	push(@lines, "--- Logical volume");
 	foreach(@lines){
 		chomp;
 		if (/LV Name\s+(\S+)/){
@@ -797,7 +832,7 @@ sub logicalView{
 		} elsif (/VG Name\s+(\S+)/){
 			$vgName = $1;
 		} elsif (m!LV Size\s+(\S.*)!){
-			$size = $1;
+			$size = SizeToKiByte($1);
 		} elsif (m!LV snapshot status.*\sfor\s+(\S+)!){
 			$parent = $1;
 			$parent =~ s!/dev/[^/]+/!!;
@@ -805,75 +840,80 @@ sub logicalView{
 			$access = $1;
 		} elsif (/--- Logical volume/){
 			if ($lvName ne ""){
+			    my $dev = "$vgName/$lvName";
 				if ($parent){
 					$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
 					$parent = '';
 				} else {
-					$s_devs{$vgName} .= "\t|$lvName|$size|$access";
+					$s_devs{$dev} .= "\t|$lvName|$size|$access";
+				}
+				if ($s_blkids{$dev} eq ""){
+				    $s_blkids{$dev} = "\tsize:$size\tinfo:LV";
+				} else {
+				    my $info = ReplaceProperty("size", $size, 
+				        $s_blkids{$dev});
+				    $info .= "\tptype:LV";
+				    $s_blkids{$dev} = $info;
 				}
 			}
 		}
-		if ($lvName ne ""){
-			if ($parent){
-				$snaps{$vgName} .= "\t|$lvName|$size|$access|$parent";
-			} else {
-				$s_devs{$vgName} .= "\t|$lvName|$size|$access";
-			}
-		}
-		close INP;
-		my ($key, $out);
-		foreach $key (sort keys %devs){
-			$out .= "\f\t$key" . $s_devs{$key}; 
-		}
-		if ($out ne ""){
-			push(@s_output, "LogLVM:$out");
-		}
-		$out = '';
-		foreach $key (sort keys %snaps){
-			$out .= "\f\t$key" . $snaps{$key}; 
-		}
-		if ($out ne ""){
-			push(@s_output, "SnapLVM:$out");
-		}
 	}
+	my ($key, $out);
+	my @sorted = &SortDevNames(keys %snaps);
+	foreach $key (@sorted){
+		$out .= "\f\t$key" . $snaps{$key}; 
+	}
+	&Out("!SnapLVM:$out");
 }
-sub vgInfo {
-	my @lines = recorder::ReadStream("vgInfo", "vgdisplay|");
+# ===
+# Prepares the data for the volume group
+sub VgInfo {
+	my @lines = recorder::ReadStream("VgInfo", "vgdisplay|");
 	my ($vgName, $size, $access, $status, $free, $alloc, %vgs, $peSize);
+	# set end marker:
+	push(@lines, "--- Volume group"); 
 	foreach(@lines){
 		chomp;
 		if (/VG Name\s+(\S+)/){
 			$vgName = $1;
 		} elsif (m!VG Size\s+(\S.*)!){
-			$size = $1;
+			$size = SizeToKiByte($1);
 		} elsif (m!VG Access\s+(\S.*)!){
 			$access = $1;
 		} elsif (m!VG Status\s+(\S.*)!){
 			$status = $1;
 		} elsif (m!Alloc PE / Size.*/\s+(\S.*)!){
-			$alloc = $1;
+			$alloc = SizeToKiByte($1);
 		} elsif (m!Free  PE / Size.*/\s+(\S.*)!){
-			$free = $1;
+			$free = SizeToKiByte($1);
 		} elsif (m!PE Size\s+(\S.*)!){
-			$peSize = $1;
+			$peSize = SizeToKiByte($1);
 		} elsif (/--- Volume group/){
 			if ($vgName ne ""){
 				$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
 			}
 		}
-		if ($vgName ne ""){
-			$vgs{$vgName} .= "|$size|$alloc|$free|$peSize|$status|$access";
-		}
-		my ($key, $out);
-		foreach $key (sort keys %vgs){
-			$out .= "\t|$key" . $vgs{$key}; 
-		}
-		if ($out ne ""){
-			push(@s_output, "VgLVM:$out");
-		}
+	}
+	my ($key, $out);
+	foreach $key (sort keys %vgs){
+		$out .= "\t|$key" . $vgs{$key}; 
+	}
+	if ($out ne ""){
+		&Out("!VgLVM:$out");
 	}
 }
 
+# ===
+# Puts a line to the output
+# @param line
+# Fills: @s_output
+sub Out{
+    my $line = shift;
+    if($line =~ m!/dev/!){
+        $line .= "";
+    }
+    push(@s_output, $line);
+}
 # Writes the progress file.
 #@param task	name of the current task
 sub Progress{
@@ -900,144 +940,14 @@ EOS
 	rename $temp, $s_fnProgress;
 }
 
-# Gets the files of a given directory.
-# In test mode this directoy will be simulated.
-# @param id		caller's id
-# @param dir	name of the directory, e.g. "/sys/block"
-# @return		an array of the names, e.g. ("sda", "sdb")
-sub findFiles{
-	my $id = shift;
-	my $dir = shift;
-	my @rc;
-	
-	if (! $s_testRun){
-		opendir my $DIR, $dir || die "$dir: $!";
-		@rc = readdir $DIR;
-		closedir $DIR;
-	} elsif ($id eq "getEmptyDisk") {
-		if ($s_testRun =~ /gapPart/){
-			@rc = (".", "..", "dm-0", "sdd1", "sda", "sdb", "sdc", "sdx");
-		} else {
-			die "not implemented";
-		}
-	}
-	return @rc
-}
-
-# Builds a pointer to the first different position of 2 strings.
-# @param x	1st string
-# @param y	2nd string
-# @return	the pointer, e.g. "-----^"
-sub MkPointer{
-	my $x = shift;
-	my $y = shift;
-	my $len = 1;
-	while($len < length($x) && substr($x, $len) == substr($y, $len)){
-		$len++;
-	}
-	my $ptr = ("-" x $len) . "^";
-	return $ptr;
-}
-#== Tests equality of two strings.
-# @param prefix	id of the test
-# @param x		first string
-# @param y		2nd string
-# @return		0: different 1: equal
-sub Equal{
-	my $prefix = shift;
-	my $x = shift;
-	my $y = shift;
-	if ($x ne $y){
-		if ($x !~ /\n/){
-			print "Difference at $prefix:\n$x\n$y\n", 
-				MkPointer($x, $y), "\n";
-		} else {
-			my @x = split(/\n/, $x);
-			my @y = split(/\n/, $y);
-			my ($ix, $max) = (0, $#x);
-			$max = $#y if $#x < $#y;
-			while($ix <= $max){
-				if ($x[$ix] ne $y[$ix]){
-					print "Difference at $prefix in line ", $ix + 1, "\n", 
-						$x[$ix], "\n", $y[$ix], "\n",
-						MkPointer($x[$ix], $y[$ix]), "\n";
-					last;
-				}
-				$ix++;
-			}
-		}
-	}
-	return $x eq $y;
-}
-
-#== Tests equality of two arrays.
-# @param prefix	id of the test
-# @param x		first array (reference)
-# @param y		2nd array (reference)
-# @param sep	separator, should not part of the strings. Default: "|"
-# @return		0: different 1: equal
-sub EqualArray{
-	my $prefix = shift;
-	my $refX = shift;
-	my $refY = shift;
-	my $sep = shift;
-	$sep = "|" unless $sep;
-	my $x = join($sep, @$refX);
-	my $y = join($sep, @$refY);
-	return Equal($prefix, $x, $y);
-}
-
-#== 
-# Tests equality of two hashes.
-# @param prefix	id of the test
-# @param x		first hash (reference)
-# @param y		2nd hask (reference)
-# @param sep	separator, should not part of the strings. Default: "|"
-# @return		0: different 1: equal
-sub EqualHash{
-	my $prefix = shift;
-	my $refX = shift;
-	my $refY = shift;
-	my $sep = shift;
-	my (@x, @y);
-	for (sort keys %$refX){
-		my $val = $$refX{$_};
-		$val =~ s/\s+$//;
-		$val =~ s/\t/ /g;
-		push(@x, "$_=>$val");
-	} 
-	for (sort keys %$refY){
-		my $val = $$refY{$_};
-		$val =~ s/\s+$//;
-		$val =~ s/\t/ /g;
-		push(@y, "$_=>" . $val);
-	} 
-	return EqualArray($prefix, \@x, \@y, $sep);
-}
-#===
-# Builds a hash from a string.
-# @param x		string to convert. Starts with a separator, e.g. ";a=>1;b=>3"
-# @return		the hash
-sub toHash{
-	my $x = shift;
-	my %hash;
-	my $sep = substr($x, 0, 1);
-	$x = substr($x, 1);
-	my @x = split(/$sep/, $x);
-	foreach(@x){
-		my @y = split(/=>/, $_);
-		$hash{$y[0]} = $y[1];
-	}
-	return \%hash;
-}
-sub testGetDiskDev{
-	&getDiskDev;
+sub TestGetDiskDev{
+	&GetDiskDev;
 	my @a = ("abc", "def");
 	my @b = ("abc", "123");
-	die "!" unless Equal("s_gapPart",  
+	die "!" unless test::Equal("s_gapPart",  
 		";sdb!4-100000-1023999;sdb!8-2457600-4194303;sdb!9-10897408-31248350;sdc!2-2048-79999;sdc!3-100000-300000;sdc!8-300049-1023999;sdc!9-2457600-4194303;sdc!10-10897408-31248383;sdx!1-2048-31248383",
 		$s_gapPart);
-	die unless EqualHash("s_devs", toHash("
+	die unless test::EqualHash("s_devs", test::ToHash("
 /dev/sdb1=>size:48976\tptype:8E00\tpinfo:Linux LVM
 /dev/sdb5=>size:716800\tptype:8300\tpinfo:Linux filesystem
 /dev/sdb6=>size:3145728\tptype:8300\tpinfo:Linux filesystem
@@ -1048,10 +958,10 @@ sub testGetDiskDev{
 /dev/sdc7=>size:204800\tptype:83\tpinfo:Linux
 "),
 		\%s_devs, "\n");
-	die unless EqualHash("s_disks", toHash(";sdb=>15624158;sdc=>15999;sdx=>15999"),
+	die unless test::EqualHash("s_disks", test::ToHash(";sdb=>15624158;sdc=>15999;sdx=>15999"),
 		\%s_disks, ";");
-	die unless EqualHash("s_extParts", toHash(";sdc=>300001-31248383"),
+	die unless test::EqualHash("s_extParts", test::ToHash(";sdc=>300001-31248383"),
 		\%s_extParts, "\n");
-	die unless Equal("s_hints", "",
+	die unless test::Equal("s_hints", "",
 		$s_hints);
 }

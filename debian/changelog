@@ -1,3 +1,10 @@
+sidu-installer (2013.12.19.2) unstable; urgency=low
+
+  * crash while showing disk info
+  * partinfo.pl: merge from sidu-disk-center: better code, more info
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 19 Dec 2013 23:39:07 +0100
+
 sidu-installer (2013.12.19) unstable; urgency=low
 
   * partinfo.pl: version in /etc/siduction-version can contain rc

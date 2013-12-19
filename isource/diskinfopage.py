@@ -249,7 +249,6 @@ class DiskInfoPage(Page):
                         (dev, size, pType, prim, ext, attr, model) = info.split(";");
                         self._disks[dev] = VirtualDisk(dev, size, model, attr,
                             prim, ext, pType)
-                        (dev, size, pType, prim, ext, model) = info.split(";");
                         if pType.lower() ==  "gpt":
                             model = "[GPT] " + model
                         self._disks[dev].addInfo(prim, ext, pType)
@@ -421,7 +420,7 @@ class DiskInfoPage(Page):
                     attr,
                     disk._info if disk._info != None else ""))
         try:
-            table = self.buildTable(self, disk)
+            table = self.buildTable(self, disks)
         except PageException as exc:
             self._session.error("buildDiskInfoTable: {:s}", 
                 exc.message)
