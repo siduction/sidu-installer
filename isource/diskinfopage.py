@@ -38,8 +38,6 @@ class PartitionInfo:
         self._megabytes = size / 1000
         # size and unit, e.g. 11GB
         self._size = size2
-        # flavour, arch, version
-        self._osInfo = ("nox", "32", "13.2");
         
     def canBeRoot(self, minSize):
         '''Tests whether the partition can be used as root partition
@@ -118,6 +116,8 @@ class DiskInfoPage(Page):
         self._physicalVolumes = []
         self._freePV = []
         self._volumeGroups = []
+        # flavour, arch, version
+        self._osInfo = ("nox", "32", "13.2");
         self._filePartInfo = session.getConfigWithoutLanguage(
                 'diskinfo.file.demo.partinfo')
         if self._filePartInfo == "" or not os.path.exists(self._filePartInfo):
@@ -209,7 +209,9 @@ class DiskInfoPage(Page):
             for line in fp:
                 no += 1
                 line = line.strip()
-                if line.startswith("!GPT="):
+                if line.startswith("#") or line == "":
+                    pass
+                elif line.startswith("!GPT="):
                     self._gptDisks = line[5:]
                 elif line.startswith("!labels="):
                     self._labels = self.autoSplit(line[8:])
@@ -252,7 +254,7 @@ class DiskInfoPage(Page):
                         if pType.lower() ==  "gpt":
                             model = "[GPT] " + model
                         self._disks[dev].addInfo(prim, ext, pType)
-                else:
+                elif not line.startswith("!"):
                     cols = line.split('\t')
                     dev = cols[0].replace('/dev/', '')
                     if line == "" or rexprExcludes.search(dev):
