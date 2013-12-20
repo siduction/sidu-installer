@@ -18,7 +18,8 @@ start)
 			fi
 			BROWSER=$LINK
 		done
-		BLOCKED_BROWSER=chromium
+		# at this moment we allow the chromium browser:
+		BLOCKED_BROWSER=chromiumX
 		if [ $(expr $BROWSER : ".*$BLOCKED_BROWSER" ) != 0  ] ; then
 			test -x /usr/bin/midori && BROWSER=/usr/bin/midori
 			test -x /usr/bin/iceweasel && BROWSER=/usr/bin/iceweasel

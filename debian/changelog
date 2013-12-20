@@ -1,3 +1,9 @@
+sidu-installer (2013.12.20-2) unstable; urgency=low
+
+  * browser chromium warning disabled
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 20 Dec 2013 23:54:25 +0100
+
 sidu-installer (2013.12.20) unstable; urgency=low
 
   * diskinfo: _osInfo not initialized
