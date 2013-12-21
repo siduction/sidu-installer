@@ -3,7 +3,7 @@ Created on 16.03.2013
 
 @author: hm
 '''
-import re
+import re, os.path
 
 from webbasic.page import Page
 from subprocess import check_output
@@ -92,6 +92,9 @@ class UserPage(Page):
         login = self._pageData.get('name')
         if not re.match(r'^[a-zA-Z][-a-zA-Z0-9_.]*$', login):
             err = self._pageData.putError('name', '.wrong_chars')
+        elif os.path.exists("/home/" + login):
+            err = self._pageData.putError('name', 'user.txt_forbidden_name')
+            
         return not err
     
     def storePassword(self, fieldLocal, fieldGlobal):

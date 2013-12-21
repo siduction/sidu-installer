@@ -1,3 +1,9 @@
+sidu-installer (2013.12.21) unstable; urgency=low
+
+  * error if siducer is used as login name
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 21 Dec 2013 21:18:00 +0100
+
 sidu-installer (2013.12.20-2) unstable; urgency=low
 
   * browser chromium warning disabled
