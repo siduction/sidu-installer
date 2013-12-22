@@ -1,3 +1,9 @@
+sidu-installer (2013.12.22.3) unstable; urgency=low
+
+  * crash in xorg: missing minsize.mb.xorg
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 22 Dec 2013 22:27:52 +0100
+
 sidu-installer (2013.12.22.2) unstable; urgency=low
 
   [ Ovidiu Angelescu ]
