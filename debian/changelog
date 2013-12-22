@@ -1,8 +1,12 @@
-sidu-installer (2013.12.22.1) UNRELEASED; urgency=low
+sidu-installer (2013.12.22.2) unstable; urgency=low
 
+  [ Ovidiu Angelescu ]
   * changes for romanian translation
 
- -- Ovidiu Angelescu <convbsd@siduction.org>  Sun, 22 Dec 2013 21:48:51 +0300
+  [ J. Hamatoma ]
+  * db updated
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 22 Dec 2013 20:55:49 +0100
 
 sidu-installer (2013.12.22) unstable; urgency=low
 
