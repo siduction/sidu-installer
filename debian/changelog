@@ -1,3 +1,11 @@
+sidu-installer (2013.12.22) unstable; urgency=low
+
+  * parameter for partition programs: no volume groups
+  * partition info may contain a ':'
+  * partition info contains subdistro if available
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 22 Dec 2013 19:40:51 +0100
+
 sidu-installer (2013.12.21) unstable; urgency=low
 
   * error if siducer is used as login name

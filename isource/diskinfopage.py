@@ -62,7 +62,8 @@ class VirtualDisk:
         '''Constructor.
         @param dev:          the device name
         @param size:         the size in kiByte
-        @param label:        the label of the disk
+        @param info:         additional info about filesys...
+        @param attr:         attributes like LVM_VG
         @param primaries:    count of primary partitions
         @param nonPrimaries: count of non primary partitions
         @param pType:        gpt or msdos
@@ -261,7 +262,7 @@ class DiskInfoPage(Page):
                         continue
                     infos = {}
                     for ix in xrange(len(cols)):
-                        vals = cols[ix].split(':')
+                        vals = cols[ix].split(':', 1)
                         if len(vals) > 1:
                             infos[vals[0]] = vals[1]
                     size = 0 if 'size' not in infos else infos['size']
@@ -282,7 +283,7 @@ class DiskInfoPage(Page):
                         date += (' ' + self._session.getConfig('diskinfo.modified') 
                             + ': ' + infos['modified'])
                         
-                    info = subdistro if subdistro == '' else distro
+                    info = subdistro if subdistro != '' else distro
                     if info == '':
                         info = debian    
                     if info == '':
@@ -488,7 +489,8 @@ class DiskInfoPage(Page):
         '''
         rc = []
         for disk in self._disks:
-            if not disk.endswith("/"):
+            item = self._disks[disk]
+            if not disk.endswith("/") and not item._attr == "LVM-VG":
                 rc.append(disk)
         rc.sort()
         return rc

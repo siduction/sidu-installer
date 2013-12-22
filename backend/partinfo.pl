@@ -1,7 +1,7 @@
 #! /usr/bin/perl
 # Gets the partition info.
-# @param fnProgress name of the file containing progress info
 # @param answer     the partition info 
+# @param fnProgress name of the file containing progress info
 # @param testRun	"": normal run otherwise: name of the test
 #
 use strict;
