@@ -1,3 +1,9 @@
+sidu-installer (2013.12.22.1) UNRELEASED; urgency=low
+
+  * changes for romanian translation
+
+ -- Ovidiu Angelescu <convbsd@siduction.org>  Sun, 22 Dec 2013 21:48:51 +0300
+
 sidu-installer (2013.12.22) unstable; urgency=low
 
   * parameter for partition programs: no volume groups
