@@ -71,10 +71,10 @@ class MountpointPage(Page):
         elif what == "cols":
             item = self._mountRows[ixRow]
             (dev, point) = item.split(r':')
-            label = "label" + unicode(ixRow-1) 
+            label = "label" + str(ixRow-1) 
             button = "<xml>" + self._snippets.get("BUTTON_DEL")
             fs = ""
-            button = button.replace("{{no}}", unicode(ixRow))
+            button = button.replace("{{no}}", str(ixRow))
             self._mounts += " /dev/" + dev + ":" + point
             rc = [dev, label, fs, point, button]
         return rc

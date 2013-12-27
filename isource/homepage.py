@@ -30,7 +30,7 @@ class HomePage(Page):
         if preloaded != "Y":
             count = int(self._session.getConfigWithoutLanguage("preload.count"))
             for ix in xrange(count):
-                value = self._session.getConfigWithoutLanguage("preload." + unicode(ix))
+                value = self._session.getConfigWithoutLanguage("preload." + str(ix))
                 cols = self.autoSplit(value)
                 if len(cols) < 2:
                     self._session.error("wrong preload [ix]:" + value)

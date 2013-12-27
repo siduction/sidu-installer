@@ -42,7 +42,7 @@ def handlePage(page, request, session):
         rc = HttpResponsePermanentRedirect(absUrl) 
     cookies = request.COOKIES
     for cookie in cookies:
-        rc.set_cookie(cookie, session.unicodeToAscii(cookies[cookie]))
+        rc.set_cookie(cookie, session.toUnicode(cookies[cookie]))
     return rc
     
 def index(request):

@@ -1,3 +1,12 @@
+sidu-installer (2013.12.26) unstable; urgency=low
+
+  * *.conf: sorted by key
+  * unicode refactoring
+  * tools for translators: check_txt.pl + sort_conf.pl
+  * crash while pushing "install all" in PacketPage
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 26 Dec 2013 21:43:19 +0100
+
 sidu-installer (2013.12.22.4) unstable; urgency=low
 
   * now with config db

@@ -7,6 +7,7 @@ import os.path, time
 from webbasic.page import Page
 from isource.diskinfopage import DiskInfoPage
 from basic.shellclient import SVOPT_DEFAULT
+from util.util import Util
 
 class RunPage(Page):
     '''
@@ -198,22 +199,22 @@ class RunPage(Page):
 
         value = self._globalPage.getField("login")
         lines.append("USER_MODULE='configured'")
-        lines.append("USER_NAME='{:s}'".format(value))
+        lines.append(u"USER_NAME='{:s}'".format(Util.toUnicode(value)))
         lines.append("")
 
         value = self._globalPage.getField("userpw")
         lines.append("USERPASS_MODULE='configured'")
         value = self._session._shellClient.escShell(value)
-        lines.append("USERPASS_CRYPT='{:s}'".format(value))
+        lines.append(u"USERPASS_CRYPT='{:s}'".format(Util.toUnicode(value)))
 
         value = self._globalPage.getField("rootpw")
         lines.append("ROOTPASS_MODULE='configured'")
         value = self._session._shellClient.escShell(value)
-        lines.append("ROOTPASS_CRYPT='{:s}'".format(value))
+        lines.append(u"ROOTPASS_CRYPT='{:s}'".format(Util.toUnicode(value)))
 
         value = self._globalPage.getField("host").strip()
         lines.append("HOST_MODULE='configured'")
-        lines.append("HOST_NAME='{:s}'".format(value))
+        lines.append(u"HOST_NAME='{:s}'".format(Util.toUnicode(value)))
         lines.append("")
 
         services = "cups"
@@ -281,11 +282,11 @@ class RunPage(Page):
             task = ""
         if task != "":
             task = self._session.translateTask(translationKey, task)
-        body = body.replace("{{percentage}}", unicode(percentage))
-        body = body.replace("{{width}}", unicode(percentage))
+        body = body.replace("{{percentage}}", str(percentage))
+        body = body.replace("{{width}}", str(percentage))
         body = body.replace("{{task}}", task)
-        body = body.replace("{{no}}", unicode(no))
-        body = body.replace("{{count}}", unicode(count))
+        body = body.replace("{{no}}", str(no))
+        body = body.replace("{{count}}", str(count))
         return body
        
     def handleButton(self, button):

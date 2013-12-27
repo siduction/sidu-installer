@@ -106,7 +106,7 @@ class PacketPage(Page):
             module = statements[0]
             statements = "<xml>" + "<br/>".join(statements[1:]) 
             button = "<xml>" + self._snippets.get("BUTTON_INSTALL")
-            button = button.replace("{{no}}", unicode(ixRow))
+            button = button.replace("{{no}}", str(ixRow))
             rc = [module, statements, button]
         return rc
     
@@ -181,7 +181,7 @@ class PacketPage(Page):
             statements = ""
             if button == "button_install_all":
                 statements = "-all"
-                for module in xrange(self._missingModules):
+                for module in self._missingModules:
                     ix = module.find("|")
                     statements += module[ix:]
             else:

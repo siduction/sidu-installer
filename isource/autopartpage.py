@@ -232,7 +232,8 @@ class AutoPartPage(Page):
         if val != None:
             matcher = re.match("(\D+)(\d+)", val)
             if matcher:
-                name = "{:s}!{:s}".format(matcher.group(1),
+                name = u"{:s}!{:s}".format(
+                    Util.toUnicode(matcher.group(1)),
                     matcher.group(2))
                 for item in self._freeSpaces:
                     info = item.split("-")
