@@ -30,7 +30,20 @@ class PartitionPage(Page):
         # fields used by diskinfopage: 
         self.addField("disk2")
         self.addField("infostate", "NO")
+        # hidden fields:
+        self.addField("reload", "NO")
    
+    def afterInit(self):
+        '''Will be called when the object is fully initialized.
+        Does some preloads: time consuming tasks will be done now,
+        while the user reads the introductions.
+        '''
+        value = self.getField("reload")
+        if value == "YES":
+            self.putField("reload", "NO")
+            self._diskInfo.reload()
+            self.setRefresh() 
+
     def changeContent(self, body):
         '''Changes the template in a customized way.
         @param body: the HTML code of the page
@@ -62,13 +75,12 @@ class PartitionPage(Page):
         if allDisksAllowed != "y" and disk == "":
             self.putError("disk", "partition.err_all_not_allowed")
         else:
+            self.putField("reload", "YES")
             if disk != "":
                 disk = "/dev/" + disk
             params = params.replace("{{disk}}", disk)
             params = self.autoSplit(params)
             self.execute(answer, options, command, params, 0)
-            # Partition info is potentially changed. Reload necessary:
-            self._diskInfo.reload()
             intro = "wait.txt_intro"
             description = "partition.description_wait"
             progress = None
@@ -89,6 +101,8 @@ class PartitionPage(Page):
             pass
         elif button == "button_reload":
             self._diskInfo.reload()
+            pageResult = self._session.redirect("partition", "partition-reload")
+            self.setRefresh() 
         elif button == "button_exec":
             pageResult = self.handleExecute()
         elif button == "button_auto":
