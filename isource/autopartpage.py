@@ -73,7 +73,7 @@ class AutoPartPage(Page):
         body = body.replace("{{PARAMETER}}", content)
         sizeAvailable = self.calcAvailableSpace()
         sizeUsed = self.getCorrectedUsedSpace()
-        sizeFree = self.humanReadableSize((sizeAvailable-sizeUsed))
+        sizeFree = self.humanReadableSize(((sizeAvailable-sizeUsed) * 1024))
         sizeAvailable = self.humanReadableSize(sizeAvailable*1024)
         self._session.setLocalVar("size_total", sizeAvailable)
         self._session.setLocalVar("size_free", sizeFree)
