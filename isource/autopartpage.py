@@ -73,8 +73,8 @@ class AutoPartPage(Page):
         body = body.replace("{{PARAMETER}}", content)
         sizeAvailable = self.calcAvailableSpace()
         sizeUsed = self.getCorrectedUsedSpace()
-        sizeFree = self.humanReadableSize(((sizeAvailable-sizeUsed) * 1024))
-        sizeAvailable = self.humanReadableSize(sizeAvailable*1024)
+        sizeFree = self.humanReadableSize((sizeAvailable-sizeUsed) * 1024, 3, 100)
+        sizeAvailable = self.humanReadableSize(sizeAvailable*1024, 3, 100)
         self._session.setLocalVar("size_total", sizeAvailable)
         self._session.setLocalVar("size_free", sizeFree)
         return body
@@ -278,7 +278,7 @@ class AutoPartPage(Page):
             if size < 0:
                 val = ""
             else:
-                val = self.humanReadableSize(size)
+                val = self.humanReadableSize(size, 3, 100)
                 size /= 1024
             self.putField(field, val)
         return size       
@@ -332,7 +332,7 @@ class AutoPartPage(Page):
             sizeMax = sizeAvailable
             if sizeMax > 50*GByte:
                 sizeMax = 50*GByte
-            self.putField("size_total", self.humanReadableSize(1024*sizeMax))
+            self.putField("size_total", self.humanReadableSize(1024*sizeMax, 3, 100))
         if sizeMax <= 4*GByte:
             home = 0
             swap = 200

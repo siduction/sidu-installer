@@ -53,20 +53,16 @@ my $covered = basic::Cover($text);
 my $clear = basic::Uncover($covered);
 die unless $text ne $clear;
 
-if ($s_cmd !~ /^test(.*)/){
+if ($s_cmd ne 'test'){
     # recording:
 	recorder::Init($s_appl, 1, "/tmp/$s_appl.recorder.data");
 } else {
-	$s_testRun = $1;
-	if ($s_testRun =~ /^:(.*)/){
-		my $file = $1;
-		die "test input not found: $file" unless -f $file;
-		# replaying
-		recorder::Init($s_appl, 2, $file);
-	} else {
-		$s_cmd = "-"; 
-		recorder::Init($s_appl, 0);
-	}
+    $s_testRun = 1;
+    $s_fnProgress = "/tmp/ap.replay.log" unless $s_fnProgress;
+	my $file = $s_answer;
+	die "test input not found: $file" unless -f $file;
+	# replaying
+	recorder::Init($s_appl, 2, $file);
 }
 basic::Init($s_fnProgress, $s_testRun ne "");
 

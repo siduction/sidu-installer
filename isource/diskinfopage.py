@@ -205,11 +205,12 @@ class DiskInfoPage(Page):
         excludes = self._session.getConfigWithoutLanguage('diskinfo.excluded.dev')
         rexprExcludes = re.compile(excludes)
         diskList = ''
+        # Don't use codecs.open(): may be not UTF-8
         with open(self._filePartInfo, "r") as fp:
             no = 0
             for line in fp:
                 no += 1
-                line = line.strip()
+                line = Util.toUnicode(line.strip())
                 if line.startswith("#") or line == "":
                     pass
                 elif line.startswith("!GPT="):

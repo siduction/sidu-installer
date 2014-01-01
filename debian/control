@@ -17,7 +17,7 @@ Package: sidu-installer
 Architecture: all
 Pre-Depends:
  pywwetha (>= 2013.11.28),
- sidu-base(>= 2013.12.27),
+ sidu-base(>= 2013.01.01),
 Depends:
  ${misc:Depends},
 Description: installer for siduction

@@ -154,7 +154,7 @@ class RunPage(Page):
         lines.append("# Determines if the HD should be formatted. (mkfs.*)")
         lines.append("# Possible are: yes|no")
         lines.append("# Default value is: yes")
-        formatIt = "no" if fs == "-" else 'yes'
+        formatIt = "no" if fs.startswith("-") else 'yes'
         lines.append("HD_FORMAT='{:s}'".format(formatIt))
         lines.append("")
 

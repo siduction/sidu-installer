@@ -1,3 +1,16 @@
+sidu-installer (2014.01.01) unstable; urgency=low
+
+  * autopart.pl: test environment improved
+  * autopart: more digits in size expressions
+  * crash if diskinfo contains a non ASCII char
+  * buttons which are pushed by JScript ("aktivate") are now hidden
+  * crash if HD_FORMAT contains a non ASCII char
+  * closes #1450
+  * closes #1456
+  * closes #1454
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 01 Jan 2014 23:00:13 +0100
+
 sidu-installer (2013.12.30) unstable; urgency=low
 
   * fix: free space in autopart has wrong unit
