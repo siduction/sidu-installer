@@ -45,6 +45,7 @@ MkLink autopart.pl $MY_BACKEND
 MkLink2 $BASE_BACKEND/automount-control.sh $MY_BACKEND
 MkLink2 /var/cache/sidu-base/public $MY_DIR/installer/static/
 
+pywwetha-control restart
 popd >/dev/null
 
 #DEBHELPER#

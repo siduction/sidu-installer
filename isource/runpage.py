@@ -151,17 +151,19 @@ class RunPage(Page):
 
         # "-" or "ext3"
         fs = self._globalPage.getField("rootfs")
+        if len(fs) > 6 or fs.find(" ") >= 0:
+            fs = "-"
         lines.append("# Determines if the HD should be formatted. (mkfs.*)")
         lines.append("# Possible are: yes|no")
         lines.append("# Default value is: yes")
-        formatIt = "no" if fs.startswith("-") else 'yes'
+        formatIt = "no" if fs.startswith("-")  else 'yes'
         lines.append("HD_FORMAT='{:s}'".format(formatIt))
         lines.append("")
 
         lines.append("# Sets the Filesystem type.")
         lines.append("# Possible are: ext3|ext4|ext2|reiserfs|jfs")
         lines.append("# Default value is: ext4")
-        lines.append("HD_FSTYPE='{:s}'".format(fs))
+        lines.append("HD_FSTYPE='{:s}'".format(Util.toUnicode(fs)))
 
         # "/dev/sda1:/tmp /dev/sdb2:home"
         value = self._globalPage.getField("mountpoints")

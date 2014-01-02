@@ -1,3 +1,10 @@
+sidu-installer (2014.01.02) unstable; urgency=low
+
+  * postinst: pywwehta restart
+  * crash on RunPage if rootfs is "nicht ändern"
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 02 Jan 2014 23:20:26 +0100
+
 sidu-installer (2014.01.01) unstable; urgency=low
 
   * autopart.pl: test environment improved
