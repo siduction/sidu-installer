@@ -3,7 +3,7 @@ Created on 10.03.2013
 
 @author: hm
 '''
-import os.path, time
+import os.path, time, codecs
 from webbasic.page import Page
 from isource.diskinfopage import DiskInfoPage
 from basic.shellclient import SVOPT_DEFAULT
@@ -163,13 +163,13 @@ class RunPage(Page):
         lines.append("# Sets the Filesystem type.")
         lines.append("# Possible are: ext3|ext4|ext2|reiserfs|jfs")
         lines.append("# Default value is: ext4")
-        lines.append("HD_FSTYPE='{:s}'".format(Util.toUnicode(fs)))
+        lines.append(u"HD_FSTYPE='{:s}'".format(Util.toUnicode(fs)))
 
         # "/dev/sda1:/tmp /dev/sdb2:home"
         value = self._globalPage.getField("mountpoints")
         
         lines.append("# Here you can give additional mappings. (Experimental) You need to have the partitions formatted yourself and give the correct mappings like: /dev/hda4:/boot /dev/hda5:/var /dev/hda6:/tmp")
-        lines.append("HD_MAP='{:s}'".format(Util.toUnicode(value)))
+        lines.append(u"HD_MAP='{:s}'".format(Util.toUnicode(value)))
         lines.append("")
 
         lines.append("# If set to yes, the program will NOT check if there is enough space to install sidux on the selected partition(s). Use at your own risk! Useful for example with HD_MAP if you only have a small root partition.")
@@ -194,7 +194,7 @@ class RunPage(Page):
         name = self._globalPage.getField("realname")
         lines.append("NAME_MODULE='configured'")
         if name != "":
-            lines.append("NAME_NAME='{:s}'".format(Util.toUnicode(name)))
+            lines.append(u"NAME_NAME='{:s}'".format(Util.toUnicode(name)))
             lines[0] += " NAME_NAME"
         
         lines.append("")
@@ -259,7 +259,7 @@ class RunPage(Page):
         lines.append("HD_AUTO='{:s}'".format(value))
         lines.append("")
 
-        with open(shellConfig, "w") as fp:
+        with codecs.open(shellConfig, "w", "utf-8") as fp:
             for line in lines:
                 fp.write(line + "\n")
         fp.close()
