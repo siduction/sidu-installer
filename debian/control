@@ -16,7 +16,7 @@ Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
 Package: sidu-installer
 Architecture: all
 Pre-Depends:
- pywwetha (>= 2013.11.28),
+ pywwetha (>= 2014.01.03),
  sidu-base(>= 2013.01.01),
 Depends:
  ${misc:Depends},

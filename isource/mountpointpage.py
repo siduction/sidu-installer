@@ -48,7 +48,7 @@ class MountpointPage(Page):
         self.addField("disk2")
         self.addField("infostate", "NO")
         # hidden fields:
-        self.addField("dev_selector")
+        self.addField("dev_selector", "DEV")
         self.addField("point_selector")
 
     def buildPartOfTable(self, info, what, ixRow = None):
@@ -71,9 +71,9 @@ class MountpointPage(Page):
         elif what == "cols":
             item = self._mountRows[ixRow]
             (dev, point) = item.split(r':')
-            label = "label" + str(ixRow-1) 
+            label = self._diskInfo.getLabel(dev) 
             button = "<xml>" + self._snippets.get("BUTTON_DEL")
-            fs = ""
+            fs = self._diskInfo.getFsSystem(dev) 
             button = button.replace("{{no}}", str(ixRow))
             self._mounts += " /dev/" + dev + ":" + point
             rc = [dev, label, fs, point, button]

@@ -1,3 +1,13 @@
+sidu-installer (2014.01.03) unstable; urgency=low
+
+  * view of partitions to mount: now with label and filesystem
+  * now "DEV" is the default device selector, instead of "LABEL"
+  * crash in RunPage if non ASCII chars in the real name
+  * dependency pywwetha: 2014.01.03: removes non ASCII char problems
+    in fields
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 03 Jan 2014 21:50:17 +0100
+
 sidu-installer (2014.01.02) unstable; urgency=low
 
   * postinst: pywwehta restart

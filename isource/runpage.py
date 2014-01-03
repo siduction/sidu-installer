@@ -169,7 +169,7 @@ class RunPage(Page):
         value = self._globalPage.getField("mountpoints")
         
         lines.append("# Here you can give additional mappings. (Experimental) You need to have the partitions formatted yourself and give the correct mappings like: /dev/hda4:/boot /dev/hda5:/var /dev/hda6:/tmp")
-        lines.append("HD_MAP='{:s}'".format(value))
+        lines.append("HD_MAP='{:s}'".format(Util.toUnicode(value)))
         lines.append("")
 
         lines.append("# If set to yes, the program will NOT check if there is enough space to install sidux on the selected partition(s). Use at your own risk! Useful for example with HD_MAP if you only have a small root partition.")
@@ -194,7 +194,7 @@ class RunPage(Page):
         name = self._globalPage.getField("realname")
         lines.append("NAME_MODULE='configured'")
         if name != "":
-            lines.append("NAME_NAME='{:s}'".format(name))
+            lines.append("NAME_NAME='{:s}'".format(Util.toUnicode(name)))
             lines[0] += " NAME_NAME"
         
         lines.append("")

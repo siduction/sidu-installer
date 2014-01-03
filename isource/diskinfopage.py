@@ -309,6 +309,28 @@ class DiskInfoPage(Page):
             rc = self._partitions[device].label
         return rc
 
+    def getLabel(self, dev):
+        '''Gets the label of a partition.
+        @param dev:    e.g. vertex/opt
+        @return:        "": no label exists
+                        otherwise: the label of the device
+        '''
+        label = ""
+        if dev in self._partitions:
+            label = self._partitions[dev]._label
+        return label
+    
+    def getFsSystem(self, dev):
+        '''Gets the filesystem of a partition.
+        @param dev:    e.g. vertex/opt
+        @return:        "": no filesystem exists
+                        otherwise: the filesystem of the device
+        '''
+        fs = ""
+        if dev in self._partitions:
+            fs = self._partitions[dev]._filesystem
+        return fs
+    
     def getPartitionsOfDisk(self, disk):
         '''Returns the partitions of a given disk.
         @param disk:    the name of the disk, e.g. sda
