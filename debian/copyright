@@ -3,12 +3,12 @@ Upstream-Name: sidu-installer
 Source: git://git.siduction.org/code/sidu-installer
 
 Files: *
-Copyright: 2011-2013 J. Hamatoma <hama@siduction.net>
+Copyright: 2011-2014 J. Hamatoma <hama@siduction.net>
 License: GPL-3.0+
 
 Files: debian/*
-Copyright: 2011-2013 J. Hamatoma <hama@siduction.net>
-           2011-2013 Alf Gaida <agaida@siduction.org>
+Copyright: 2011-2014 J. Hamatoma <hama@siduction.net>
+           2011-2014 Alf Gaida <agaida@siduction.org>
 License: GPL-3.0+
 
 
