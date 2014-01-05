@@ -1,3 +1,9 @@
+sidu-installer (2014.01.05) unstable; urgency=medium
+
+  * fix the version in Pre-Depends for sidu-base to 2014.01.05
+
+ -- Alf Gaida <agaida@siduction.org>  Sun, 05 Jan 2014 03:24:35 +0100
+
 sidu-installer (2014.01.04) unstable; urgency=low
 
   * crash in RunPage if non ASCII chars in the real name 

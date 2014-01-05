@@ -26,3 +26,6 @@ backend/startgui.sh
 # don't track automatically generated files
 /icons/hicolor/
 /icons/pixmaps/
+
+# don't track editor stuff
+.idea/*
