@@ -1,0 +1,6 @@
+?package(sidu-installer):needs="X11"\
+  section="Applications/System/Administration"\
+  title="Sidu-Installer"\
+  command="/usr/bin/sidu-installer-control start"\
+  hints="Siduction Installer"\
+  icon="/usr/share/icons/sidu-installer.xpm"
