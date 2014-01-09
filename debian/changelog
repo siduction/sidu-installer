@@ -1,3 +1,9 @@
+sidu-installer (2014.01.09.1) unstable; urgency=medium
+
+  * sidu-base new version for dependency
+
+ -- Alf Gaida <agaida@siduction.org>  Thu, 09 Jan 2014 21:40:24 +0100
+
 sidu-installer (2014.01.09) unstable; urgency=medium
 
   * versioned dependency for fll-installer

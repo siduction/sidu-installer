@@ -19,7 +19,7 @@ Architecture: all
 Pre-Depends:
  fll-installer (>= 2014.01.09),
  pywwetha (>= 2014.01.03),
- sidu-base (>= 2013.01.05.2),
+ sidu-base (>= 2013.01.09),
 Depends:
  ${misc:Depends},
 Description: installer for siduction
