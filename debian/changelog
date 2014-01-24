@@ -1,8 +1,9 @@
-sidu-installer (2014.01.11) UNRELEASED; urgency=medium
+sidu-installer (2014.01.12) UNRELEASED; urgency=medium
 
   * translation of sidu-installer adjusted
+  * fix translation
 
- -- Ferdinand Thommes <devil@siduction.org>  Fri, 24 Jan 2014 22:15:40 +0100
+ -- Ferdinand Thommes <devil@siduction.org>  Fri, 24 Jan 2014 22:56:53 +0100
 
 sidu-installer (2014.01.10) unstable; urgency=medium
 
