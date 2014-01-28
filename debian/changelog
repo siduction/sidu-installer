@@ -1,3 +1,10 @@
+sidu-installer (2014.01.28) unstable; urgency=medium
+
+  * contribution non-free patch for fixes repository
+  * closes: #1489
+
+ -- J. Hamatoma <hama@siduction.net>  Tue, 28 Jan 2014 22:14:45 +0100
+
 sidu-installer (2014.01.13) unstable; urgency=medium
 
   [ Ferdinand Thommes ]
@@ -5,7 +12,8 @@ sidu-installer (2014.01.13) unstable; urgency=medium
   * fix translation
 
   [ J. Hamatoma ]
-  * insertion in the sqlist database 
+  * rebuild of the sqlite database 
+  * closes #1487
 
  -- J. Hamatoma <hama@siduction.net>  Sun, 26 Jan 2014 18:27:49 +0100
 

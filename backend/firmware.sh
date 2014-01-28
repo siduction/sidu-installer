@@ -22,6 +22,7 @@ info)
 	;;
 install)
 	CONFIG=/etc/apt/sources.list.d/debian.list
+	CONFIG2=/etc/apt/sources.list.d/siduction.list
 	UPDATE=0
 	if ! grep "^deb.*non-free" $CONFIG >/dev/null ; then
 		sed -i -e 's/main/main non-free/;' $CONFIG
@@ -31,6 +32,14 @@ install)
 		sed -i -e 's/main/main contrib/;' $CONFIG
 		UPDATE=1
 	fi 	
+	if ! grep "^deb.*/fixes.*non-free" $CONFIG2 >/dev/null ; then
+		sed -i -e 's/^\(deb.*[/]fixes.*main\)/\1 non-free/;' $CONFIG2
+		UPDATE=1
+	fi 	
+	if ! grep "^deb.*/fixes.*contrib" $CONFIG2 >/dev/null ; then
+		sed -i -e 's/^\(deb.*[/]fixes.*main\)/\1 contrib/;' $CONFIG2
+		UPDATE=1
+	fi
 	date "+%Y.%m.%d-%H:%M:%S Installing firmware..." >$TEMP1
 	if [ 1 = 1 -o $UPDATE ] ; then
 		echo "apt-get update" >>$TEMP1
