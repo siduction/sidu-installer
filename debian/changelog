@@ -1,3 +1,11 @@
+sidu-installer (2014.02.12) unstable; urgency=medium
+
+  * port changed to 80 (from 8086)
+  * +updatecheck.pl
+  * fix ip for sidu-installer: 127.0.0.86
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 16 Feb 2014 00:04:28 +0100
+
 sidu-installer (2014.01.28) unstable; urgency=medium
 
   * contribution non-free patch for fixes repository

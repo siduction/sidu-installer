@@ -4,20 +4,11 @@ test -n "$CMD" || CMD=start
 
 case "$1" in                                                                                                            
 start)
-	pywwetha-control $CMD
-	sidu-base-control $CMD
+	sudo sidu-control systemctl pywwetha start
+	sudo sidu-control systemctl sidu-base start
 	if [ -n "${DISPLAY}" ] ; then
 	# Launches x-www-browser if we are in kde, xfce, lxde, rqt, gnome
-		BROWSER=x-www-browser
-		LINK=/usr/bin/$BROWSER
-		while [ True ] ; do
-			LINK=$(readlink $LINK)
-			test -z "$LINK" && break
-			if [ $(expr $LINK : "[.][.]") != 0 ] ; then
-				LINK=/usr/bin/$LINK
-			fi
-			BROWSER=$LINK
-		done
+		BROWSER=$(sidu-control linkderef x-www-browser
 		# at this moment we allow the chromium browser:
 		BLOCKED_BROWSER=chromiumX
 		if [ $(expr $BROWSER : ".*$BLOCKED_BROWSER" ) != 0  ] ; then
@@ -28,17 +19,17 @@ start)
 			fi
 		fi 
 	else
-	# Launches www-browser (elinks) if we are in nox
+		# Launches www-browser (elinks) if we are in nox
 		BROWSER=www-browser
 	fi
-	$BROWSER http://sidu-installer:8086
+	$BROWSER http://sidu-installer
 	;;
 stop)
-	sidu-base-control $CMD
-	pywwetha-control $CMD
+	sudo sidu-control systemctl pywwetha stop
+	sudo sidu-control systemctl sidu-base stop
 	;;                                                                                                              
 *)                                                                                                                      
-        echo "unknown command! Use start stop."                                            
-        exit 1                                                                                                          
-        ;;                                                                                                              
+    echo "unknown command! Use start stop."                                            
+    exit 1                                                                                                          
+    ;;                                                                                                              
 esac                                                                                                                    

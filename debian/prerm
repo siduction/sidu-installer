@@ -19,6 +19,7 @@ RmLink backend/automount-control.sh
 
 # Remove the links to the shellserver:
 cd /usr/share/sidu-base/backend
+RmLink updatecheck.py
 RmLink install.sh
 RmLink partinfo.pl
 RmLink partinfo.sh

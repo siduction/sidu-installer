@@ -6,7 +6,6 @@ Created on 10.03.2013
 
 from webbasic.page import Page
 from basic.shellclient import SVOPT_BACKGROUND
-import logging, os, sys
 
 class HomePage(Page):
     '''

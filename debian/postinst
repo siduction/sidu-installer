@@ -4,11 +4,12 @@
 
 set -e
 
-MY_DIR=/usr/share/sidu-installer
+PROJECT=sidu-installer
+MY_DIR=/usr/share/$PROJECT
 # useless, never used MY_BACKEND=../sidu-base
 
 BASE_BACKEND=/usr/share/sidu-base/backend
-MY_BACKEND=../../sidu-installer/backend
+MY_BACKEND=../../$PROJECT/backend
 
 
 function MkLink() {
@@ -26,15 +27,16 @@ function MkLink2() {
 
 case "$1" in
     configure)
-        if ! grep -q "sidu-installer" /etc/hosts ; then
+        if [ -f /etc/skel/Desktop/$PROJECT.desktop ]; then
+            chmod 755 /etc/skel/Desktop/$PROJECT.desktop
+        fi
+        if grep -q $PROJECT /etc/hosts ; then
+        	perl -pi -e "s/^.*$PROJECT.*/127.0.0.86 $PROJECT/;" /etc/hosts
+        else
             # if the last newline is missing:
-            echo "" >>/etc/hosts
-            ADDR=86
-            while grep -q "127.0.0.$ADDR" /etc/hosts ; do
-                ADDR=$(expr $ADDR + 1)
-            done
-            echo "127.0.0.$ADDR sidu-installer" >>/etc/hosts
-            echo "virtual host installed: sidu-installer ($ADDR)"
+            tail -n1 /etc/hosts | hd | grep -q "0a" || echo "" >>/etc/hosts
+            echo "127.0.0.86 $PROJECT" >>/etc/hosts
+            echo "virtual host installed: $PROJECT (127.0.0.86)"
         fi
 
         # Create the links from the toolkit:
@@ -50,7 +52,8 @@ case "$1" in
         MkLink nonfree.sh $MY_BACKEND
         MkLink autopart.sh $MY_BACKEND
         MkLink autopart.pl $MY_BACKEND
-
+		MkLink updatecheck.py $MY_BACKEND
+		
         MkLink2 $BASE_BACKEND/automount-control.sh $MY_BACKEND
         MkLink2 /var/cache/sidu-base/public $MY_DIR/installer/static/
         pywwetha-control restart

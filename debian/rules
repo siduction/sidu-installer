@@ -5,7 +5,7 @@
 export DH_VERBOSE=1
 
 %:
-	dh $@ 
+	dh $@ --with systemd
 
 override_dh_auto_build:
 	# hama special: the following code does not work in my environment
@@ -28,4 +28,5 @@ override_dh_auto_build:
 override_dh_auto_clean:
 	rm -rf icons/pixmaps
 	rm -rf icons/hicolor
+	find . -name \*.pyc | xargs rm -f
 	dh_auto_clean
