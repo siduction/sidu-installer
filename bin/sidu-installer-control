@@ -1,35 +1,4 @@
 #! /bin/bash
-CMD=$1
-test -n "$CMD" || CMD=start
+# usage: sidu-installer-control start|stop|restart
 
-case "$1" in                                                                                                            
-start)
-	sudo sidu-control systemctl pywwetha start
-	sudo sidu-control systemctl sidu-base start
-	if [ -n "${DISPLAY}" ] ; then
-	# Launches x-www-browser if we are in kde, xfce, lxde, rqt, gnome
-		BROWSER=$(sidu-control linkderef x-www-browser
-		# at this moment we allow the chromium browser:
-		BLOCKED_BROWSER=chromiumX
-		if [ $(expr $BROWSER : ".*$BLOCKED_BROWSER" ) != 0  ] ; then
-			test -x /usr/bin/midori && BROWSER=/usr/bin/midori
-			test -x /usr/bin/iceweasel && BROWSER=/usr/bin/iceweasel
-			if [ $(expr $BROWSER : ".*$BLOCKED_BROWSER") != 0 ] ; then
-				xmessage "$BLOCKED_BROWSER has a bug avoiding that sidu-installer works. No alternative browser found. Please install midori (or similar) ..."
-			fi
-		fi 
-	else
-		# Launches www-browser (elinks) if we are in nox
-		BROWSER=www-browser
-	fi
-	$BROWSER http://sidu-installer
-	;;
-stop)
-	sudo sidu-control systemctl pywwetha stop
-	sudo sidu-control systemctl sidu-base stop
-	;;                                                                                                              
-*)                                                                                                                      
-    echo "unknown command! Use start stop."                                            
-    exit 1                                                                                                          
-    ;;                                                                                                              
-esac                                                                                                                    
+sidu-control browser sidu-installer $1 sidu-base

@@ -1,3 +1,9 @@
+sidu-installer (2014.03.07) unstable; urgency=medium
+
+  * using sidu-control
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 09 Mar 2014 02:22:48 +0100
+
 sidu-installer (2014.02.12) unstable; urgency=medium
 
   * port changed to 80 (from 8086)

@@ -7,6 +7,7 @@ Uploaders: Alf Gaida <agaida@siduction.org>,
  Ferdinand Thommes <devil@siduction.org>,
 Build-Depends:
  debhelper (>= 9),
+ dh-systemd,
  inkscape,
  imagemagick,
 Standards-Version: 3.9.5
