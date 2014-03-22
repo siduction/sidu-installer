@@ -11,8 +11,6 @@ class PartitionPage(Page):
     '''
     Handles the page allowing changing the partitions.
     '''
-
-
     def __init__(self, session):
         '''
         Constructor.

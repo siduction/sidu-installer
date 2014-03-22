@@ -52,7 +52,7 @@ class BootPage(Page):
         '''Reads the file with the timezone info.
         @return: a tuple (regions, cities)
         '''
-        name = self._session.getConfigWithoutLanguage(".dir.temp") + "timezoneinfo.txt"
+        name = self._session._tempDir + "timezoneinfo.txt"
         cities = []
         zones = []
         if not os.path.exists(name):

@@ -9,6 +9,7 @@ icons/sidu-installer.svg  usr/share/icons/hicolor/scalable/apps
 #icons/hicolor            usr/share/icons
 icons/pixmaps/*           usr/share/icons
 backend	                  usr/share/sidu-installer
+scripts	                  usr/share/sidu-installer
 etc/sidu-installer        etc
 etc/pywwetha              etc
 etc/virtualhosts.d        etc/pywwetha

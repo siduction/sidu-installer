@@ -22,8 +22,7 @@ class PacketPage(Page):
         self._firmwareFile = (self._session.getConfigWithoutLanguage(".dir.temp") 
             + "fwdetect.txt")
         self._nodeLog = "public/firmware_log.txt"
-        self._installationLog = (self._session.getConfigWithoutLanguage(".dir.temp") 
-            + self._nodeLog)
+        self._installationLog = (self._session._tempDir + self._nodeLog)
         self._missingModules = None
         self._installedModules = None
         self._hasInfo = False

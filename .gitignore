@@ -33,3 +33,5 @@ backend/.pydevproject
 backend/D
 .coverage
 backend/sdc_partinfo.pl
+util/
+

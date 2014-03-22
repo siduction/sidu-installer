@@ -1,3 +1,20 @@
+sidu-installer (2014.03.30) unstable; urgency=medium
+
+  * md devices (made by mdadm) build a virtual disk "(mdraid)"
+  * displaying "(mdraid)" in the disk info
+  * displaying mdX partitions in the partition info
+  * filtering out virtual disks from real disks (target of fdisk ...)
+  * closes: #1508
+  * python scripts in subdir scripts
+  * packet version check and update with one click
+  * new: usage of SessionBase._tempDir
+  * syntax partinfo.txt: "commands" starting with !<name>= (instead of
+    <name>:)
+  * unified: partinfo.txt and sdc_partinfo.txt
+  * mibytes instead of megabytes
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 23 Mar 2014 00:08:22 +0100
+
 sidu-installer (2014.03.07) unstable; urgency=medium
 
   * using sidu-control

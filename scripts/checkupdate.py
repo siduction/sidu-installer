@@ -4,6 +4,9 @@
 Tests whether a newer version of the sidu-installer is available.
 Result: a file (name given by an argument) with this format:
 
+Usage:
+checkupdate.py <answer_file>
+
 Example:
 .hasNetwork=True
 sidu-installer=(keine) 2014.01.27
@@ -25,7 +28,8 @@ class UpdateTester:
         self._network = self.testNetwork()
         self._currentVersion = dict()
         self._availableVersion = dict()
-        self._packets = ["sidu-installer", "sidu-base", "pywwetha"]
+        self._packets = ["fll-installer", "pywwetha", "sidu-base", 
+                         "sidu-installer", "sidu-disk-center"]
         
     def testNetwork(self):
         '''Tests whether the network is working.
@@ -100,6 +104,10 @@ def main(argv):
         tester = UpdateTester(answer)
         tester.getVersions()
         tester.writeAnswer()
+        fn = answer + ".pending"
+        if os.path.exists(fn):
+            os.unlink(fn)
+            print("deleted: " + fn)
         
 if __name__ == "__main__":
     main(sys.argv)

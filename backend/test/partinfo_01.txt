@@ -1,0 +1,20 @@
+!SnapLVM:
+loop0		fs:squashfs	distro:jessie/sid	subdistro:siduction 13.2.rc1 December - lxde - (201312222031)
+sda1		fs:ext4	uuid:9170f0af-fcd5-4749-a859-3cdb1a0c4153	created:2013.11.9	modified:2013.12.25	size:14810112	pinfo:Linux
+sda2		fs:ext4	uuid:21f00f31-11b9-41d7-aadb-3b7022ab455b	created:2013.11.9	modified:2013.12.25	size:8293376	pinfo:Linux
+sda5		fs:ext4	uuid:fd1b3bd0-e165-43d0-a5f8-0083ab1d807a	distro:jessie/sid	subdistro:siduction 13.2.rc1 December - lxde - (201312222031)	created:2013.12.25	modified:2013.12.25	size:21841920	pinfo:Linux
+sda6		fs:ext4	uuid:b65bd58b-c004-4af4-8773-e14aa51d90af	created:2013.12.25	modified:2013.12.25	size:107111424	pinfo:Linux
+sda7		fs:swap	uuid:59050040-202b-4e4a-abe6-83bac9c6ebb5	size:4229120	pinfo:Linux swap / Solaris
+sdb1		fs:ntfs	uuid:00123515566E5A92	size:10882048	pinfo:HPFS/NTFS/exFAT
+sdb2		fs:ntfs	uuid:5B3173F87F85C216	size:61440000	pinfo:HPFS/NTFS/exFAT
+sdb3		fs:swap	uuid:394335aa-3b5d-470d-8289-4b7a3a836cfb	size:2097152	pinfo:Linux swap / Solaris
+sdb4		fs:ext4	uuid:66c61b5f-03e5-49a6-96ed-8710f4e3d5c8	distro:wheezy/sid	created:2012.11.22	modified:2013.12.25	size:81870117	pinfo:Linux
+sr0		label:siduction	fs:iso9660
+!phDisk=	sda;152587;msdos;3;4;;ATA WDC WD1600AAJB-5 (scsi)	sdb;152587;msdos;4;1;;ATA ST3160812AS (scsi)
+!labels=;siduction
+!VG=
+!LV=
+!GapPart=
+!osinfo=lxde;32;13.2.rc1
+!FreeLVM:
+!MarkedLVM:

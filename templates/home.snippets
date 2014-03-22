@@ -19,14 +19,43 @@ MAIN:
 <li>{{home.txt_wiki}}: <a href="http://wiki.siduction.org" target="_blank"> http://wiki.siduction.org</a></li>
 </ul>
 </div>
-<div class="textblock">
-<div class="center">
-<img class="home_img_usb" src="/static/images/usbstick.png" alt="{{home.txt_alt_usb}}" />
-<input class="home_button_usb" type="submit" name="button_usb_install" value="{{home.txt_usb_installer}}" />
-</div>
-</div>
+{{UPDATE_BODY}}
 <div class="textblock center">
 <input type="submit" name="button_clear_config" value="{{home.txt_clear_config}}" />
 </div>
 </div> <!-- text_area-->
+
+UPD_WAIT:
+<div class="textblock">
+{{home.txt_upd_wait}}
+</div>
+
+UPD_LOG:
+<div class="textblock">
+<a href="{{url_log}}">{{home.txt_logfile}}</a>
+<div class="center">
+<input type="submit" name="button_update_again" value="{{home.txt_update_again}}" />
+</div>
+</div>
+
+UPD_NO_NETWORK:
+<div class="textblock">
+{{home.txt_upd_no_network}}
+</div>
+
+TABLE_UPDATE:
+<div class="textblock">
+<table>
+<tr>
+	<th>{{home.txt_package}}</th>
+	<th>{{home.txt_package_current}}</th>
+	<th>{{home.txt_package_next}}</th>
+</tr>
+{{ROWS}}
+</table>
+{{home.txt_update_needed}}
+<div class="center">
+<input type="submit" name="button_update" value="{{home.txt_button_update}}" />
+</div>
+</div>
 

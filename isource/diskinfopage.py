@@ -8,6 +8,8 @@ from webbasic.page import Page, PageException
 from basic.shellclient import SVOPT_BACKGROUND
 from util.util import Util
 
+VIRT_RAID_DISK = "(mdraid)"
+COMMAND = "partinfo"
 class PartitionInfo:
     '''the info of one partition
     '''
@@ -34,10 +36,12 @@ class PartitionInfo:
         self._filesystem = fs
         # additional info
         self._info = info
-        # size in MByte
-        self._megabytes = size / 1000
+        # size in MiByte
+        self._mibytes = size / 1024
         # size and unit, e.g. 11GB
         self._size = size2
+        # flavour, arch, version
+        self._osInfo = ("nox", "32", "13.2");
         
     def canBeRoot(self, minSize):
         '''Tests whether the partition can be used as root partition
@@ -45,7 +49,7 @@ class PartitionInfo:
         @return: True: can be used as root partition<br>
                 False: otherwise
         '''
-        rc = self._megabytes >= minSize
+        rc = self._mibytes >= minSize
         if rc:
             if self._partInfo == "Microsoft basic data":
                 rc = False
@@ -61,7 +65,7 @@ class VirtualDisk:
                  primaries = 0, nonPrimaries = 0, pType = None):
         '''Constructor.
         @param dev:          the device name
-        @param size:         the size in kiByte
+        @param size:         the size in MiByte
         @param info:         additional info about filesys...
         @param attr:         attributes like LVM_VG
         @param primaries:    count of primary partitions
@@ -116,7 +120,8 @@ class DiskInfoPage(Page):
         self._markedLVM = []
         self._physicalVolumes = []
         self._freePV = []
-        self._volumeGroups = []
+        self._volumeGroupList = []
+        self._volumeGroups = {}
         # flavour, arch, version
         self._osInfo = ("nox", "32", "13.2");
         self._filePartInfo = session.getConfigWithoutLanguage(
@@ -160,7 +165,7 @@ class DiskInfoPage(Page):
         Util.writeFile(self._fnPending);
         answer = self._filePartInfo
         options = SVOPT_BACKGROUND
-        command = "partinfo"
+        command = COMMAND
         params = self._fnPending
         self._session._shellClient.execute(answer, options, command, params, 
             0, False)
@@ -198,6 +203,17 @@ class DiskInfoPage(Page):
         '''
         self._session.deleteFile(self._filePartInfo)
 
+    def addRaidPartition(self, partInfo):
+        '''Adds a raid partition into the "virtual drive" mdraid.
+        @param partInfo:    instance of PartitionInfo
+        '''
+        if VIRT_RAID_DISK not in self._disks:
+            disk = VirtualDisk(VIRT_RAID_DISK, 0, "", "RAID")
+            self._disks[VIRT_RAID_DISK] = disk
+        else:
+            disk = self._disks[VIRT_RAID_DISK]
+        disk._size += partInfo._mibytes
+        
     def importPartitionInfo(self):
         '''Gets the data of the partition info and put it into into the user data.
         '''
@@ -222,23 +238,23 @@ class DiskInfoPage(Page):
                     if line.find(":") > 0:
                         self._lvmVGs =  self.autoSplit(line, True);
                         for vg in self._lvmVGs:
-                            (name, size) = vg.split(":")
-                            # size is in MiByte. Convert to KiByte:
+                            name, size = vg.split(":")
+                            # size is in MiByte:
                             self._disks[name] = VirtualDisk(name, int(size),
                                  "", "LVM-VG")
-                elif line.startswith("PhLVM:"):
-                    self._physicalVolumes = self.autoSplit(line[6:], True)
-                elif line.startswith("FreeLVM:"):
+                            self._volumeGroups[name] = size
+                elif line.startswith("!PhLVM="):
+                    self._physicalVolumes = self.autoSplit(line[7:], True)
+                elif line.startswith("!FreeLVM="):
                     self._freePV = self.autoSplit(line[8:], True)
-                elif line.startswith("MarkedLVM:"):
-                    self._markedLVM = self.autoSplit(line[10:], True)
-                elif line.startswith("LogLVM:"):
+                elif line.startswith("!MarkedLVM="):
+                    self._markedLVM = self.autoSplit(line[11:], True)
+                elif line.startswith("!LogLVM="):
                     pass
-                elif line.startswith("VgLVM:"):
-                    self._volumeGroups = self.autoSplit(line[6:], True)
-                    for lvm in self._lvmVGs.split(";"):
-                        lvm += "/"
-                        self._disks[lvm] = VirtualDisk(lvm, -1, "", "LVM-VG")
+                elif line.startswith("!VgLVM="):
+                    self._volumeGroupList = self.autoSplit(line[7:], True)
+                elif line.startswith("!SnapLVM:"):
+                    pass
                 elif line.startswith("!osinfo="):
                     self._osInfo = line[8:].split(";")
                 elif line.startswith("!LV="):
@@ -295,6 +311,8 @@ class DiskInfoPage(Page):
                     self._partitions[dev] = PartitionInfo(self._partitions, 
                         dev, label, int(size), size2, ptype, pinfo, fs, info)
                     self._partitionList.append(self._partitions[dev])
+                    if dev.startswith("md"):
+                        self.addRaidPartition(self._partitions[dev])
             fp.close()
             # strip the first separator:
             self._bootOptTarget = diskList[1:]
@@ -339,6 +357,8 @@ class DiskInfoPage(Page):
         rc = []
         if disk.endswith("/"):
             disk = "mapper/" + disk[0:-1] + "-"
+        elif disk == VIRT_RAID_DISK:
+            disk = "md"
         for partition in self._partitionList:
             if partition._device.startswith(disk):
                 rc.append(partition)
@@ -463,6 +483,7 @@ class DiskInfoPage(Page):
         else:
             if state == None or state not in ["NO", "PART", "DISK"]:
                 state = "NO"
+            # INFO_PART or INFO_DISK
             content = self._snippets.get("INFO_" + state)
             content = content.replace("{{STATE_SWITCH}}", 
                 self._snippets.get("STATE_SWITCH"))
@@ -513,7 +534,8 @@ class DiskInfoPage(Page):
         rc = []
         for disk in self._disks:
             item = self._disks[disk]
-            if not disk.endswith("/") and not item._attr == "LVM-VG":
+            if not (disk.endswith("/") or item._attr == "LVM-VG"
+                    or disk.startswith("(")):
                 rc.append(disk)
         rc.sort()
         return rc
@@ -691,7 +713,23 @@ class DiskInfoPage(Page):
                 cols[0] = cols[0].replace("/dev/", "")
             rc.append(cols)
         return rc
-    
+
+    def buildDevSize(self, devs):
+        '''Builds a list of tuples (<dev>, <size>).
+        @param devs:    a list of device names
+        @return:        a list of tuples 
+                        e.g. [("sda1", "4GiB"), ("sdb3", "2MiB")]
+        '''
+        rc = []
+        for pv in devs:
+            if pv in self._partitions:
+                size = self._partitions[pv]._size
+            else:
+                size = 0
+            cols = (pv, size)
+            rc.append(cols)
+        return rc
+
     def getMarkedPV(self, fullInfo = False):
         '''Returns the names of the partitions with partition type 0x8e.
         @param fullInfo:    False: only the name will be returned
@@ -699,9 +737,9 @@ class DiskInfoPage(Page):
         @return: a list of names, e.g. [sdc1, sdc2]
         '''
         if not fullInfo:
-            rc = self.listOfFirst(self._markedLVM)
+            rc = self._markedLVM
         else:
-            rc = self.listOfFull(self._markedLVM)
+            rc = self.buildDevSize(self._markedLVM)
         return rc
 
     def getFreePV(self, fullInfo = False):
@@ -712,16 +750,16 @@ class DiskInfoPage(Page):
                  or a list of tuples: [("sdc1", "4G"), ("sdc3", "2G")]
         '''
         if not fullInfo:
-            rc = self.listOfFirst(self._freePV)
+            rc = self._freePV
         else:
-            rc = self.listOfFull(self._freePV)
+            rc = self.buildDevSize(self._freePV)
         return rc
 
     def getVolumeGroups(self):
         '''Returns a list of the names of the volume groups.
         @return: a list of the names of the volume groups
         '''
-        rc = self.listOfFirst(self._volumeGroups)
+        rc = self._volumeGroups.keys()
         return rc
     
     def listOfFirstOfVG(self, vg, source):
