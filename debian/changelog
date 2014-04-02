@@ -1,3 +1,13 @@
+sidu-installer (2014.04.02) unstable; urgency=medium
+
+  * new: diskinfo.root.minsize.mb.lxqt
+  * no crash, if a new flavour is built
+  * partinfo.pl: physical disks will be detected if partition table 
+    is wrong
+  * closes: #1559
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 02 Apr 2014 20:41:43 +0200
+
 sidu-installer (2014.03.30) unstable; urgency=medium
 
   * md devices (made by mdadm) build a virtual disk "(mdraid)"
@@ -13,7 +23,7 @@ sidu-installer (2014.03.30) unstable; urgency=medium
   * unified: partinfo.txt and sdc_partinfo.txt
   * mibytes instead of megabytes
 
- -- J. Hamatoma <hama@siduction.net>  Sun, 23 Mar 2014 00:08:22 +0100
+ -- J. Hamatoma <hama@siduction.net>  Mon, 31 Mar 2014 00:04:28 +0100
 
 sidu-installer (2014.03.07) unstable; urgency=medium
 

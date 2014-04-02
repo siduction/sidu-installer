@@ -429,8 +429,13 @@ class AutoPartPage(Page):
         vgInfo = self.getField("vg") + ":" + str(extensionSize) + "K"
         lvInfo = ""
         flavour = self._diskInfo.getOsInfo()[0]
-        minSize = int(self._session.getConfigWithoutLanguage(
-                        "diskinfo.root.minsize.mb." + flavour))
+        key = "diskinfo.root.minsize.mb." + flavour
+        value = self._session.getConfigOrNoneWithoutLanguage(key)
+        if value == None:
+            self.putErrorText(None, "configuration error: missing " + key)
+            value = self._session.getConfigWithoutLanguage(
+                "diskinfo.root.minsize.mb.kde")
+        minSize = int(value)
         size = self.getCorrectedSizeValue("size_root") / 1024
         error = False 
         progress = None

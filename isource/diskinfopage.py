@@ -73,7 +73,7 @@ class VirtualDisk:
         @param pType:        gpt or msdos
         '''
         self._device = dev
-        self._size = int(size)
+        self._size = int(size) if size != "" else 0
         self._info = info
         self._attr = attr
         self._primaries = primaries

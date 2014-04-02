@@ -350,7 +350,7 @@ sub GetVG{
 # @return 	e.g. ("sda", "sdc")
 sub GetDiskDev{
 	&Progress("partprobe");
-	my @lines = recorder::ReadStream("GetDiskDev", "partprobe -s|");
+	my @lines = recorder::ReadStream("GetDiskDev", "partprobe 2>&1 -s|");
 	my @rc;
 	
 	# count the interesting disks:
@@ -376,6 +376,9 @@ sub GetDiskDev{
 				&Progress("gdisk");
 				&GetGdiskInfo($dev);
 			}
+		} elsif (m!Error: .* on /dev/(\w+)!){
+		    GetPhysicalDiskInfo($1, "error");
+		    next;
 		}
         if (m!/dev/(\w+):\s+(\w+)!){                                                                                                
 			GetPhysicalDiskInfo($1, $2);
