@@ -361,7 +361,7 @@ sub GetDiskDev{
 			$s_maxTasks += 1;
 		}
 	}
-
+    my $disks = " ";
 	foreach (@lines){
 #/dev/sda: msdos partitions 1 2 3 4 <5 6>                                                                                          
 #/dev/sdb: gpt partitions 1 5 6 7 
@@ -380,8 +380,10 @@ sub GetDiskDev{
 		    GetPhysicalDiskInfo($1, "error");
 		    next;
 		}
-        if (m!/dev/(\w+):\s+(\w+)!){                                                                                                
-			GetPhysicalDiskInfo($1, $2);
+        if (m!/dev/(\w+):\s+(\w+)!){
+            my ($dev, $info) = ($1, $2);                                                                                                
+			GetPhysicalDiskInfo($dev, $info);
+			$disks .= " $dev";
         }
 	}
 	my @disks = GetEmptyDisks();
@@ -389,6 +391,12 @@ sub GetDiskDev{
 		&Progress("empty disk");
 		# fdisk calculates the partition gaps (here the whole disk)
 		GetFdiskInfo($_);
+	}
+	my $defaults = "vda vdb vdc sda sdb sdc sdd sde sdf hda hdb hdc hdd hde";
+	foreach (split(/ /, $defaults)){
+	    if ($disks !~ / $_ / && -b "/dev/$_"){
+	        GetFdiskInfo($_, "msdos");
+	    }
 	}
 	return @rc;
 }

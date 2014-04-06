@@ -1,3 +1,9 @@
+sidu-installer (2014.04.03) unstable; urgency=medium
+
+  * partinfo.pl: workaround for detecting physical disks
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 06 Apr 2014 21:19:21 +0200
+
 sidu-installer (2014.04.02) unstable; urgency=medium
 
   * new: diskinfo.root.minsize.mb.lxqt
