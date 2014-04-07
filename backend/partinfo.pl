@@ -395,7 +395,7 @@ sub GetDiskDev{
 	my $defaults = "vda vdb vdc sda sdb sdc sdd sde sdf hda hdb hdc hdd hde";
 	foreach (split(/ /, $defaults)){
 	    if ($disks !~ / $_ / && -b "/dev/$_"){
-	        GetFdiskInfo($_, "msdos");
+	        GetPhysicalDiskInfo($_, "msdos");
 	    }
 	}
 	return @rc;

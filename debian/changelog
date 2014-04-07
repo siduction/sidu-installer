@@ -1,3 +1,9 @@
+sidu-installer (2014.04.04) unstable; urgency=medium
+
+  * partinfo.pl: fix in the workaround
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 07 Apr 2014 23:23:24 +0200
+
 sidu-installer (2014.04.03) unstable; urgency=medium
 
   * partinfo.pl: workaround for detecting physical disks
