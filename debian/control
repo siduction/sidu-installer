@@ -19,9 +19,10 @@ Package: sidu-installer
 Architecture: all
 Pre-Depends:
  fll-installer (>= 2014.01.10),
- sidu-base (>= 2014.03.07) | sidu-base-systemd (>= 2014.03.07),
+ sidu-base-systemd (>= 2014.03.07) | sidu-base (>= 2014.03.07),
 Depends:
  ${misc:Depends},
+ python,
 Description: installer for siduction
  The main content is a set of HTML files describing features, handling
  and tips for siduction.

@@ -2,7 +2,7 @@ sidu-installer (2014.04.07) unstable; urgency=medium
 
   * depend on sidu-base | sidu-base-systemd
 
- -- Alf Gaida <agaida@siduction.org>  Tue, 08 Apr 2014 00:27:52 +0200
+ -- Alf Gaida <agaida@siduction.org>  Tue, 08 Apr 2014 01:31:37 +0200
 
 sidu-installer (2014.04.04) unstable; urgency=medium
 
