@@ -1,4 +1,4 @@
 #! /bin/bash
 # usage: sidu-installer-control start|stop|restart
 
-sidu-control browser sidu-installer $1 sidu-base-systemd
+sidu-control browser sidu-installer $1 sidu-base
