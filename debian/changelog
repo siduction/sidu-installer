@@ -4,6 +4,13 @@ sidu-installer (2014.04.10) unstable; urgency=medium
 
  -- J. Hamatoma <hama@siduction.net>  Fri, 11 Apr 2014 23:58:44 +0200
 
+sidu-installer (2014.04.08) unstable; urgency=medium
+
+  * revert the dependency to sidu-base-systemd, we use a unified sidu-base
+    again
+
+ -- Alf Gaida <agaida@siduction.org>  Wed, 09 Apr 2014 00:11:50 +0200
+
 sidu-installer (2014.04.07) unstable; urgency=medium
 
   * depend on sidu-base | sidu-base-systemd
