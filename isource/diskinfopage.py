@@ -239,6 +239,8 @@ class DiskInfoPage(Page):
                         self._lvmVGs =  self.autoSplit(line, True);
                         for vg in self._lvmVGs:
                             name, size = vg.split(":")
+                            if rexprExcludes.match(name + "0"):
+                                continue
                             # size is in MiByte:
                             self._disks[name] = VirtualDisk(name, int(size),
                                  "", "LVM-VG")
@@ -274,6 +276,8 @@ class DiskInfoPage(Page):
                         self._disks[dev].addInfo(prim, ext, pType)
                 elif not line.startswith("!"):
                     cols = line.split('\t')
+                    if len(cols) < 2:
+                        continue
                     dev = cols[0].replace('/dev/', '')
                     if line == "" or rexprExcludes.search(dev):
                         continue

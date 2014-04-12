@@ -15,6 +15,20 @@ backend/sdc_lvm.sh
 backend/sdc_partinfo.sh
 backend/shellserver.sh
 backend/startgui.sh
+backend/sidu_basic.pm
+backend/sidu_recorder.pm
+backend/sidu_test.pm
+backend/test/data.tgz
+backend/test/partinfo.01.txt
+backend/test/partinfo.03.txt
+backend/test/pi.recorder.01.data
+backend/test/sdc_partinfo.01.txt
+config/comparison_de.html
+packetversions.txt.prepare
+public
+scripts/partinfo.py
+util
+
 
 # don't track debian build crap
 /debian/*.debhelper
