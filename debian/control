@@ -20,6 +20,7 @@ Architecture: all
 Pre-Depends:
  fll-installer (>= 2014.01.10),
  sidu-base (>= 2014.04.11),
+ pywwetha,
 Depends:
  ${misc:Depends},
  python,
