@@ -1,3 +1,9 @@
+sidu-installer (2014.04.13) unstable; urgency=medium
+
+  * ignoring sr0 as physical disk 
+
+ -- J. Hamatoma <hama@siduction.net>  Sun, 13 Apr 2014 08:38:07 +0200
+
 sidu-installer (2014.04.12) unstable; urgency=medium
 
   * as the installer should run only from iso and pywwetha is a 

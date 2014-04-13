@@ -239,7 +239,7 @@ class DiskInfoPage(Page):
                         self._lvmVGs =  self.autoSplit(line, True);
                         for vg in self._lvmVGs:
                             name, size = vg.split(":")
-                            if rexprExcludes.match(name + "0"):
+                            if rexprExcludes.match(name):
                                 continue
                             # size is in MiByte:
                             self._disks[name] = VirtualDisk(name, int(size),
@@ -269,6 +269,8 @@ class DiskInfoPage(Page):
                     disks = self.autoSplit(line[8:], True)
                     for info in disks:
                         (dev, size, pType, prim, ext, attr, model) = info.split(";");
+                        if rexprExcludes.match(dev):
+                            continue
                         self._disks[dev] = VirtualDisk(dev, size, model, attr,
                             prim, ext, pType)
                         if pType.lower() ==  "gpt":
