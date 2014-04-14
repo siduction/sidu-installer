@@ -1,3 +1,9 @@
+sidu-installer (2014.04.14) unstable; urgency=medium
+
+  * django modules fix from djinn (prefix djinn.)
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 14 Apr 2014 18:05:45 +0200
+
 sidu-installer (2014.04.13) unstable; urgency=medium
 
   * ignoring sr0 as physical disk 
