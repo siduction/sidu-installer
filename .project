@@ -3,6 +3,7 @@
 	<name>sidu-installer</name>
 	<comment></comment>
 	<projects>
+		<project>pywwetha</project>
 		<project>sidu-base</project>
 	</projects>
 	<buildSpec>

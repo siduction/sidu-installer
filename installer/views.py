@@ -1,5 +1,5 @@
 # Create your views here.
-from django.http import HttpResponse, HttpResponsePermanentRedirect
+from djinn.django.http import HttpResponse, HttpResponsePermanentRedirect
 from isource.session import Session
 from isource.homepage import HomePage
 from isource.autopartpage import AutoPartPage
