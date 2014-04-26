@@ -2,7 +2,7 @@
     Type=Application
     Exec=sidu-installer-control start
     Icon=sidu-installer
-    Name=sidu-installer
-    GenericName=sidu-installer
-    GenericName[de]=sidu-installer
+    Name=Installer
+    GenericName=Installer
+    GenericName[de]=Installer
     Categories=System;
