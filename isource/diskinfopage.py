@@ -153,7 +153,6 @@ class DiskInfoPage(Page):
         else:
             ftime = os.path.getctime(fnPending)
             if time.time() - ftime > 30:
-                
                 buildIt = True
         if buildIt:
             self.buildInfoFile()

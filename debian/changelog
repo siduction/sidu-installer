@@ -1,3 +1,11 @@
+sidu-installer (2014.09.18) unstable; urgency=medium
+
+  * new: diskinfo.root.minsize.mb.mate
+  * automatic reloading after partition editing
+  * closes: #1686
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 17 Sep 2014 23:39:30 +0200
+
 sidu-installer (2014.09.17) unstable; urgency=medium
 
   * closes #1686

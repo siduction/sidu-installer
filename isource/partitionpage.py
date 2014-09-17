@@ -73,6 +73,8 @@ class PartitionPage(Page):
         if allDisksAllowed != "y" and disk == "":
             self.putError("disk", "partition.err_all_not_allowed")
         else:
+            # automatic partition reloading():
+            self._diskInfo.reload()
             self.putField("reload", "YES")
             if disk != "":
                 disk = "/dev/" + disk
