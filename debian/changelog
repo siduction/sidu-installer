@@ -1,3 +1,13 @@
+sidu-installer (2014.09.20) unstable; urgency=medium
+
+  * language will be set for GUI programs like gparted
+  * closes #1472
+  * updated config db
+  * closes #1686
+  * dependency: sidu-base 2014.09.20
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 20 Sep 2014 00:32:12 +0200
+
 sidu-installer (2014.09.18) unstable; urgency=medium
 
   * new: diskinfo.root.minsize.mb.mate

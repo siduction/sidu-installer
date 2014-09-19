@@ -19,7 +19,7 @@ Package: sidu-installer
 Architecture: all
 Pre-Depends:
  fll-installer (>= 2014.01.10),
- sidu-base (>= 2014.07.29),
+ sidu-base (>= 2014.09.20),
  pywwetha,
 Depends:
  ${misc:Depends},
