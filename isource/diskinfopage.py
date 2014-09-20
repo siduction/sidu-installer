@@ -146,6 +146,7 @@ class DiskInfoPage(Page):
     def reload(self):
         '''The partition info will be requested again.
         '''
+        self._hasInfo = False
         fnPending = self._filePartInfo + ".pending"
         buildIt = False
         if not os.path.exists(fnPending):

@@ -32,7 +32,7 @@ class NetworkPage(Page):
         This allows a generic handling of the fields.
         '''
         self.addField("host")
-        self.addField("ssh")
+        self.addField("ssh", None, 1)
    
     def changeContent(self, body):
         '''Changes the template in a customized way.

@@ -1,3 +1,11 @@
+sidu-installer (2014.09.21) unstable; urgency=medium
+
+  * ssh server start: default now "no"
+  * closes #1696
+  * reloading after partitioning will be shown
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 20 Sep 2014 08:15:40 +0200
+
 sidu-installer (2014.09.20) unstable; urgency=medium
 
   * language will be set for GUI programs like gparted
