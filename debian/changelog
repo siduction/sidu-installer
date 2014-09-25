@@ -1,3 +1,19 @@
+sidu-installer (2014.09.26) unstable; urgency=medium
+
+  * better messages while waiting for package info
+  * closes: #1703
+  * rootfs and partitions without filesystem are now excluded
+    from the mount partitions
+  * closes: #1702
+  * Expert mode: availiable over the url sidu-installer/expert
+    can be switched on/off
+  * in expert mode: reasons why partitions are not listed in mount
+    partitions
+  * more stability in homepage: files are saver than fields
+  * updatecheck.py: better error processing
+
+ -- J. Hamatoma <hama@siduction.net>  Fri, 26 Sep 2014 00:12:02 +0200
+
 sidu-installer (2014.09.21) unstable; urgency=medium
 
   * ssh server start: default now "no"

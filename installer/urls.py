@@ -10,6 +10,7 @@ def getPatterns():
     rc = patterns('',
         url(r'^$', views.home, name='root'),
         url(r'^home', views.home, name='home'),
+        url(r'^expert', views.expert, name='expert'),
         url(r'^autopart', views.autopart, name='autopart'),
         url(r'^partition', views.partition, name='partition'),
         url(r'^rootfs', views.rootfs, name='rootfs'),

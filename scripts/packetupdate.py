@@ -13,6 +13,8 @@ def main(argv):
         content = subprocess.check_output(cmd, stderr=subprocess.STDOUT, shell=False)
         temp = answer + ".tmp"
         os.rename(temp, answer)
+    except subprocess.CalledProcessError, exc:
+        content = "+++ RC=" + str(exc.returncode) + ": " + exc.output
     except Exception:
         content = traceback.format_exc()
     fp = open(answer, "w")

@@ -2,6 +2,7 @@
 from djinn.django.http import HttpResponse, HttpResponsePermanentRedirect
 from isource.session import Session
 from isource.homepage import HomePage
+from isource.expertpage import ExpertPage
 from isource.autopartpage import AutoPartPage
 from isource.partitionpage import PartitionPage
 from isource.rootfspage import RootFSPage
@@ -9,11 +10,11 @@ from isource.bootpage import BootPage
 from isource.networkpage import NetworkPage
 from isource.packetpage import PacketPage
 from webbasic.waitpage import WaitPage
+from webbasic.checkpage import CheckPage
 from isource.mountpointpage import MountpointPage
 from isource.userpage import UserPage
 from isource.globalpage import GlobalPage
 from isource.runpage import RunPage
-from isource.checkpage import CheckPage
 
 def getSession(request):
     homeDir = request.documentRoot if hasattr(request, "documentRoot") else None
@@ -54,6 +55,11 @@ def index(request):
 def home(request):
     session = getSession(request)
     rc = handlePage(HomePage(session), request, session)
+    return rc
+
+def expert(request):
+    session = getSession(request)
+    rc = handlePage(ExpertPage(session), request, session)
     return rc
 
 def autopart(request):

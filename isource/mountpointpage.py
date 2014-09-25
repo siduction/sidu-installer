@@ -22,6 +22,7 @@ class MountpointPage(Page):
         self._diskInfo = DiskInfoPage(self)
         self._errorPrefix = self._snippets.get("ERROR_PREFIX")
         self._errorSuffix = self._snippets.get("ERROR_SUFFIX")
+        self._whyNot = []
 
     def initMounts(self):
         points = self._globalPage.getField("mountpoint.list")
@@ -86,7 +87,7 @@ class MountpointPage(Page):
                      values
         '''
         devSelector = self.getField("dev_selector")
-        (devs, labels) = self._diskInfo.getMountPartitions(self._mountRows)
+        (devs, labels, self._whyNot) = self._diskInfo.getMountPartitions(self._mountRows)
         if devSelector == "DEV":
             content = self._snippets.get("DEVICE")
             content = self.fillDynamicSelected("add_label", devs, None, content)
@@ -137,6 +138,12 @@ class MountpointPage(Page):
         state = self.getField("infostate")
         content = self._diskInfo.buildInfoSwitch(state)
         body = body.replace("{{INFO}}", content)
+        content = ""
+        expert = self._globalPage.getField("expert")
+        if len(self._whyNot) > 0 and expert == "T":
+            content = self._snippets.get("WHY_NOT")
+            content = content.replace("{{TXT_WHY_NOT}}", " ".join(self._whyNot))
+        body = body.replace("{{WHY_NOT}}", content)
         return body
     
     def addMountPoint(self):

@@ -563,17 +563,29 @@ class DiskInfoPage(Page):
     def getMountPartitions(self, yetMounted):
         '''Returns a tuple of devices and labels.
         @param yetMounted: a list of strings with <device>:<mountpoint>
-        @return: a tuple (devs, labels). devs is a list of device names
+        @return: a tuple (devs, labels, whyNot). devs is a list of device names
                  which are valid for mounting, labels is a list of "" or the
-                 assoziated label
+                 assoziated label, whyNot is a list of messages, why a device
+                 may not be mounted
         '''
         devs = []
         labels = []
+        whyNot = []
+        rootFs = self._parentPage._globalPage.getField("root")
         for partition in self._partitionList:
-            if not self.isYetMounted(partition._device, yetMounted):
+            curDev = partition._device
+            if curDev == rootFs:
+                whyNot.append(curDev + ': ' 
+                              + self._session.getConfig("run.txt_rootfs"))
+            elif partition._filesystem == "":
+                whyNot.append(curDev + ': '
+                               + self._session.getConfig("diskinfo.txt_no_fs"))
+            elif self.isYetMounted(partition._device, yetMounted):
+                pass
+            else:
                 devs.append(partition._device)
                 labels.append(partition._label)
-        return (devs, labels)
+        return (devs, labels, whyNot)
     
     def getWaitMessage(self):
         '''Returns a snippet for a "wait for info" message.

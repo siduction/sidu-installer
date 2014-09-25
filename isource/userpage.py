@@ -123,11 +123,11 @@ class UserPage(Page):
                 self.storePassword("pass", "userpw")
                 pageResult = self._session.redirect(
                     self.neighbourOf(self._name, False), 
-                    'homepage.handleButton')
+                    'userpage.handleButton')
         elif button == 'button_prev':
             pageResult = self._session.redirect(
                 self.neighbourOf(self._name, True), 
-                'homepage.handleButton')
+                'userpage.handleButton')
         else:
             self.buttonError(button)
             

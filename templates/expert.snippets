@@ -1,0 +1,20 @@
+MAIN:
+<h1>{{expert.title}}</h1>
+
+<p>{{expert.intro}}</p>
+<form method="GET" action="!expert">
+    <p class="center">
+{{BUTTON}}
+    </p>
+<hr/>
+<p>
+<ul><li><a href="home">{{home.txt_welcome}}</a></li>
+</ul>
+</p>
+</form>
+
+SET_EXPERT:
+   <input type="submit" name="button_set_expert" value="{{expert.button_set_expert}}" />
+
+UNSET_EXPERT:
+   <input type="submit" name="button_unset_expert" value="{{expert.button_unset_expert}}" />

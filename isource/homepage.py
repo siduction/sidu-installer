@@ -21,6 +21,8 @@ class HomePage(Page):
         @param session: the session info
         '''
         Page.__init__(self, "home", session)
+        self._fnPreloaded = self._session._tempDir + "preloaded.mrk";
+        self._fnWaitForLog = self._session._tempDir + "waitForLog.mrk";
         self._rowUpdates = None
         self._updateDataExists = False
         self._fnUpdateCheck = self._session._tempDir + "packetversions.txt"
@@ -35,8 +37,9 @@ class HomePage(Page):
         while the user reads the introductions.
         '''
         self.startUpdateCheck()
-        preloaded = self.getField("preloaded")
-        if preloaded != "y":
+        preloaded = os.path.exists(self._fnPreloaded)
+        if not preloaded:
+            Util.writeFile(self._fnPreloaded)
             count = int(self._session.getConfigWithoutLanguage("preload.count"))
             for ix in xrange(count):
                 value = self._session.getConfigWithoutLanguage("preload." + str(ix))
@@ -57,31 +60,28 @@ class HomePage(Page):
                     else:
                         command = command[1:]
                 self.execute(answer, opt, command, param, 0, False)
-            self.putField("preloaded", "y")
         
     def defineFields(self):
         '''Defines the fields of the page.
         This allows a generic handling of the fields.
         '''
-        # hidden:
-        self.addField("preloaded", "No")
-        self.addField("waitForLog", "No")
-
+        pass
+    
     def startUpdateCheck(self):
         '''Starts the program to check for packet updates.
         '''
-        value = self.getField("waitForLog")
-        if value == "y":
+        waitForLog = os.path.exists(self._fnWaitForLog)
+        if waitForLog:
             if os.path.exists(self._fnUpdateLog):
-                value = "No"
-                self.putField("waitForLog", value)
+                waitForLog = False
+                self._session.deleteFile(self._fnWaitForLog)
                 self.setRefresh()
-        if value != "y":
+        if not waitForLog:
             answer = self._fnUpdateCheck
             self._updateDataExists = os.path.exists(answer)
             if not self._updateDataExists:
                 if not os.path.exists(self._fnUpdateCheckPending):
-                    Util.writeFile(self._fnUpdateCheckPending, None)
+                    Util.writeFile(self._fnUpdateCheckPending)
                     command = "checkupdate"
                     options = SVOPT_BACKGROUND 
                     # APPL, ARGS, USER, OPTS
@@ -174,9 +174,11 @@ class HomePage(Page):
             self._session.deleteFile(self._fnUpdateCheck)
             self._session.deleteFile(self._fnUpdateCheckPending)
             self._session.deleteFile(self._fnUpdateLog)
+            self._session.deleteFile(self._fnPreloaded)
+            self.setRefresh()
         elif button ==  "button_update":
-            value = self.getField("waitForLog")
-            if value != "y" and not os.path.exists(self._fnUpdateLog):
+            waitForLog = os.path.exists(self._fnWaitForLog)
+            if not waitForLog and not os.path.exists(self._fnUpdateLog):
                 answer = self._fnUpdateLog
                 options = SVOPT_BACKGROUND
                 command = "packetupdate"
@@ -187,9 +189,15 @@ class HomePage(Page):
                         cols = item.split("|")
                         params.append(cols[0])
                     self.execute(answer, options, command, params, 0)
-                    self.putField("waitForLog", "y")
-                self._session.redirect("/home", 
-                    "homepage.handleButton(buttonUpdate)")
+                    Util.writeFile(self._fnWaitForLog)
+                    intro = "wait.txt_intro"
+                    description = "home.description_wait_update"
+                    progress = None
+                    pageResult = self.gotoWait(self._name, answer, progress, intro, [command],
+                        description, None)
+                else:    
+                    self._session.redirect("/home", 
+                        "homepage.handleButton(buttonUpdate)")
         elif button == "button_update_again":
             if os.path.exists(self._fnUpdateLog):
                 self._session.deleteFile(self._fnUpdateCheck)        
