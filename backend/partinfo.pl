@@ -187,8 +187,11 @@ sub GetSiduInfo{
     my $info = &recorder::FirstLineOf("/etc/siduction-version");
     # siduction 11.1 One Step Beyond - kde - 
     my ($version, $flavour) = ("x.y", "z");
-    if ($info =~ /^\S+\s+([.\drc]+)\s.*-\s+(\w+) -/){
+    if ($info =~ /^\S+\s+([.\drc]+)\s.*-\s+(\S+)\s+-/){
         ($version, $flavour) = ($1, $2);
+        if ($flavour =~ /^(\w+)/){
+            $flavour = $1;
+        }
     }
     # Linux version 3.7-8.towo-siduction-amd64 (Debian 3.7-14)...
     $info = &recorder::FirstLineOf("/proc/version");
@@ -498,8 +501,8 @@ sub GetFdiskInfo{
 	my @partNos;
 	my ($extMin, $extMax) = (-1, -1);
 	foreach(@lines){
-#/dev/sda6       118061056  1000215215   441077080   8e  Linux LVM
-		if (m!^/dev/([a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)!){
+#/dev/sda6       118061056  1000215215   441077080   10G  8e  Linux LVM
+		if (m!^/dev/([a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+\S+\s+([0-9a-fA-F]{1,2})\s+(.*)!){
 			my ($dev, $partno, $min, $max, $size, $ptype, $info)  = ($1, $2, $3, $4, $5, $6, $7);
 			# extended partition?
 			if ($ptype == 5){
@@ -512,6 +515,21 @@ sub GetFdiskInfo{
 				push(@partNos, $partno);
 			}
 		    $s_hasLVMFlag{"$disk$partno"} = $size if $ptype =~ /8e/i;
+      } elsif (m!^/dev/([a-z]+(\d+))\s\D*(\d+)\s+(\d+)\s+(\d+)[+]?\s+([0-9a-fA-F]{1,2})\s+(.*)!){
+         # older fdisk versions:
+#/dev/sda6       118061056  1000215215   441077080   8e  Linux LVM         
+         my ($dev, $partno, $min, $max, $size, $ptype, $info)  = ($1, $2, $3, $4, $5, $6, $7);
+         # extended partition?
+         if ($ptype == 5){
+            $s_extParts{$disk} = "$min-$max";
+            ($extMin, $extMax) = ($min, $max);
+         } elsif ($ptype ne "ee"){
+            # ignore extended and protective partitions:
+            $s_devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
+            push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
+            push(@partNos, $partno);
+         }
+          $s_hasLVMFlag{"$disk$partno"} = $size if $ptype =~ /8e/i;
 		} elsif (/total\s+(\d+)\s+sectors/){
 			$sectorCount = $1;
 		} elsif (m!logical/physical\): (\d+) bytes!){

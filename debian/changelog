@@ -1,3 +1,13 @@
+sidu-installer (2014.10.07) unstable; urgency=medium
+
+  * format of fdisk output has changed
+  * closes #1712
+  * fix: crash while installing firmware specific modules
+  * flavour name (siduction-version) can contain other non blank chars
+  * fix: crash if unknown flavour
+
+ -- J. Hamatoma <hama@siduction.net>  Tue, 07 Oct 2014 21:43:15 +0200
+
 sidu-installer (2014.09.26) unstable; urgency=medium
 
   * better messages while waiting for package info

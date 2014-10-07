@@ -185,7 +185,7 @@ class PacketPage(Page):
                     statements += module[ix:]
             else:
                 ix = int(button[12:])
-                if ix < len(self._missingModules):
+                if self._missingModules != None and ix < len(self._missingModules):
                     statements = self._missingModules[ix]
             if statements != "":
                 rc = self.install(statements)
