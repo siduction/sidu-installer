@@ -1,3 +1,11 @@
+sidu-installer (2014.11.18) unstable; urgency=medium
+
+  * auto partitioning: error if 3 primary partitions exists
+  * mkfs.* with option -F (to avoid questions)
+  * closes #1719
+
+ -- J. Hamatoma <hama@siduction.net>  Wed, 19 Nov 2014 00:41:38 +0100
+
 sidu-installer (2014.10.23) unstable; urgency=medium
 
   * LVM deactivated in the automatic partitioning

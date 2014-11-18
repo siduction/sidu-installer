@@ -448,17 +448,22 @@ sub FindFreePrimary{
 	if ($$refPartList != /\S/){
 		$rc = 1;
 	} else {
-		my $last = 0;
-		for (sort split/ /, $$refPartList){
+		my @pList;
+		for (0..4){
+			push(@pList, 0);
+		}
+		for (split/ /, $$refPartList){
 			if (/(\d+)/){
-				if ($1 > $last + 1){
-					$rc = $last + 1;
-					last;
-				}
-				$last = $1;
+				$pList[$1] = 1 if ($1 <= 4);
 			}
 		}
-		$rc = 0 if $rc > 4;
+		for (1..4){
+			if ($pList[$_] == 0){
+				$rc = $_;
+				last;
+			}
+		}
+		
 		if ($rc == 0){
 			$s_hints .= ";missingPrimary";
 		} else {

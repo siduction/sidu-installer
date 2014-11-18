@@ -1,6 +1,6 @@
 #! /usr/bin/perl
 #
-# Usage: autopart.pl CMD PROGRESS ANSWER DISKS ALLOW_INIT \
+# Usage: autopart.pl CMD ANSWER PROGRESS DISKS ALLOW_INIT \
 #                    PARTS VG_INFO LV_INFO MAX_SIZE [PASSPHRASE]
 
 use strict;
@@ -275,7 +275,7 @@ sub BuildLV{
 		if ($fsFull eq ""){
 			&basic::Error("unknown filesystem: $fs");
 		} else {
-			&recorder::Exec("BuildLV-3", "mkfs.$fs -L $label $lvPath");
+			&recorder::Exec("BuildLV-3", "mkfs.$fs -F -L $label $lvPath");
 			&basic::Log("mapper/$vg-$name created as $name ($fs)", 1);
 		}
 	}
@@ -644,12 +644,11 @@ sub CreateThreePartitions{
             $no = $isExtended ? 5 : 1;
             $dev = CreateOnePartition("${disk}$no", $from, $to, $fs, "", "Linux");
             if ($fs eq "swap"){
-    			&recorder::Exec("CreateThreePartitions", "mkswap -L $label /dev/$dev");
-    			&basic::Log("swap activated on $dev", 1);
+    			  &recorder::Exec("CreateThreePartitions", "mkswap -L $label /dev/$dev");
+    			  &basic::Log("swap activated on $dev", 1);
             } else {
-    			&recorder::Exec("CreateThreePartitions-2", "mkfs.$fs -L $label /dev/$dev");
-    			&basic::Log("$dev created as $class ($fs)", 1);
-                
+    			  &recorder::Exec("CreateThreePartitions-2", "mkfs.$fs -F -L $label /dev/$dev");
+    			  &basic::Log("$dev created as $class ($fs)", 1);
             }
             $from = $to + 1;
         }    
@@ -679,8 +678,8 @@ sub CreateOnePartition{
 	$dev =~ /^(\D+)(\d+)/;
 	my $no;
 	($disk, $no) = ($1, $2);
-	my $info = GetDiskInfo($disk);
-	my $last;
+	my $info = ($disk);
+	my $last = $to + 1;
 	$last = $1 if $info =~ /last:(\d+)/;
 	$to = $last if $last < $to;
 	
@@ -690,14 +689,14 @@ sub CreateOnePartition{
 			if ($no == 0){
 			     $class = "extended";  
 			} else {
-			    $class = $partType eq $MBR && $no > 4 ? "logical" : "primary";
+			   $class = $partType eq $MBR && $no > 4 ? "logical" : "primary";
 			} 
 			my $fs = "";
 			$fs = $fileSys if $fileSys =~ /ext|fat/;
 			$fs = "linux-swap" if $fileSys eq "swap";
 
-			my @lines = recorder::ReadStream("CreateOnePartition", 
-				"parted -s /dev/$disk unit s mkpart $class $fs ${from}s ${to}s print|");
+         my $cmd = "parted -s /dev/$disk unit s mkpart $class $fs ${from}s ${to}s print|";
+			my @lines = recorder::ReadStream("CreateOnePartition", $cmd);
 			foreach (@lines){
 				if (/^\s*(\d+)\s+(\d+)s\s+(\d+)s/ && $2 == $from && $3 == $to){
 					$newNo = $1;
@@ -756,7 +755,7 @@ sub SectorsOverlap{
 	my $partNo = shift;
 	my $from = shift;
 	my $to = shift;
-	my $info = GetDiskInfo($disk);
+	my $info = ($disk);
 	my $rc = 0;
 	if ($info =~ /:$partNo-/){
 		&basic::Error("partition $partNo already exists");
@@ -852,7 +851,7 @@ sub FindDiskType{
 sub GetPartNosOfDisk{
     my $disk = shift;
     
-    my $parts = GetDiskInfo($disk);
+    my $parts = ($disk);
     my @cols = split(/:/, $parts);
     my @rc;
     foreach(@cols){

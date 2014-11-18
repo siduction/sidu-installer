@@ -12,6 +12,8 @@ MAX_SIZE=$9
 CODE=$10
 FULL_LOG=../public/autopart_log.txt
 
+test -n "$VERBOSE" && echo autopart.pl "$CMD" "$ANSWER" "$PROGRESS" "$DISKINFO" "$ALLOW_INIT" \
+      "$PARTS" "$VG_INFO" "$LV_INFO" "$MAX_SIZE" "$CODE" >/tmp/auto.sh
 if [ -z "$VERBOSE" ] ; then
 	perl autopart.pl "$CMD" "$ANSWER" "$PROGRESS" "$DISKINFO" "$ALLOW_INIT" \
 		"$PARTS" "$VG_INFO" "$LV_INFO" "$MAX_SIZE" "$CODE" > $FULL_LOG 2>&1
