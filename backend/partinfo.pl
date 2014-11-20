@@ -515,6 +515,7 @@ sub GetFdiskInfo{
 				($extMin, $extMax) = ($min, $max);
 			} elsif ($ptype ne "ee"){
 				# ignore extended and protective partitions:
+				$size = int($size * 1.0 * $sectorSize / 1024);
 				$s_devs{$dev} = "size:$size\tptype:$ptype\tpinfo:$info";
 				push(@sectors, sprintf("%012d-%012d-%d", $min, $max, $partno));
 				push(@partNos, $partno);
@@ -524,6 +525,7 @@ sub GetFdiskInfo{
          # older fdisk versions:
 #/dev/sda6       118061056  1000215215   441077080   8e  Linux LVM         
          my ($dev, $partno, $min, $max, $size, $ptype, $info)  = ($1, $2, $3, $4, $5, $6, $7);
+         $size = int($size * 1.0 * $sectorSize / 1024);
          # extended partition?
          if ($ptype == 5){
             $s_extParts{$disk} = "$min-$max";

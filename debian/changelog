@@ -1,3 +1,11 @@
+sidu-installer (2014.11.21) unstable; urgency=medium
+
+  * recognizing partitions with fdisk returns the size in sectors
+    instead of KiByte
+  * closes #1718
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 20 Nov 2014 23:37:37 +0100
+
 sidu-installer (2014.11.20.2) unstable; urgency=medium
 
   * text database updated
