@@ -139,8 +139,8 @@ class MountpointPage(Page):
         content = self._diskInfo.buildInfoSwitch(state)
         body = body.replace("{{INFO}}", content)
         content = ""
-        expert = self._globalPage.getField("expert")
-        if len(self._whyNot) > 0 and expert == "T":
+        isExpert = self.isExpert()
+        if len(self._whyNot) > 0 and isExpert:
             content = self._snippets.get("WHY_NOT")
             content = content.replace("{{TXT_WHY_NOT}}", " ".join(self._whyNot))
         body = body.replace("{{WHY_NOT}}", content)

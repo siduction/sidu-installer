@@ -53,6 +53,10 @@ class PartitionPage(Page):
         state = self.getField("infostate")
         content = self._diskInfo.buildInfoSwitch(state)
         body = body.replace("{{INFO}}", content)
+        contentAutopart = ""
+        if self.isExpert():
+            contentAutopart = self._snippets.get("AUTOPART")
+        body = body.replace("{{AUTOPART}}", contentAutopart)
         return body
     
     def handleExecute(self):

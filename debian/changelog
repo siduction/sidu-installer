@@ -1,3 +1,12 @@
+sidu-installer (2014.11.20) unstable; urgency=medium
+
+  * auto partitioning only in expert mode
+  * some English texts have been cut (file format violated)
+  * closes #1717
+  * dependency: sidu-base: 2014.11.20
+
+ -- J. Hamatoma <hama@siduction.net>  Thu, 20 Nov 2014 01:18:03 +0100
+
 sidu-installer (2014.11.18) unstable; urgency=medium
 
   * auto partitioning: error if 3 primary partitions exists

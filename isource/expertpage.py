@@ -29,8 +29,7 @@ class ExpertPage(Page):
         @param body: the HTML code of the page
         @return: the modified body
         '''
-        currentGlobal = self._globalPage.getField("expert")
-        if currentGlobal == "T":
+        if self.isExpert():
             content = self._snippets.get("UNSET_EXPERT")
         else:
             content = self._snippets.get("SET_EXPERT")
@@ -50,6 +49,7 @@ class ExpertPage(Page):
             self._globalPage.putField('expert', 'F')
         else:
             self.buttonError(button)
+        self._globalPage.putField('.pages', '')
             
         return pageResult
     
