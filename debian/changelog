@@ -1,3 +1,10 @@
+sidu-installer (2015.02.15) unstable; urgency=medium
+
+  * added preinst to make sidu-installer only a live package
+  * closes #1749
+
+ -- Angelescu Ovidiu <convbsd@siduction.org>  Sun, 15 Feb 2015 21:09:03 +0200
+
 sidu-installer (2014.11.21) unstable; urgency=medium
 
   * recognizing partitions with fdisk returns the size in sectors
