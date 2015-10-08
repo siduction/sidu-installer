@@ -1,29 +1,26 @@
 Source: sidu-installer
-Section: web
-Priority: extra
 Maintainer: J. Hamatoma <hama@siduction.net>
 Uploaders: Alf Gaida <agaida@siduction.org>,
- Hendrik Lehmbruch <hendrikl@siduction.org>,
- Ferdinand Thommes <devil@siduction.org>,
-Build-Depends:
- debhelper (>= 9),
- dh-systemd,
- inkscape,
- imagemagick,
-Standards-Version: 3.9.5
-Homepage: http://siduction.org
-Vcs-git:  git://git3@git.siduction.org:code/sidu-installer
+           Hendrik Lehmbruch <hendrikl@siduction.org>,
+           Ferdinand Thommes <devil@siduction.org>
+Section: web
+Priority: extra
+Build-Depends: debhelper (>= 9),
+               dh-systemd,
+               inkscape,
+               imagemagick
+Standards-Version: 3.9.6
 Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
+Vcs-Git: git://git3@git.siduction.org:code/sidu-installer
+Homepage: http://siduction.org
 
 Package: sidu-installer
 Architecture: all
-Pre-Depends:
- fll-installer (>= 2014.01.10),
- sidu-base (>= 2014.11.20),
- pywwetha,
-Depends:
- ${misc:Depends},
- python,
+Depends: ${misc:Depends},
+         python
+Pre-Depends: fll-installer (>= 2014.01.10),
+             sidu-base (>= 2014.11.20),
+             pywwetha
 Description: installer for siduction
  The main content is a set of HTML files describing features, handling
  and tips for siduction.

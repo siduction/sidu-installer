@@ -1,3 +1,10 @@
+sidu-installer (2015.10.09) unstable; urgency=medium
+
+  * modify the restart behavior in postinst to always return 0
+  * beautify debian/control
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 09 Oct 2015 00:11:49 +0200
+
 sidu-installer (2015.02.15) unstable; urgency=medium
 
   * added preinst to make sidu-installer only a live package

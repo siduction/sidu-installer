@@ -57,11 +57,14 @@ case "$1" in
         cd $BASE_SCRIPTS
 		MkLink checkupdate.py $MY_SCRIPTS
 		MkLink packetupdate.py $MY_SCRIPTS
-		
+
 		cd $BASE_BACKEND
         MkLink2 $BASE_BACKEND/automount-control.sh $MY_BACKEND
         MkLink2 /var/cache/sidu-base/public $MY_DIR/installer/static/
-        pywwetha-control restart
+
+        # a fucking service start must not prevail the installation of a
+        # package in no way - therefore it always returns true AG 2015-10-09
+        pywwetha-control restart | true
 
         # useless noop - popd >/dev/null
     ;;
@@ -81,4 +84,3 @@ esac
 #DEBHELPER#
 
 exit 0
-
