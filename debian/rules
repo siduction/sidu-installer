@@ -23,10 +23,10 @@ override_dh_auto_build:
 	mkdir -p icons/pixmaps
 	convert icons/hicolor/32x32/apps/sidu-installer.png icons/pixmaps/sidu-installer.xpm
 	convert icons/hicolor/16x16/apps/sidu-installer.png icons/pixmaps/sidu-installer-16.xpm
-	dh_auto_build 
-	
+	dh_auto_build
+
 override_dh_auto_clean:
 	rm -rf icons/pixmaps
 	rm -rf icons/hicolor
-	find . -name \*.pyc | xargs rm -f
+	find . -name \*.pyc -delete
 	dh_auto_clean

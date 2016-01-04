@@ -5,6 +5,20 @@ sidu-installer (2016.01.04) unstable; urgency=medium
 
  -- J. Hamatoma <hama@siduction.net>  Mon, 04 Jan 2016 22:07:38 +0100
 
+sidu-installer (2015.10.09) unstable; urgency=medium
+
+  * modify the restart behavior in postinst to always return 0
+  * beautify debian/control
+
+ -- Alf Gaida <agaida@siduction.org>  Fri, 09 Oct 2015 00:11:49 +0200
+
+sidu-installer (2015.02.15) unstable; urgency=medium
+
+  * added preinst to make sidu-installer only a live package
+  * closes #1749
+
+ -- Angelescu Ovidiu <convbsd@siduction.org>  Sun, 15 Feb 2015 21:09:03 +0200
+
 sidu-installer (2014.11.21) unstable; urgency=medium
 
   * recognizing partitions with fdisk returns the size in sectors
