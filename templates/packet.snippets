@@ -14,6 +14,11 @@ FOUND_FIRMWARE:
 	{{INSTALLED_FW}}
 	{{FW_SEPARATOR}}
 	{{MISSING_FW}}
+	{{FW_SEPARATOR}}
+	<input type="checkbox" name="dsfg_only" size="1" value='y'
+	onchange="document.getElementById('butactivate').click();">
+	{{packet.txt_dsfg_software}}
+	</input>
 </div>
 
 FW_SEPARATOR:
@@ -54,7 +59,7 @@ SOURCE_FOUND:
 <p>{{packet.txt_contrib_installed}}</p>
 
 SOURCE_MISSED:
-<p><input type="submit" name="button_contrib" value="{{packet.txt_button_contrib}}" /></p>
+<!-- p><input type="submit" name="button_contrib" value="{{packet.txt_button_contrib}}" /></p -->
 
 BUTTON_INSTALL:
 <input type="submit" name="button_inst_{{no}}" value="{{packet.txt_button_install}}" />

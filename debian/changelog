@@ -1,3 +1,10 @@
+sidu-installer (2016.01.04) unstable; urgency=medium
+
+  * new checkbox: only DSFG compliant software
+  * closes #1804
+
+ -- J. Hamatoma <hama@siduction.net>  Mon, 04 Jan 2016 22:07:38 +0100
+
 sidu-installer (2014.11.21) unstable; urgency=medium
 
   * recognizing partitions with fdisk returns the size in sectors

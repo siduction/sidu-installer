@@ -78,7 +78,8 @@ class PacketPage(Page):
         '''Defines the fields of the page.
         This allows a generic handling of the fields.
         '''
-        pass
+        self.addField("dsfg_only", "F", None, "b")
+
         # Hidden fields:
    
     def buildPartOfTable(self, info, what, ixRow = None):
@@ -194,6 +195,8 @@ class PacketPage(Page):
                 self.neighbourOf(self._name, True), 
                 'packet.handleButton')
         elif button == 'button_next':
+            value = self.getField("dsfg_only")
+            self.storeAsGlobal("dsfg_only", "dsfg_only")
             pageResult = self._session.redirect(
                 self.neighbourOf(self._name, False), 
                 'packet.handleButton')
