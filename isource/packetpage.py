@@ -78,7 +78,7 @@ class PacketPage(Page):
         '''Defines the fields of the page.
         This allows a generic handling of the fields.
         '''
-        self.addField("dsfg_only", "F", None, "b")
+        self.addField("free_sw_only", "F", None, "b")
 
         # Hidden fields:
    
@@ -195,8 +195,7 @@ class PacketPage(Page):
                 self.neighbourOf(self._name, True), 
                 'packet.handleButton')
         elif button == 'button_next':
-            value = self.getField("dsfg_only")
-            self.storeAsGlobal("dsfg_only", "dsfg_only")
+            self.storeAsGlobal("free_sw_only", "free_sw_only")
             pageResult = self._session.redirect(
                 self.neighbourOf(self._name, False), 
                 'packet.handleButton')

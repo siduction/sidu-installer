@@ -259,11 +259,10 @@ class RunPage(Page):
         lines.append("HD_AUTO='{:s}'".format(value))
         lines.append("")
 
-        value = self._globalPage.getField("dfsg_only")
-        if value == 'y':
-            lines.append("DSFG_ONLY='Y'")
-            lines.append("")
-            
+        value = self._globalPage.getField("free_sw_only")
+        lines.append("FREE_SW_ONLY='{:s}'".format(value))
+        lines.append("")
+             
         with codecs.open(shellConfig, "w", "utf-8") as fp:
             for line in lines:
                 fp.write(line + "\n")

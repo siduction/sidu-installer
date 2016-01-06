@@ -4,6 +4,10 @@ MAIN:
 	<div class="textblock">
 		<p>{{packet.txt_intro}}</p>
 		<p>{{packet.txt_intro2}}</p>
+		<p><input type="checkbox" name="free_sw_only" size="1" value='y'
+		onchange="document.getElementById('butactivate').click();"/>
+		{{packet.txt_dsfg_software}}
+		</p>
 		{{SOURCES}}
 	</div>
 {{FOUND_FIRMWARE}}
@@ -14,11 +18,6 @@ FOUND_FIRMWARE:
 	{{INSTALLED_FW}}
 	{{FW_SEPARATOR}}
 	{{MISSING_FW}}
-	{{FW_SEPARATOR}}
-	<input type="checkbox" name="dsfg_only" size="1" value='y'
-	onchange="document.getElementById('butactivate').click();">
-	{{packet.txt_dsfg_software}}
-	</input>
 </div>
 
 FW_SEPARATOR:
