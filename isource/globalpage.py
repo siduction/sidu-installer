@@ -48,5 +48,6 @@ class GlobalPage(GlobalBasePage):
         self.addField("mountonboot")
         self.addField("wait.translation")
         self.addField(".pages")
-
+        # F or T
+        self.addField("free_sw_only", "F", None, "b")
         
