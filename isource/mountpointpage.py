@@ -43,6 +43,7 @@ class MountpointPage(Page):
         self.addField("add_mount")
         self.addField("add_mount2")
         self.addField("mountonboot")
+        self.addField("efi_boot")
         self.addField("mounts")
         self.addField("partinfo")
         # fields used by diskinfopage: 
@@ -122,6 +123,15 @@ class MountpointPage(Page):
                 self._session.getConfig("mountpoint.txt_button_text"))
         return body
     
+    def efiPartOfRoot(self):
+        '''Returns the EFI partition of the root partition.
+        @return    None: not available or not a EFI system<br>
+                   the EFI partition, e.g. "sda1" 
+        '''
+        rootDev = self._globalPage.getField("root")
+        rc = self._diskInfo.efiPartOfRoot(rootDev)
+        return rc
+        
     def changeContent(self, body):
         '''Changes the template in a customized way.
         @param body: the HTML code of the page
@@ -129,6 +139,17 @@ class MountpointPage(Page):
         '''
         body = self.handleSelectors(body)
         body = self.fillStaticSelected("mountonboot", body)
+        if self.efiPartOfRoot() != None:
+            value = self._session.getConfig("mountpoint.opts_mountonboot")
+            texts = value[1:].split(value[:1])
+            values = ["yes", "no"]
+            disabled = ""
+        else:
+            texts = [self._session.getConfig("mountpoint.txt_efi_impossible")]
+            values = None
+            disabled = "disabled"
+        body = self.fillDynamicSelected('efi_boot', texts, values, body)
+        body = body.replace("{{efi_boot_disabled}}", disabled)
         devs = self._diskInfo.getMountPartitions(self._mountRows)[0]
         body = self.fillDynamicSelected("add_dev", devs, None, body)
         self._mounts = ""
@@ -162,8 +183,6 @@ class MountpointPage(Page):
             points += ";" + dev + ":" + point
             self._globalPage.putField("mountpoint.list", points)
             self.initMounts()
-            
-        
     
     def handleButton(self, button):
         '''Do the actions after a button has been pushed.
@@ -199,6 +218,11 @@ class MountpointPage(Page):
                 "mountpoint.handleButton")
         elif button == "button_next":
             self.storeAsGlobal("mountonboot", "mountonboot")
+            value = ""
+            if self.getField("efi_boot") == "yes":
+                value = self.efiPartOfRoot()
+            self._session.log("efi_boot: " + value)
+            self._globalPage.putField("efi_boot", value)
             pageResult = self._session.redirect(
                 self.neighbourOf(self._name, False), 
                 "mountpoint.handleButton")

@@ -50,4 +50,5 @@ class GlobalPage(GlobalBasePage):
         self.addField(".pages")
         # F or T
         self.addField("free_sw_only", "F", None, "b")
+        self.addField("efi_boot")
         

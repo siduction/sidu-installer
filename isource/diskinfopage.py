@@ -122,6 +122,7 @@ class DiskInfoPage(Page):
         self._freePV = []
         self._volumeGroupList = []
         self._volumeGroups = {}
+        self._isEfi = False
         # flavour, arch, version
         self._osInfo = ("nox", "32", "13.2");
         self._filePartInfo = session.getConfigWithoutLanguage(
@@ -143,6 +144,22 @@ class DiskInfoPage(Page):
                 if now - ftime > 30:
                     self.buildInfoFile()
 
+    def efiPartOfRoot(self, bootDev):
+        '''Returns the EFI boot partition of the disk or None
+        @param bootDev  the partition for the root filesystem, e.g. sda1 
+        @return         True: System is able too boot with EFI
+        '''
+        rc = None
+        if self._isEfi and self.hasGPT(bootDev):
+            prefix = self.getDiskOfPartition(bootDev)
+            for dev in self._partitions:
+                if dev.startswith(prefix):
+                    part = self._partitions[dev]
+                    if part._partType == "EF00":
+                        rc = dev
+                        break
+        return rc
+        
     def reload(self):
         '''The partition info will be requested again.
         '''
@@ -231,6 +248,8 @@ class DiskInfoPage(Page):
                     pass
                 elif line.startswith("!GPT="):
                     self._gptDisks = line[5:]
+                elif line.startswith("!IsEfi="):
+                    self._isEfi = line[7:] == 't'
                 elif line.startswith("!labels="):
                     self._labels = self.autoSplit(line[8:])
                 elif line.startswith("!VG="):
@@ -400,7 +419,7 @@ class DiskInfoPage(Page):
              False: otherwise
         '''
         disk = self._disks[self.getDiskOfPartition(partition)]
-        rc = disk._attr.find("gpt") >= 0
+        rc = disk._attr.find("gpt") >= 0 or disk._class.find("gpt") >= 0
         return rc
 
     def buildPartOfTable(self, info, what, ixRow = None):

@@ -47,8 +47,11 @@ MAIN:
 			{{body_mountonboot}}
 			</select>
 		</td>
-		<td>{{mountpoint.txt_desc_mount_on_boot}}</td>
-		<td>&nbsp;</td>
+		<td>{{mountpoint.txt_efi_boot}}</td>
+		<td><select name="efi_boot" size="1" {{efi_boot_disabled}}>
+			{{body_efi_boot}}
+			</select>
+		</td>
 		<td>&nbsp;</td>
 	</tr>
 </table>

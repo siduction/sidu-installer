@@ -108,6 +108,8 @@ sub Main{
 	foreach $dev (@sorted){
 		&Out("$dev\t$s_blkids{$dev}");
 	}
+	# isefi.mrk is for emulation (debugging)
+	&Out("!IsEfi=" . (-e "/sys/firmware/efi/efivars" || -e "/etc/sidu-base/isefi.mrk" ? "t" : "f"));
 	&Out("!phDisk=" . JoinPhysicalDiskInfo());
 	&Out("!labels=;" . join(";", @s_labels));
 	my $val = "!VG=";
@@ -783,6 +785,7 @@ sub MergeDevs{
 		} else {
 			my $size = "\t$1" if $val =~ /(size:\d+)/;
 			my $ptype = "\t$1" if $val =~ /(id:\w+)/;
+			my $ptype = "\t$1" if $val =~ /(ptype:\w+)/;
 			my $info2 = "\t$1" if $val =~ /(pinfo:[^\t]+)/;
 			$s_blkids{$dev} = "$info$size$ptype$info2";
 		}

@@ -236,6 +236,10 @@ class RunPage(Page):
         lines.append("# Possible are: grub")
         lines.append("# Default value is: grub")
         lines.append("BOOT_LOADER='{:s}'".format(value))
+        lines.append("# Use (U)EFI for boot process")
+        lines.append("# Possible: '' or <efi_device>, e.g. 'sdb1'")
+        value = self._globalPage.getField("efi_boot")
+        lines.append("EFI_BOOT='{:s}'".format(value))
         lines.append("")
 
         lines.append("# If set to 'yes' a boot disk will be created! (AFAIK this doesnt work anymore)")
