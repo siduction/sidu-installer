@@ -1,3 +1,9 @@
+sidu-installer (2016.01.9.2) unstable; urgency=medium
+
+  * Careless mistakes: pyhton errors in diskinfopage
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 09 Jan 2016 09:33:07 +0100
+
 sidu-installer (2016.01.09) unstable; urgency=medium
 
   * vdX is a possible device name

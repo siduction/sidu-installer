@@ -420,8 +420,8 @@ class DiskInfoPage(Page):
         '''
         rc = False
         dev = self.getDiskOfPartition(partition)
-        if self._disks.contains(dev):
-            disk = self._disks[value]
+        if dev in self._disks:
+            disk = self._disks[dev]
             rc = disk._attr.find("gpt") >= 0 or disk._class.find("gpt") >= 0
         return rc
 
