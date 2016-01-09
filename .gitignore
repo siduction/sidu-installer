@@ -48,4 +48,5 @@ backend/D
 .coverage
 backend/sdc_partinfo.pl
 util/
+fll-installer
 

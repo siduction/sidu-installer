@@ -144,20 +144,19 @@ class DiskInfoPage(Page):
                 if now - ftime > 30:
                     self.buildInfoFile()
 
-    def efiPartOfRoot(self, bootDev):
-        '''Returns the EFI boot partition of the disk or None
+    def efiPartition(self):
+        '''Returns the first EFI boot partition of all detected disks
         @param bootDev  the partition for the root filesystem, e.g. sda1 
-        @return         True: System is able too boot with EFI
+        @return         None: No EFI partition found or not booted using EFI<br>
+                        otherwise: the first EFI partition
         '''
         rc = None
-        if self._isEfi and self.hasGPT(bootDev):
-            prefix = self.getDiskOfPartition(bootDev)
+        if self._isEfi:
             for dev in self._partitions:
-                if dev.startswith(prefix):
-                    part = self._partitions[dev]
-                    if part._partType == "EF00":
-                        rc = dev
-                        break
+                part = self._partitions[dev]
+                if part._partType == "EF00":
+                    rc = dev
+                    break
         return rc
         
     def reload(self):

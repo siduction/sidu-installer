@@ -12,7 +12,6 @@ class MountpointPage(Page):
     Handles the page allowing changing the partitions.
     '''
 
-
     def __init__(self, session):
         '''
         Constructor.
@@ -123,13 +122,12 @@ class MountpointPage(Page):
                 self._session.getConfig("mountpoint.txt_button_text"))
         return body
     
-    def efiPartOfRoot(self):
+    def efiPartition(self):
         '''Returns the EFI partition of the root partition.
         @return    None: not available or not a EFI system<br>
                    the EFI partition, e.g. "sda1" 
         '''
-        rootDev = self._globalPage.getField("root")
-        rc = self._diskInfo.efiPartOfRoot(rootDev)
+        rc = self._diskInfo.efiPartition()
         return rc
         
     def changeContent(self, body):
@@ -139,7 +137,7 @@ class MountpointPage(Page):
         '''
         body = self.handleSelectors(body)
         body = self.fillStaticSelected("mountonboot", body)
-        if self.efiPartOfRoot() != None:
+        if self.efiPartition() != None:
             value = self._session.getConfig("mountpoint.opts_mountonboot")
             texts = value[1:].split(value[:1])
             values = ["yes", "no"]
@@ -220,7 +218,7 @@ class MountpointPage(Page):
             self.storeAsGlobal("mountonboot", "mountonboot")
             value = ""
             if self.getField("efi_boot") == "yes":
-                value = self.efiPartOfRoot()
+                value = self.efiPartition()
             self._session.log("efi_boot: " + value)
             self._globalPage.putField("efi_boot", value)
             pageResult = self._session.redirect(
