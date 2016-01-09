@@ -407,7 +407,7 @@ class DiskInfoPage(Page):
                 otherwise: the disk containing the partition
         '''
         rc = None
-        matcher = re.match(r"(sd[a-z])\d", partition)
+        matcher = re.match(r"([vs]d[a-z])\d", partition)
         if matcher != None:
             rc = matcher.group(1)
         return rc
@@ -418,8 +418,11 @@ class DiskInfoPage(Page):
          @return True: the partition is on a GPT disk<br>
              False: otherwise
         '''
-        disk = self._disks[self.getDiskOfPartition(partition)]
-        rc = disk._attr.find("gpt") >= 0 or disk._class.find("gpt") >= 0
+        rc = False
+        dev = self.getDiskOfPartition(partition)
+        if self._disks.contains(dev):
+            disk = self._disks[value]
+            rc = disk._attr.find("gpt") >= 0 or disk._class.find("gpt") >= 0
         return rc
 
     def buildPartOfTable(self, info, what, ixRow = None):

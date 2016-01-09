@@ -1,3 +1,10 @@
+sidu-installer (2016.01.09) unstable; urgency=medium
+
+  * vdX is a possible device name
+  * avoiding error on retrieving partitions
+
+ -- J. Hamatoma <hama@siduction.net>  Sat, 09 Jan 2016 03:19:36 +0100
+
 sidu-installer (2016.01.08) unstable; urgency=medium
 
   (U)efi support
