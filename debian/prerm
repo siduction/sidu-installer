@@ -6,35 +6,25 @@ if grep -q $PROJ /etc/hosts ; then
 	echo "virtual host removed: $PROJ"
 fi
 
-# delete the links from the sidu-base:
-function RmLink(){
-	if [ -L $1 ] ; then
-		rm -f $1
-	fi
-}
-pushd /usr/share/$PROJ >/dev/null
 
-RmLink installer/static/public
-RmLink backend/automount-control.sh
+rm -rf /usr/share/sidu-installer
 
-# Remove the links to the shellserver:
-cd /usr/share/sidu-base/scripts
-RmLink checkupdate.py
-RmLink packetupdate.py
-cd /usr/share/sidu-base/backend
-RmLink install.sh
-RmLink partinfo.pl
-RmLink partinfo.sh
-RmLink timezoneinfo.sh
-RmLink firmware.sh
-RmLink firmware.pl
-RmLink nonfree.sh
-RmLink autopart.sh
-RmLink autopart.pl
+rm -f /usr/share/sidu-base/scripts/checkupdate.py
+rm -f /usr/share/sidu-base/scripts/packetupdate.py
 
-popd >/dev/null
+rm -f /usr/share/sidu-base/backend/automount-control.sh
+rm -f /usr/share/sidu-base/backend/install.sh
+rm -f /usr/share/sidu-base/backend/partinfo.pl
+rm -f /usr/share/sidu-base/backend/partinfo.sh
+rm -f /usr/share/sidu-base/backend/timezoneinfo.sh
+rm -f /usr/share/sidu-base/backend/firmware.sh
+rm -f /usr/share/sidu-base/backend/firmware.pl
+rm -f /usr/share/sidu-base/backend/nonfree.sh
+rm -f /usr/share/sidu-base/backend/autopart.sh
+rm -f /usr/share/sidu-base/backend/autopart.pl
 
-# Debhelpertoken added, review needed
+rm -rf /var/cache/sidu-base/shellserver-tasks
+rm -f  /var/cache/sidu-base/*
 
 #DEBHELPER#
 

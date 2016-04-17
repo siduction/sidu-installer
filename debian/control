@@ -9,10 +9,9 @@ Build-Depends: debhelper (>= 9),
                dh-systemd,
                inkscape,
                imagemagick
-Standards-Version: 3.9.6
-Vcs-Browser: http://git.siduction.org/?p=code/sidu-installer.git
-Vcs-Git: git://git3@git.siduction.org:code/sidu-installer
-Homepage: http://siduction.org
+Standards-Version: 3.9.7
+Vcs-Browser: http://git.siduction.org/summary/base!siduction-settings.git
+Vcs-Git: http://git.siduction.org/r/base/siduction-settings.git
 
 Package: sidu-installer
 Architecture: all

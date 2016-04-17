@@ -1,3 +1,16 @@
+sidu-installer (2016.04.18.1) unstable; urgency=medium
+
+  * some more cleanup
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 18 Apr 2016 01:16:41 +0200
+
+sidu-installer (2016.04.18) unstable; urgency=medium
+
+  * remove installer debris 
+  * bump standards
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 18 Apr 2016 00:46:42 +0200
+
 sidu-installer (2016.01.9.3) unstable; urgency=medium
 
   * an EFI partition may be on any disk
