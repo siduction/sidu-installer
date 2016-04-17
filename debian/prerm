@@ -23,8 +23,8 @@ rm -f /usr/share/sidu-base/backend/nonfree.sh
 rm -f /usr/share/sidu-base/backend/autopart.sh
 rm -f /usr/share/sidu-base/backend/autopart.pl
 
-rm -rf /var/cache/sidu-base/shellserver-tasks
-rm -f  /var/cache/sidu-base/*
+rm -rf /var/cache/sidu-base/*
+mkdir -p /var/cache/sidu-base/public
 
 #DEBHELPER#
 

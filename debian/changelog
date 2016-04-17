@@ -1,3 +1,9 @@
+sidu-installer (2016.04.18.2) unstable; urgency=medium
+
+  * fix cleanup 
+
+ -- Alf Gaida <agaida@siduction.org>  Mon, 18 Apr 2016 01:41:11 +0200
+
 sidu-installer (2016.04.18.1) unstable; urgency=medium
 
   * some more cleanup
