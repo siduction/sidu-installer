@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 9),
                dh-systemd,
                inkscape,
                imagemagick
-Standards-Version: 3.9.7
+Standards-Version: 3.9.8
 Vcs-Browser: http://git.siduction.org/summary/base!siduction-settings.git
 Vcs-Git: http://git.siduction.org/r/base/siduction-settings.git
 
@@ -17,7 +17,7 @@ Package: sidu-installer
 Architecture: all
 Depends: ${misc:Depends},
          python
-Pre-Depends: fll-installer (>= 2014.01.10),
+Pre-Depends: fll-installer,
              sidu-base (>= 2014.11.20),
              pywwetha
 Description: installer for siduction
