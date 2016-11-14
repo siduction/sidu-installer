@@ -5,7 +5,7 @@ Uploaders: Alf Gaida <agaida@siduction.org>,
            Ferdinand Thommes <devil@siduction.org>
 Section: web
 Priority: extra
-Build-Depends: debhelper (>= 9),
+Build-Depends: debhelper (>= 10),
                dh-systemd,
                inkscape,
                imagemagick
