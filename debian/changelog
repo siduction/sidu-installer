@@ -1,3 +1,9 @@
+sidu-installer (2016.12.19) unstable; urgency=medium
+
+  * noch nen upload zur Übung - dput war kaputt
+
+ -- Alf Gaida <agaida@siduction.org>  Sun, 18 Dec 2016 18:49:31 +0100
+
 sidu-installer (2016.12.18) unstable; urgency=medium
 
   * disc-center removed from update check
