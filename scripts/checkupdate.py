@@ -29,7 +29,9 @@ class UpdateTester:
         self._currentVersion = dict()
         self._availableVersion = dict()
         self._packets = ["fll-installer", "pywwetha", "sidu-base", 
-                         "sidu-installer", "sidu-disk-center"]
+                         "sidu-installer"]
+        ''', "sidu-disk-center"] removed from list of needed packages by musca, 2016/12/18 
+        '''
         
     def testNetwork(self):
         '''Tests whether the network is working.
